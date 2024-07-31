@@ -21,3 +21,4 @@ yarn-error.log*
 *.bak
 *.dat
 *.dir
+*.db
