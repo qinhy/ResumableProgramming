@@ -831,7 +831,7 @@ with shelve.open('machine_cache.db') as db:
 
 - **Recording Machine Action**: if actions are relatively simple, the state is large or complex, or if you benefit from having an audit trail of actions. This method is preferable when actions are cheap to replay, or when the system's design allows for efficient state reconstruction.
 
-### Additional Notes:
+### Additional Notes
 - **Databases**: As the examples above show, we indeed need persistent storage (or a database) to save our states for resumability and to manage our states. We can use both SQL (such as PostgreSQL's support for transactional states) and NoSQL technologies (such as MongoDB's document-based storage, which can be effectively used for maintaining state), which we will discuss in the next chapter.
 
 - **Message Queues**: Message queues can be used to send commands, events, etc., which will be useful for controlling resumable machine clusters over the internet. Tools like RabbitMQ or Kafka can manage tasks in a resumable fashion by decoupling task submission from execution.
@@ -1233,7 +1233,7 @@ if __name__ == '__main__':
 
     - **Action and State Recovery**: Every significant action performed on `MachineA` triggers a corresponding update to the database. This method ensures that the machine's state is continually recorded. If an unexpected shutdown or failure occurs, the system can revert to or resume from the last successfully recorded state. This functionality is critical for maintaining the continuity and reliability of operations, especially in automated or semi-automated systems.
 
-  - Additional Notes:
+  - Additional Notes
     - **Complexity**: Managing state with transactions adds a layer of complexity to system design (especially **table design**). Developers must carefully handle transaction scopes, ensure proper rollback on failures, and maintain database performance under high-throughput conditions. Thorough testing is required to ensure the system behaves as expected under various failure scenarios.
     - **Advanced Tool: Using SQLAlchemy**: To manage database interactions more robustly and elegantly, SQLAlchemy, an SQL toolkit and Object-Relational Mapping (ORM) system for Python, can be employed. SQLAlchemy provides a high-level abstraction to interact with the database, allowing developers to write Pythonic code rather than SQL queries. It supports a wide range of SQL constructs, transaction management, and automatic rollback mechanisms, which are ideal for implementing complex transactional logic required in resumable systems.
       ```python
@@ -1582,7 +1582,7 @@ if __name__ == '__main__':
 - **Summary**: Evaluate the pros and cons of each database type for resumable applications.
 - **Future Outlook**: Consider future database technologies and trends.
 
-### Additional Notes:
+### Additional Notes
 - ...
 
 ## Chapter 4: Design Pattern of Model-View-Controller (MVC)
@@ -2235,7 +2235,7 @@ The application of the MVC design pattern in your script allows for well-organiz
 - **Ease of Maintenance and Extendibility**: The clear division makes it easier to update and maintain the code. For example, adding new features, such as additional machine actions or different recovery strategies, can be done with minimal impact on the existing code structure.
 - **Testability**: The separation allows for more straightforward unit testing of individual components, especially the business logic in the controller and the state management in the model.
 
-### Additional Notes:
+### Additional Notes
 
 - **Consideration of MachineAModel (Model)**:
    - Represents a virtual machine with attributes for orientation, position, and a list of actions.
@@ -2494,38 +2494,38 @@ class FailureState(TaskState):
 
 print('```')
 # Example Usage 1
-task = Task()
+network_task = Task()
 
 # try invalid transition
 # task.complete() 
 
-task.info()
-task.approve()
-task.info()
-task.execute()
-task.info()
-task.complete()
-task.info()
+network_task.info()
+network_task.approve()
+network_task.info()
+network_task.execute()
+network_task.info()
+network_task.complete()
+network_task.info()
 
 
 # Example Usage 2
 tasks = [Task() for i in range(10)]
-for i,task in enumerate(tasks):
+for i,network_task in enumerate(tasks):
     print(f'{i}:')
 
     ii = 1
     print(f'try No.{ii}:')
-    task.approve()
-    task.execute()
-    task.complete()
+    network_task.approve()
+    network_task.execute()
+    network_task.complete()
 
-    while task.is_failure():
-        task.recover()
+    while network_task.is_failure():
+        network_task.recover()
         ii += 1
         print(f'try No.{ii}:')
-        task.approve()
-        task.execute()
-        task.complete()
+        network_task.approve()
+        network_task.execute()
+        network_task.complete()
 print('```')
 ```
 
@@ -2607,7 +2607,7 @@ This example involves very simple sequential tasks, meaning its states and trans
 from collections import deque
 
 # Define the state transitions with the additional states
-states = [
+_states = [
     'init','connected','close','loss','waiting','failure','talk'
     ]
 transitions = {
@@ -2800,17 +2800,17 @@ class CommunicationState(NetworkState):
 
 ```python
 # Example usage
-task = NetworkTask()
-print(f'State: {task.current_state()}')  # State: Initiation
+network_task = NetworkTask()
+print(f'State: {network_task.current_state()}')  # State: Initiation
 
-task.waiting()  # Transition to Waiting 
-print(f'State: {task.current_state()}')  # State: Connection Established or False!!
+network_task.waiting()  # Transition to Waiting 
+print(f'State: {network_task.current_state()}')  # State: Connection Established or False!!
 
-task.communication()  # Transition to Connection
-print(f'State: {task.current_state()}')  # State: Communication or Connection Lost !!
+network_task.communication()  # Transition to Connection
+print(f'State: {network_task.current_state()}')  # State: Communication or Connection Lost !!
 
-task.closure()  # Transition to Initiation
-print(f'State: {task.current_state()}')  # State: Initiation
+network_task.closure()  # Transition to Initiation
+print(f'State: {network_task.current_state()}')  # State: Initiation
 ```
 
 ```python
@@ -2942,7 +2942,7 @@ print('```')
 ```python
 print('```')
 # Example usage
-task = NetworkTask()
+network_task = NetworkTask()
 target_state = CommunicationState
 
 print(f'Set target state: {target_state}')
@@ -2953,16 +2953,16 @@ def next_action(task:NetworkTask,target_state):
     return path[1]
     
 #In practice, it is better to set a maximum number for attempts.
-while task.current_state() != target_state:
-    cls = next_action(task,target_state)
+while network_task.current_state() != target_state:
+    cls = next_action(network_task,target_state)
     if cls is None:raise ValueError('no next acion! unreachable!')
 
     cls_str = class_str_map[cls]
     method_str = class_methodstr_map[cls_str]
-    print(f'Current: {class_str_map[task.current_state()]}, try {method_str}')
-    getattr(task,method_str)()
+    print(f'Current: {class_str_map[network_task.current_state()]}, try {method_str}')
+    getattr(network_task,method_str)()
     
-print(f'Success to target state: {task.current_state()}')
+print(f'Success to target state: {network_task.current_state()}')
 print('```')
 ```
 
@@ -3017,12 +3017,192 @@ This code defines the state transitions and uses a breadth-first search algorith
 
 In summary, FSMs are invaluable for managing state transitions in resumable systems. They provide a clear and structured approach to handling various states and transitions, ensuring that systems can pause and resume operations without losing context or consistency. This example demonstrates how FSMs can be applied to a network connection recovery system, highlighting their practical utility and importance.
 
-### Conclusion
-- **Summary**: Highlight how state machines can simplify resumability challenges.
 - **Future Outlook**: Look at evolving uses of state machines in software development.
 
-### Additional Notes:
-- ...
+### Conclusion
+
+- **Summary**: Finite State Machines (FSMs) are a powerful and versatile tool for managing state transitions in both simple and complex systems. By defining clear states, transitions, and actions, FSMs offer a systematic approach to handling various conditions and events within a system. This design pattern is particularly beneficial for resumable systems, where the ability to pause and resume operations without losing context or consistency is crucial.
+
+- **Future Outlook**: 
+    - **Encapsulation of State Behavior**: Each state class encapsulates specific behaviors and transitions, making the system easier to understand and modify.
+    - **Ease of Modification**: Changes to state behavior or transitions can be made within individual state classes, simplifying maintenance.
+    - **Error Handling**: FSMs prevent invalid transitions through built-in error handling mechanisms, enhancing the robustness of the system.
+
+By implementing FSMs, developers can create more robust, error-resistant, and maintainable systems. Whether managing user interfaces, network protocols, or workflow processes, FSMs provide a clear and structured approach to state management. As demonstrated, FSMs not only improve system reliability and performance but also ensure that resumable systems can handle interruptions gracefully, **resuming** operations seamlessly from the last recorded state.
+
+### Additional Notes
+- **Advanced State Machine Patterns**:
+   - While this chapter covers the basics, there are advanced patterns such as hierarchical state machines (HSM) and statecharts that can further enhance the capabilities of FSMs. These patterns allow for more complex state hierarchies and transitions, useful in large-scale systems.
+
+- **State Machine Libraries**:
+   - Various programming languages offer robust libraries and frameworks to implement state machines efficiently. For example, `transitions` in Python, `StateMachine` in JavaScript, and `Boost.Statechart` in C++. Leveraging these libraries can save time and reduce errors.
+
+- **Documentation and Visualization**:
+   - Documenting the state machine design with diagrams (e.g., state diagrams or flowcharts) helps in understanding and maintaining the system. Visualization tools can generate these diagrams automatically from the state machine code.
+
+- **Concurrency and State Machines**:
+   - In multi-threaded or distributed systems, managing concurrency with state machines can be challenging. Techniques such as locking mechanisms, state machine replicas, or distributed state management should be considered.
+
+- **Event-Driven Architectures**:
+   - State machines are a natural fit for event-driven architectures. They can be integrated with event queues, message brokers, or reactive programming frameworks to handle asynchronous events efficiently.
+
+- **Integration with Other Design Patterns**:
+   - State machines often work well in combination with other design patterns like Singleton (for a single instance of the state machine), Observer (for notifying state changes), and Strategy (for state-specific behavior).
+
+Let's try `transitions` in Python as following example:
+
+
+```python
+from dataclasses import dataclass
+from transitions import Machine
+import random
+import time
+
+
+class NetworkTask:
+    @dataclass
+    class States:
+        Initiation='Initiation'
+        ConnectionEstablished='ConnectionEstablished'
+        Closure='Closure'
+        ConnectionLost='ConnectionLost'
+        Waiting='Waiting'
+        Failure='Failure'
+        Communication='Communication'
+    _transitions = {
+        States.Initiation:            [States.Waiting],
+        States.ConnectionEstablished: [States.ConnectionLost,States.Communication,States.Closure],
+        States.Closure:               [States.Initiation],
+        States.ConnectionLost:        [States.Initiation],
+        States.Waiting:               [States.ConnectionEstablished,States.Failure],
+        States.Failure:               [States.Initiation],
+        States.Communication:         [States.Closure,States.ConnectionLost,States.Communication]
+    }
+    _states = list(_transitions.keys())
+
+    def __init__(self):
+        self.machine = Machine(model=self, states=NetworkTask._states, initial=NetworkTask.States.Initiation)
+        for source,v in self._transitions.items():
+            for dest in v:
+                self.machine.add_transition(source=source,dest=dest,trigger=f'to_{dest}')
+
+        self.to_Waiting()
+
+    def to_Waiting(self):
+        self.simulate_waiting()
+
+    def to_Communication(self):
+        self.simulate_communication()
+        
+    def simulate_waiting(self):
+        time.sleep(1)
+        if random.random() <= 0.5:
+            # function of to_ConnectionEstablished is auto set by lib
+            self.to_ConnectionEstablished()
+        else:
+            # function of to_Failure is auto set by lib
+            self.to_Failure()
+    
+    def simulate_communication(self):
+        self.state = NetworkTask.States.Waiting
+        time.sleep(1)
+        if random.random() <= 0.3:
+            self.state = NetworkTask.States.Communication
+        elif random.random() <= 0.6:
+            # function of to_ConnectionLost is auto set by lib
+            self.to_ConnectionLost()
+        else:
+            
+            self.to_Failure()
+
+    def get_transitions(self):
+        return self._transitions
+
+print('```')
+# Example usage
+network_task = NetworkTask()
+if network_task.state == 'ConnectionEstablished':
+    network_task.simulate_communication()
+print(network_task.state)
+
+
+print();print()
+# Example find_path
+from collections import deque
+def find_path(transitions:dict, start_state, end_state):
+    queue = deque([[start_state]])    
+    visited = set()    
+    while queue:
+        path = queue.popleft()
+        state = path[-1]        
+        if state == end_state:
+            return path
+        if state not in visited:
+            visited.add(state)            
+            next_states = transitions.get(state, [])
+            for next_state in next_states:
+                new_path = list(path)
+                new_path.append(next_state)
+                queue.append(new_path)
+    return []
+
+start_state = NetworkTask.States.Failure
+end_state   = NetworkTask.States.Communication
+path        = find_path(network_task.get_transitions(), start_state, end_state)
+print(f"Path from {start_state} to {end_state} : "+' -> '.join([p for p in path]))
+
+
+print();print()
+# Example resumability
+network_task = NetworkTask()
+target_state = NetworkTask.States.Communication
+print(f'Set target state: {target_state} ( current is {network_task.state})')
+def next_action(task:NetworkTask,target_state):
+    path = find_path(network_task.get_transitions(), task.state, target_state)
+    if len(path)<=1: return None
+    return path[1]
+    
+#In practice, it is better to set a maximum number for attempts.
+while network_task.state != target_state:
+    cls = next_action(network_task,target_state)
+    if cls is None:raise ValueError('no next acion! unreachable!')
+    
+    print(f'Current: {network_task.state}, try to_{cls}')
+    getattr(network_task,f'to_{cls}')()
+
+print(f'Success to target state: {network_task.state}')
+
+print('```')
+```
+
+    ```
+    ConnectionLost
+    
+    
+    Path from Failure to Communication : Failure -> Initiation -> Waiting -> ConnectionEstablished -> Communication
+    
+    
+    Set target state: Communication ( current is Failure)
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: ConnectionEstablished, try to_Communication
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: Failure, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: ConnectionEstablished, try to_Communication
+    Current: ConnectionLost, try to_Initiation
+    Current: Initiation, try to_Waiting
+    Current: ConnectionEstablished, try to_Communication
+    Success to target state: Communication
+    ```
+    
 
 ---
 
