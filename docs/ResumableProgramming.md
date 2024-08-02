@@ -592,13 +592,13 @@ class MachineA:
     def turn_left(self, degrees):
         # Turn the machine left by a certain degree
         self.orientation = (self.orientation + degrees) % 360
-        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def turn_right(self, degrees):
         # Turn the machine right by a certain degree
         self.orientation = (self.orientation - degrees) % 360
-        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def move_forward(self, distance):
@@ -606,7 +606,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] += distance * math.cos(radian)  # x position changes
         self.position[1] += distance * math.sin(radian)  # y position changes
-        print(f"Moved forward {distance} distance. New position: {self.position}",'\n')
+        print(f"Moved forward {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def move_backward(self, distance):
@@ -614,7 +614,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] -= distance * math.cos(radian)  # x position changes
         self.position[1] -= distance * math.sin(radian)  # y position changes
-        print(f"Reversed {distance} distance. New position: {self.position}",'\n')
+        print(f"Reversed {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def get_machine_state(self):
@@ -622,7 +622,7 @@ class MachineA:
     
     def random_crash(self):
         if random.random() > 0.6:
-            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!','\n')
+            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!')
             self.reset()
             return False
         else:
@@ -632,34 +632,36 @@ class MachineA:
         # Reset the machine to the initial state
         self.orientation = 0
         self.position = [0, 0]
-        print("Machine has been reset to the 0,(0,0) state.",'\n')
+        print("Machine has been reset to the 0,(0,0) state.")
 
 # Example of using MachineA
+print('```')
 machine = MachineA()
 machine.turn_left(90)
 machine.move_forward(10)
-print(machine.get_machine_state(),'\n')
+print(machine.get_machine_state())
 machine.turn_right(90)
 machine.move_backward(5)
-print(machine.get_machine_state(),'\n')
+print(machine.get_machine_state())
+print('```')
 ```
 
-    Turned left 90 degrees. New orientation: 90 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    (90, [6.123233995736766e-16, 10.0]) 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Reversed 5 distance. New position: [-5.0, 0.0] 
-    
-    (0, [-5.0, 0.0]) 
-    
+    ```
+    Turned left 90 degrees. New orientation: 90
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Moved forward 10 distance. New position: [10.0, 0.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    (0, [0, 0])
+    Turned right 90 degrees. New orientation: 270
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Reversed 5 distance. New position: [-5.0, 0.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    (0, [0, 0])
+    ```
     
 
 The machine in the code shows unstable movements, making it very hard to reach the goal axis of (-5, 10). In production systems, obviously, users will hate losing their previous work and ending up in an unexpected state, which is not the goal.
@@ -673,6 +675,7 @@ let us make a simple "Resumable Implementation" as following:
 import shelve  # Used for simple key-value pair storage
 with shelve.open('machine_cache.db') as db:
     
+    print('```')
     machine = MachineA()
     db['machine_state'] = machine.get_machine_state() # reord
     
@@ -694,39 +697,32 @@ with shelve.open('machine_cache.db') as db:
         machine = MachineA(*db['machine_state'])
     db['machine_state'] = machine.get_machine_state()
         
-    print(machine.get_machine_state())
+    print(machine.get_machine_state())    
+    print('```')
     
 # The second way is to record the action name and its arguments as a "state" after performing each action. 
 ```
 
-    Turned left 90 degrees. New orientation: 90 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
+    ```
+    Turned left 90 degrees. New orientation: 90
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Turned left 90 degrees. New orientation: 90
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Turned left 90 degrees. New orientation: 90
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
     (90, [6.123233995736766e-16, 10.0])
-    Turned right 90 degrees. New orientation: 0 
-    
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0] 
-    
+    Turned right 90 degrees. New orientation: 0
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
+    ```
     
 
 - **Fist Way: Recording Machine State After Each Action**: This approach saves the entire state of the machine after each action using a key-value store. When an action results in a crash, the machine's state is restored from the last successful operation, and the action is retried.
@@ -761,6 +757,7 @@ def redo_actions(machine_class,action_list):
 
 with shelve.open('machine_cache.db') as db:
     
+    print('```')
     machine = MachineA()
     db['machine_state'] = []
 
@@ -783,140 +780,25 @@ with shelve.open('machine_cache.db') as db:
     db['machine_state'] = db['machine_state'] + [('move_backward',5)]
         
     print(machine.get_machine_state())
-    
+    print('```')
 # The second way is to record the action name and its arguments as a "state" after performing each action. 
 ```
 
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
+    ```
+    Turned left 90 degrees. New orientation: 90
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
     (90, [6.123233995736766e-16, 10.0])
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
+    Turned right 90 degrees. New orientation: 0
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
     turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
+    Turned left 90 degrees. New orientation: 90
     move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    turn_left 90
-    Turned left 90 degrees. New orientation: 90 
-    
-    move_forward 10
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0] 
-    
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    Turned right 90 degrees. New orientation: 0
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
+    ```
     
 
 - **Second Way: Recording Actions and Arguments as State**: In this method, we record each action and its parameters. Upon a crash, the machine is reinitialized, and all recorded actions are replayed to restore the last known good state before attempting to continue from the point of failure.
@@ -1077,14 +959,14 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print(e,'\n')
+        print(e)
     return conn
 
 def execute_transaction(conn):
     try:
         # start a transaction
         conn.execute('BEGIN TRANSACTION;')
-        print("Transaction started.",'\n')
+        print("Transaction started.")
         
         # create table
         conn.execute('''CREATE TABLE IF NOT EXISTS Users (
@@ -1098,60 +980,56 @@ def execute_transaction(conn):
         # Insert data into table
         conn.execute("INSERT INTO Users (FirstName, LastName, Email) VALUES (?, ?, ?);",
                      ('John', 'Doe', 'john.doe@example.com'))
-        print("Data inserted.",'\n')
+        print("Data inserted.")
 
         # Create a savepoint
         conn.execute("SAVEPOINT Savepoint1;")
-        print("Savepoint created.",'\n')
+        print("Savepoint created.")
 
         # Insert more data
         conn.execute("INSERT INTO Users (FirstName, LastName, Email) VALUES (?, ?, ?);",
                      ('Jane', 'Smith', 'jane.smith@example.com'))
-        print("More data inserted.",'\n')
+        print("More data inserted.")
 
         # Assume an error occurred, rollback to savepoint
         conn.execute("ROLLBACK TRANSACTION TO Savepoint1;")
-        print("Rolled back to savepoint.",'\n')
+        print("Rolled back to savepoint.")
 
         # Continue with transaction
         conn.execute("INSERT INTO Users (FirstName, LastName, Email) VALUES (?, ?, ?);",
                      ('Alice', 'Johnson', 'alice.johnson@example.com'))
-        print("Additional data inserted after rollback.",'\n')
+        print("Additional data inserted after rollback.")
 
         # Commit transaction
         conn.commit()
-        print("Transaction committed.",'\n')
+        print("Transaction committed.")
     except Error as e:
         # Rollback the entire transaction in case of error
         conn.rollback()
-        print("Transaction failed and rolled back due to error:", e,'\n')
+        print("Transaction failed and rolled back due to error:", e)
 
 # Example usage
 if __name__ == '__main__':
+    print('```')
     database = "example.db"
     conn = create_connection(database)
-    
     if conn is None:
         raise Exception("Failed to connect to the database.")
     
     execute_transaction(conn)
     conn.close()
+    print('```')
 ```
 
-    Transaction started. 
-    
-    Data inserted. 
-    
-    Savepoint created. 
-    
-    More data inserted. 
-    
-    Rolled back to savepoint. 
-    
-    Additional data inserted after rollback. 
-    
-    Transaction committed. 
-    
+    ```
+    Transaction started.
+    Data inserted.
+    Savepoint created.
+    More data inserted.
+    Rolled back to savepoint.
+    Additional data inserted after rollback.
+    Transaction committed.
+    ```
     
 
   - **Explanation of the Code**:
@@ -1178,13 +1056,13 @@ class MachineA:
     def turn_left(self, degrees):
         # Turn the machine left by a certain degree
         self.orientation = (self.orientation + degrees) % 360
-        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def turn_right(self, degrees):
         # Turn the machine right by a certain degree
         self.orientation = (self.orientation - degrees) % 360
-        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def move_forward(self, distance):
@@ -1192,7 +1070,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] += distance * math.cos(radian)  # x position changes
         self.position[1] += distance * math.sin(radian)  # y position changes
-        print(f"Moved forward {distance} distance. New position: {self.position}",'\n')
+        print(f"Moved forward {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def move_backward(self, distance):
@@ -1200,7 +1078,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] -= distance * math.cos(radian)  # x position changes
         self.position[1] -= distance * math.sin(radian)  # y position changes
-        print(f"Reversed {distance} distance. New position: {self.position}",'\n')
+        print(f"Reversed {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def get_machine_state(self):
@@ -1208,7 +1086,7 @@ class MachineA:
     
     def random_crash(self):
         if random.random() > 0.6:
-            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!','\n')
+            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!')
             self.reset()
             return False
         else:
@@ -1218,7 +1096,7 @@ class MachineA:
         # Reset the machine to the initial state
         self.orientation = 0
         self.position = [0, 0]
-        print("Machine has been reset to the 0,(0,0) state.",'\n')
+        print("Machine has been reset to the 0,(0,0) state.")
 ############# end same as before
 
 import sqlite3
@@ -1230,7 +1108,7 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print(e,'\n')
+        print(e)
     return None
 
 def save_machine_state(conn, machine):
@@ -1243,11 +1121,11 @@ def save_machine_state(conn, machine):
             conn.execute("INSERT INTO MachineState (Orientation, PositionX, PositionY ) VALUES (?, ?, ?);", [state[0],*state[1]])
             # Commit the changes
             conn.commit()
-            print("Machine state saved: Orientation {}, Position {}".format(*state),'\n')
+            print("Machine state saved: Orientation {}, Position {}".format(*state))
     except Error as e:
         # Rollback in case of error
         conn.rollback()
-        print("Failed to save state, rolled back transaction:", e,'\n')
+        print("Failed to save state, rolled back transaction:", e)
 
 def get_last_machine_state(conn):
     """ Retrieve the last saved state of the machine """
@@ -1256,13 +1134,13 @@ def get_last_machine_state(conn):
         cursor.execute("SELECT Orientation, PositionX, PositionY FROM MachineState ORDER BY Id DESC LIMIT 1;")
         state = cursor.fetchone()
         if state:
-            print("Last machine state retrieved: Orientation {}, (PositionX, PositionY) {}".format(*state),'\n')
+            print("Last machine state retrieved: Orientation {}, (PositionX, PositionY) {}".format(*state))
             return (state[0],(state[1],state[2]))
         else:
-            print("No previous state found.",'\n')
+            print("No previous state found.")
             return (0,(0,0))
     except Error as e:
-        print("Error retrieving the last state:", e,'\n')
+        print("Error retrieving the last state:", e)
         return None
 
 def setup_database(conn):
@@ -1272,7 +1150,7 @@ def setup_database(conn):
                         Orientation NUMBER NOT NULL,
                         PositionX NUMBER NOT NULL,
                         PositionY NUMBER NOT NULL);''')
-    print("Database setup complete.",'\n')
+    print("Database setup complete.")
 
 
 def main():
@@ -1293,7 +1171,7 @@ def main():
         machine = MachineA(*get_last_machine_state(conn))
     save_machine_state(conn, machine)
         
-    print(machine.get_machine_state(),'\n')
+    print(machine.get_machine_state())
 
     while not machine.turn_right(90):
         machine = MachineA(*get_last_machine_state(conn))
@@ -1303,91 +1181,51 @@ def main():
         machine = MachineA(*get_last_machine_state(conn))
     save_machine_state(conn, machine)
         
-    print(machine.get_machine_state(),'\n')
+    print(machine.get_machine_state())
     # Close connection
     conn.close()
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__':    
+    print('```')
+    main()    
+    print('```')
 ```
 
-    Database setup complete. 
-    
-    Machine state saved: Orientation 0, Position [0, 0] 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    Machine state saved: Orientation 90, Position [0, 0] 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 90, (PositionX, PositionY) 0 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Machine state saved: Orientation 90, Position [6.123233995736766e-16, 10.0] 
-    
-    (90, [6.123233995736766e-16, 10.0]) 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 90, (PositionX, PositionY) 6.123233995736766e-16 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 90, (PositionX, PositionY) 6.123233995736766e-16 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 90, (PositionX, PositionY) 6.123233995736766e-16 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 90, (PositionX, PositionY) 6.123233995736766e-16 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    Machine state saved: Orientation 0, Position [6.123233995736766e-16, 10] 
-    
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0] 
-    
-    Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0] 
-    
-    (0, [-4.999999999999999, 10.0]) 
-    
+    ```
+    Database setup complete.
+    Machine state saved: Orientation 0, Position [0, 0]
+    Turned left 90 degrees. New orientation: 90
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 0, (PositionX, PositionY) 0
+    Turned left 90 degrees. New orientation: 90
+    Machine state saved: Orientation 90, Position [0, 0]
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    Machine state saved: Orientation 90, Position [6.123233995736766e-16, 10.0]
+    (90, [6.123233995736766e-16, 10.0])
+    Turned right 90 degrees. New orientation: 0
+    Machine state saved: Orientation 0, Position [6.123233995736766e-16, 10.0]
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 0, (PositionX, PositionY) 6.123233995736766e-16
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
+    Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0]
+    (0, [-4.999999999999999, 10.0])
+    ```
     
 
   - Key Aspects of This Example:
 
     - **Database Setup**: This involves initializing a SQLite database and creating a table specifically designed to store the operational state of `MachineA`. The setup might look something like this:
       ```python
-      conn.execute("""
-      CREATE TABLE IF NOT EXISTS MachineState (
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Orientation NUMBER NOT NULL,
-                        PositionX NUMBER NOT NULL,
-                        PositionY NUMBER NOT NULL);
-      """)
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS MachineState (
+                          Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          Orientation NUMBER NOT NULL,
+                          PositionX NUMBER NOT NULL,
+                          PositionY NUMBER NOT NULL);
+        """)
       ```
       This table is structured to automatically record the time of each state change alongside the state itself, which aids in tracking and debugging.
 
@@ -1399,45 +1237,45 @@ if __name__ == '__main__':
     - **Complexity**: Managing state with transactions adds a layer of complexity to system design (especially **table design**). Developers must carefully handle transaction scopes, ensure proper rollback on failures, and maintain database performance under high-throughput conditions. Thorough testing is required to ensure the system behaves as expected under various failure scenarios.
     - **Advanced Tool: Using SQLAlchemy**: To manage database interactions more robustly and elegantly, SQLAlchemy, an SQL toolkit and Object-Relational Mapping (ORM) system for Python, can be employed. SQLAlchemy provides a high-level abstraction to interact with the database, allowing developers to write Pythonic code rather than SQL queries. It supports a wide range of SQL constructs, transaction management, and automatic rollback mechanisms, which are ideal for implementing complex transactional logic required in resumable systems.
       ```python
-      from sqlalchemy import create_engine, Table, Column, Integer, MetaData, NUMBER
-      from sqlalchemy.orm import sessionmaker
-      
-      engine = create_engine('sqlite:///example.db')
-      Session = sessionmaker(bind=engine)
-      session = Session()
-      metadata = MetaData()
+        from sqlalchemy import create_engine, Table, Column, Integer, MetaData, NUMBER
+        from sqlalchemy.orm import sessionmaker
+        
+        engine = create_engine('sqlite:///example.db')
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        metadata = MetaData()
 
-      machine_state = Table('MachineState', metadata,
-                            Column('Id', Integer, primary_key=True),
-                            Column('Orientation', NUMBER),
-                            Column('PositionX', NUMBER),
-                            Column('PositionY', NUMBER)
-                            )
-      
-      metadata.create_all(engine)  # Create tables based on metadata definition
+        machine_state = Table('MachineState', metadata,
+                              Column('Id', Integer, primary_key=True),
+                              Column('Orientation', NUMBER),
+                              Column('PositionX', NUMBER),
+                              Column('PositionY', NUMBER)
+                              )
+        
+        metadata.create_all(engine)  # Create tables based on metadata definition
 
-      try:
-          # Using SQLAlchemy's ORM to handle transactions
-          new_state = machine_state.insert().values(MachineState='Operational')
-          session.execute(new_state)
-          session.commit()
-      except:
-          session.rollback()
-          print("Error updating machine state.")
-      finally:
-          session.close()
+        try:
+            # Using SQLAlchemy's ORM to handle transactions
+            new_state = machine_state.insert().values(MachineState='Operational')
+            session.execute(new_state)
+            session.commit()
+        except:
+            session.rollback()
+            print("Error updating machine state.")
+        finally:
+            session.close()
       ```
     - **Migration Strategy**: migrating a SQL database, particularly when there are **slight changes** to table schemas, it's crucial to ensure that data integrity is maintained and downtime is minimized.
       - **Create Migration Scripts**: Write SQL scripts that modify the database schema. These scripts should be idempotent, meaning they can be run multiple times without causing issues.
         
       - **Examples of Migration Scripts**:
         ```sql
-        -- Adding a Column
-        ALTER TABLE my_table ADD COLUMN new_column VARCHAR(255) NULL;
-        -- Changing Data Type
-        ALTER TABLE my_table ALTER COLUMN existing_column TYPE new_type;
-        -- Dropping a Column
-        ALTER TABLE my_table DROP COLUMN old_column;
+          -- Adding a Column
+          ALTER TABLE my_table ADD COLUMN new_column VARCHAR(255) NULL;
+          -- Changing Data Type
+          ALTER TABLE my_table ALTER COLUMN existing_column TYPE new_type;
+          -- Dropping a Column
+          ALTER TABLE my_table DROP COLUMN old_column;
         ```
 
 ### Section 2: Key-Value Databases
@@ -1554,10 +1392,14 @@ user_data = {
     "RegistrationDate": "2024-02-01"
 }
 
+print('```')
 insert_user(user_data)
+print('```')
 ```
 
-    User added.
+    ```
+    User already exists.
+    ```
     
 
 - **Practical Example (for MachineA)**: (Using MongoDB for Resumability) In this MongoDB-based example, we'll manage the state of a hypothetical MachineA. Instead of using SQL transactions, we'll leverage MongoDB's document model to store the machine's state, employing operations that ensure data consistency and can be resumed if interrupted.
@@ -1578,13 +1420,13 @@ class MachineA:
     def turn_left(self, degrees):
         # Turn the machine left by a certain degree
         self.orientation = (self.orientation + degrees) % 360
-        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned left {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def turn_right(self, degrees):
         # Turn the machine right by a certain degree
         self.orientation = (self.orientation - degrees) % 360
-        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}",'\n')
+        print(f"Turned right {degrees} degrees. New orientation: {self.orientation}")
         return self.random_crash()
 
     def move_forward(self, distance):
@@ -1592,7 +1434,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] += distance * math.cos(radian)  # x position changes
         self.position[1] += distance * math.sin(radian)  # y position changes
-        print(f"Moved forward {distance} distance. New position: {self.position}",'\n')
+        print(f"Moved forward {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def move_backward(self, distance):
@@ -1600,7 +1442,7 @@ class MachineA:
         radian = math.radians(self.orientation)
         self.position[0] -= distance * math.cos(radian)  # x position changes
         self.position[1] -= distance * math.sin(radian)  # y position changes
-        print(f"Reversed {distance} distance. New position: {self.position}",'\n')
+        print(f"Reversed {distance} distance. New position: {self.position}")
         return self.random_crash()
 
     def get_machine_state(self):
@@ -1608,7 +1450,7 @@ class MachineA:
     
     def random_crash(self):
         if random.random() > 0.6:
-            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!','\n')
+            print('!!!!!!!!!This machine crashed, auto reset!!!!!!!!!')
             self.reset()
             return False
         else:
@@ -1618,7 +1460,7 @@ class MachineA:
         # Reset the machine to the initial state
         self.orientation = 0
         self.position = [0, 0]
-        print("Machine has been reset to the 0,(0,0) state.",'\n')
+        print("Machine has been reset to the 0,(0,0) state.")
 ############# end same as before
 
 from pymongo import MongoClient, errors, database
@@ -1628,7 +1470,7 @@ def create_connection():
     try:
         return MongoClient('mongodb://localhost:27017/')
     except errors.ConnectionFailure as e:
-        print("Connection error:", e,'\n')
+        print("Connection error:", e)
     return None
 
 def save_machine_state(client:MongoClient, machine:MachineA):
@@ -1637,9 +1479,9 @@ def save_machine_state(client:MongoClient, machine:MachineA):
         # Insert the machine state
         result = client.get_database("machine_states_db").get_collection("MachineState").insert_one({
             "orientation":orientation,"position":position})
-        print("Machine state saved: Orientation {}, Position {}".format(orientation, position),'\n')
+        print("Machine state saved: Orientation {}, Position {}".format(orientation, position))
     except errors.PyMongoError as e:
-        print("Failed to save state:", e,'\n')
+        print("Failed to save state:", e)
 
 def get_last_machine_state(client:MongoClient):
     """ Retrieve the last saved state of the machine """
@@ -1648,13 +1490,13 @@ def get_last_machine_state(client:MongoClient):
         state = list(cursor)
         state = state[0] if len(state) > 0 else None
         if state:
-            print("Last machine state retrieved: Orientation {}, Position {}".format(state["orientation"], state["position"]),'\n')
+            print("Last machine state retrieved: Orientation {}, Position {}".format(state["orientation"], state["position"]))
             return state["orientation"], state["position"]
         else:
-            print("No previous state found.",'\n')
+            print("No previous state found.")
             return (0, (0, 0))
     except errors.PyMongoError as e:
-        print("Error retrieving the last state:", e,'\n')
+        print("Error retrieving the last state:", e)
         return None
 
 def setup_database(client:MongoClient):
@@ -1662,7 +1504,7 @@ def setup_database(client:MongoClient):
     db = client.get_database("machine_states_db")
     if "MachineState" not in db.list_collection_names():
         db.create_collection("MachineState")
-    print("Database setup complete.",'\n')
+    print("Database setup complete.")
 
 
 
@@ -1684,7 +1526,7 @@ def main():
         machine = MachineA(*get_last_machine_state(conn))
     save_machine_state(conn, machine)
         
-    print(machine.get_machine_state(),'\n')
+    print(machine.get_machine_state())
 
     while not machine.turn_right(90):
         machine = MachineA(*get_last_machine_state(conn))
@@ -1694,62 +1536,46 @@ def main():
         machine = MachineA(*get_last_machine_state(conn))
     save_machine_state(conn, machine)
         
-    print(machine.get_machine_state(),'\n')
+    print(machine.get_machine_state())
     # Close connection
     conn.close()
 
 if __name__ == '__main__':
+    print('```')
     main()
+    print('```')
 ```
 
-    Database setup complete. 
-    
-    Machine state saved: Orientation 0, Position [0, 0] 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 0, Position [0, 0] 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 0, Position [0, 0] 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!! 
-    
-    Machine has been reset to the 0,(0,0) state. 
-    
-    Last machine state retrieved: Orientation 0, Position [0, 0] 
-    
-    Turned left 90 degrees. New orientation: 90 
-    
-    Machine state saved: Orientation 90, Position [0, 0] 
-    
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0] 
-    
-    Machine state saved: Orientation 90, Position [6.123233995736766e-16, 10.0] 
-    
-    (90, [6.123233995736766e-16, 10.0]) 
-    
-    Turned right 90 degrees. New orientation: 0 
-    
-    Machine state saved: Orientation 0, Position [6.123233995736766e-16, 10.0] 
-    
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0] 
-    
-    Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0] 
-    
-    (0, [-4.999999999999999, 10.0]) 
-    
+    ```
+    Database setup complete.
+    Machine state saved: Orientation 0, Position [0, 0]
+    Turned left 90 degrees. New orientation: 90
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 0, Position [0, 0]
+    Turned left 90 degrees. New orientation: 90
+    Machine state saved: Orientation 90, Position [0, 0]
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 90, Position [0, 0]
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 90, Position [0, 0]
+    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
+    Machine state saved: Orientation 90, Position [6.123233995736766e-16, 10.0]
+    (90, [6.123233995736766e-16, 10.0])
+    Turned right 90 degrees. New orientation: 0
+    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
+    Machine has been reset to the 0,(0,0) state.
+    Last machine state retrieved: Orientation 90, Position [6.123233995736766e-16, 10.0]
+    Turned right 90 degrees. New orientation: 0
+    Machine state saved: Orientation 0, Position [6.123233995736766e-16, 10.0]
+    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
+    Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0]
+    (0, [-4.999999999999999, 10.0])
+    ```
     
 
 ### Conclusion
@@ -1964,22 +1790,24 @@ class BookController:
 
 
 # Example of using the MVC components
+print('```')
 controller = BookController()
 controller.add_book("1984", "George Orwell")
 controller.add_book("Brave New World", "Aldous Huxley")
 controller.view_book(1)
 controller.update_book(1, "1984", "George Orwell - Updated")
 controller.list_books()
+print('```')
 ```
 
+    ```
     Book added successfully.
     Book added successfully.
-    Book ID: 1, Title: 1984, Author: George Orwell - Updated
+    Book ID: 1, Title: 1984, Author: George Orwell
     Book updated successfully.
     Book ID: 1, Title: 1984, Author: George Orwell - Updated
     Book ID: 2, Title: Brave New World, Author: Aldous Huxley
-    Book ID: 3, Title: 1984, Author: George Orwell
-    Book ID: 4, Title: Brave New World, Author: Aldous Huxley
+    ```
     
 
 ### Section 2: MVC in Resumability
@@ -2179,41 +2007,30 @@ def main():
     MachineView().display_machine(machine)
 
 if __name__ == '__main__':
+    print('```')
     for i in range(1):
         main()
+    print('```')
 ```
 
+    ```
     Machine added successfully.
     Turned left 90 degrees. New orientation: 90
     !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
     Machine has been reset to the 0,(0,0) state.
     Turned left 90 degrees. New orientation: 90
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
-    Machine has been reset to the 0,(0,0) state.
-    Turned left 90 degrees. New orientation: 90
     Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
     !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
     Machine has been reset to the 0,(0,0) state.
     Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
-    Machine has been reset to the 0,(0,0) state.
-    Moved forward 10 distance. New position: [6.123233995736766e-16, 10.0]
-    Machine ID: 1, Orientation: 90, Position: [6.123233995736766e-16, 10.0]
+    Machine ID: 3, Orientation: 90, Position: [6.123233995736766e-16, 10.0]
     Turned right 90 degrees. New orientation: 0
     !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
     Machine has been reset to the 0,(0,0) state.
     Turned right 90 degrees. New orientation: 0
     Reversed 5 distance. New position: [-4.999999999999999, 10.0]
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
-    Machine has been reset to the 0,(0,0) state.
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
-    Machine has been reset to the 0,(0,0) state.
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
-    !!!!!!!!!This machine crashed, auto reset!!!!!!!!!
-    Machine has been reset to the 0,(0,0) state.
-    Reversed 5 distance. New position: [-4.999999999999999, 10.0]
-    Machine ID: 1, Orientation: 0, Position: [-4.999999999999999, 10.0]
+    Machine ID: 3, Orientation: 0, Position: [-4.999999999999999, 10.0]
+    ```
     
 
 ##### Explanation
@@ -2387,17 +2204,28 @@ def main():
     MachineView().display_machine(controller.model)
 
 if __name__ == '__main__':
+    print('```')
     main()
+    print('```')
 ```
 
+    ```
+    Machine ID: 6, Orientation: 0, Position: [6.123233995736766e-16, 10.0]
     Machine crashed, auto reset
     Machine crashed, auto reset
     Machine crashed, auto reset
     Machine crashed, auto reset
     Machine crashed, auto reset
     Machine crashed, auto reset
-    Machine ID: 12, Orientation: 0, Position: [6.123233995736766e-16, 10.0]
-    Machine ID: 12, Orientation: 0, Position: [-4.999999999999999, 10.0]
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine crashed, auto reset
+    Machine ID: 20, Orientation: 0, Position: [-4.999999999999999, 10.0]
+    ```
     
 
 ### Conclusion
@@ -2530,6 +2358,7 @@ class TrafficLightRedState:
 
 
 # # Example Usage
+print('```')
 traffic_light = TrafficLight()
 traffic_light.to_Green()
 traffic_light.info()
@@ -2537,7 +2366,18 @@ traffic_light.to_Yellow()
 traffic_light.info()
 traffic_light.to_Red()
 traffic_light.info()
+print('```')
 ```
+
+    ```
+    Already on Green light.
+    Green light is on. Cars can move.
+    Transition to Yellow light.
+    Yellow light is on. Please prepare to stop.
+    Transition to Red light.
+    Red light is on. Stop.
+    ```
+    
 
 - Explanation of the Traffic Light **Finite** State Machine Implementation
 
@@ -2652,7 +2492,7 @@ class FailureState(TaskState):
         task.state = InitiationState()
         print(f"Task recovered from Failure, transitioning back to {type(task.state).__name__}.")
 
-
+print('```')
 # Example Usage 1
 task = Task()
 
@@ -2686,7 +2526,79 @@ for i,task in enumerate(tasks):
         task.approve()
         task.execute()
         task.complete()
+print('```')
 ```
+
+    ```
+    Task is in Initiation state. Awaiting approval.
+    Task moved to Approval.
+    Task is in Approval state. Awaiting execution.
+    Task moved to Execution.
+    Task is in Execution state. Awaiting completion.
+    !!!!!!!!!!!!!This task crashed! Task moved to FailureState.!!!!!!!!!!!!!
+    Task is in Failure state due to an error.
+    0:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    1:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    2:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    !!!!!!!!!!!!!This task crashed! Task moved to FailureState.!!!!!!!!!!!!!
+    Task recovered from Failure, transitioning back to InitiationState.
+    try No.2:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    3:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    4:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    5:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    !!!!!!!!!!!!!This task crashed! Task moved to FailureState.!!!!!!!!!!!!!
+    Task recovered from Failure, transitioning back to InitiationState.
+    try No.2:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    6:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    7:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    8:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    9:
+    try No.1:
+    Task moved to Approval.
+    Task moved to Execution.
+    Task moved to Completion.
+    ```
+    
 
 This example involves very simple sequential tasks, meaning its states and transitions are minimal. However, in many cases, our system has many more states and transitions, making it difficult to do **Resumability** in a single function. As the following example shows, we will need a solver.
 
@@ -2753,11 +2665,18 @@ end_state = 'talk'
 path = find_path(transitions, start_state, end_state)
 
 # Print the path
+print('```')
 if path:
     print("Path from", start_state, "to", end_state, ":", " -> ".join(path))
 else:
     print("No path found from", start_state, "to", end_state)
+print('```')
 ```
+
+    ```
+    Path from loss to talk : loss -> init -> waiting -> connected -> talk
+    ```
+    
 
 - **Example 2: Network Connection Resumable System:** In a network connection resumable system, managing various states such as `init`, `connected`, `loss`, `close`, `waiting`, `failure`, and `talk` is crucial for maintaining a stable and resilient connection. An FSM can be used to handle these state transitions and ensure that the system can recover from disruptions seamlessly.
 
@@ -2787,6 +2706,7 @@ Here is a Python implementation to find the path from "ConnectionLost" to "Commu
 ```python
 import json
 import time
+import random
 
 class NetworkTask:
     def __init__(self): self.state = InitiationState()
@@ -2806,7 +2726,7 @@ class NetworkTask:
     def current_state(self): return self.state.current_state(self)
 
 class NetworkState:
-    def _defult_error(self,to=''): raise NotImplementedError(f"Invalid transition from {self.__class__.__name__} to {to}")
+    def _defult_error(self,to=''): raise NotImplementedError(f"Invalid transition from [{self.__class__.__name__}] -> [{to}]")
     def initiation(self, task: NetworkTask): self._defult_error("Initiation")
     def connectionEstablished(self, task: NetworkTask): self._defult_error("Connection Established")
     def closure(self, task: NetworkTask): self._defult_error("Closure")
@@ -2828,19 +2748,19 @@ class InitiationState(NetworkState):
 
 class ConnectionEstablishedState(NetworkState):
     @staticmethod
-    def _transitions(): return [ConnectionLostState,CommunicationState,ClosureState,]    
+    def _transitions(): return [ConnectionLostState,CommunicationState,ClosureState]    
     def connectionLost(self, task: NetworkTask):         task.transition_to(ConnectionLostState())
     def communication(self, task: NetworkTask):          task.transition_to(CommunicationState())
     def closure(self, task: NetworkTask):                task.transition_to(ClosureState())
 
 class ClosureState(NetworkState):
     @staticmethod
-    def _transitions(): return [InitiationState,]
+    def _transitions(): return [InitiationState]
     def initiation(self, task: NetworkTask):             task.transition_to(InitiationState())
 
 class ConnectionLostState(NetworkState):
     @staticmethod
-    def _transitions(): return [InitiationState,]
+    def _transitions(): return [InitiationState]
     def initiation(self, task: NetworkTask):             task.transition_to(InitiationState())
 
 class WaitingState(NetworkState):    
@@ -2893,6 +2813,44 @@ task.closure()  # Transition to Initiation
 print(f'State: {task.current_state()}')  # State: Initiation
 ```
 
+```python
+State: <class '__main__.InitiationState'>
+State: <class '__main__.FailureState'>
+
+
+
+---------------------------------------------------------------------------
+
+NotImplementedError                       Traceback (most recent call last)
+
+Cell In[101], line 9
+      6 task.waiting()  # Transition to Waiting 
+      7 print(f'State: {task.current_state()}')  # State: Connection Established or False!!
+----> 9 task.communication()  # Transition to Connection
+     10 print(f'State: {task.current_state()}')  # State: Communication or Connection Lost !!
+     12 task.closure()  # Transition to Initiation
+
+
+Cell In[100], line 14, in NetworkTask.communication(self)
+     13 def communication(self): 
+---> 14     self.state.communication(self)
+     15     self.state.simulate_communication(self)
+
+
+Cell In[100], line 30, in NetworkState.communication(self, task)
+---> 30 def communication(self, task: NetworkTask): self._defult_error("Communication")
+
+
+Cell In[100], line 23, in NetworkState._defult_error(self, to)
+     22 class NetworkState:
+---> 23     def _defult_error(self,to=''): raise NotImplementedError(f"Invalid transition from [{self.__class__.__name__}] -> [{to}]")
+     24     def initiation(self, task: NetworkTask): self._defult_error("Initiation")
+     25     def connectionEstablished(self, task: NetworkTask): self._defult_error("Connection Established")
+
+
+NotImplementedError: Invalid transition from [FailureState] -> [Communication]
+```
+
 
 ```python
 # Extract transitions
@@ -2910,11 +2868,46 @@ class_str_map.update({cls:cls.__name__ for cls,trans in transitions.items()})
 class_methodstr_map = {cls.__name__:cls.__name__.replace('State','').lower() for cls,trans in transitions.items()}
 
 transitions_str = {class_str_map[cls]:[class_str_map[t] for t in trans] for cls,trans in transitions.items()}
+print('```json')
 print(json.dumps(transitions_str,indent=2))
+print('```')
 ```
+
+    ```json
+    {
+      "InitiationState": [
+        "WaitingState"
+      ],
+      "ConnectionEstablishedState": [
+        "ConnectionLostState",
+        "CommunicationState",
+        "ClosureState"
+      ],
+      "ClosureState": [
+        "InitiationState"
+      ],
+      "ConnectionLostState": [
+        "InitiationState"
+      ],
+      "WaitingState": [
+        "ConnectionEstablishedState",
+        "FailureState"
+      ],
+      "FailureState": [
+        "InitiationState"
+      ],
+      "CommunicationState": [
+        "ClosureState",
+        "ConnectionLostState"
+      ]
+    }
+    ```
+    
 
 
 ```python
+from collections import deque
+
 def find_path(transitions:dict, start_state, end_state):
     queue = deque([[start_state]])    
     visited = set()    
@@ -2922,49 +2915,103 @@ def find_path(transitions:dict, start_state, end_state):
         path = queue.popleft()
         state = path[-1]        
         if state == end_state:
-            return path        
+            return path
         if state not in visited:
             visited.add(state)            
             next_states = transitions.get(state, [])
             for next_state in next_states:
                 new_path = list(path)
                 new_path.append(next_state)
-                queue.append(new_path)    
-    return None
+                queue.append(new_path)
+    return []
 
-start_state = class_str_map[FailureState]
-end_state = class_str_map[CommunicationState]
-path = find_path(transitions_str, start_state, end_state)
-
-if path:
-    print("Path from", start_state, "to", end_state, ":", " -> ".join(path))
-else:
-    print("No path found from", start_state, "to", end_state)
+start_state = FailureState
+end_state   = CommunicationState
+path        = find_path(transitions, start_state, end_state)
+print('```')
+print(f"Path from {class_str_map[start_state]} to {class_str_map[end_state]} : "+' -> '.join([class_str_map[p] for p in path]))
+print('```')
 ```
+
+    ```
+    Path from FailureState to CommunicationState : FailureState -> InitiationState -> WaitingState -> ConnectionEstablishedState -> CommunicationState
+    ```
+    
 
 
 ```python
+print('```')
 # Example usage
 task = NetworkTask()
 target_state = CommunicationState
 
+print(f'Set target state: {target_state}')
+
 def next_action(task:NetworkTask,target_state):
-    start_state = class_str_map[task.current_state()]
-    end_state = class_str_map[target_state]
-    path = find_path(transitions_str, start_state, end_state)    
-    if path is None: return None
-    if len(path)==1: return path[0]
+    path = find_path(transitions, task.current_state(), target_state)
+    if len(path)<=1: return None
     return path[1]
     
-#In practice, it is better to set a maximum time for attempts.
-while class_str_map[task.current_state()] != class_str_map[target_state]:
-    action = next_action(task,target_state)
-    if action is None:raise ValueError('no next acion! unreachable!')
-    print(f'Current: {class_str_map[task.current_state()]}, try {class_methodstr_map[action]}')
-    getattr(task,class_methodstr_map[action])()
+#In practice, it is better to set a maximum number for attempts.
+while task.current_state() != target_state:
+    cls = next_action(task,target_state)
+    if cls is None:raise ValueError('no next acion! unreachable!')
+
+    cls_str = class_str_map[cls]
+    method_str = class_methodstr_map[cls_str]
+    print(f'Current: {class_str_map[task.current_state()]}, try {method_str}')
+    getattr(task,method_str)()
     
-print(f'Success to target state: {target_state}')
+print(f'Success to target state: {task.current_state()}')
+print('```')
 ```
+
+    ```
+    Set target state: <class '__main__.CommunicationState'>
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Current: ConnectionLostState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Current: ConnectionLostState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Current: ConnectionLostState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Current: ConnectionLostState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Current: ConnectionLostState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: FailureState, try initiation
+    Current: InitiationState, try waiting
+    Current: ConnectionEstablishedState, try communication
+    Success to target state: <class '__main__.CommunicationState'>
+    ```
+    
 
 This code defines the state transitions and uses a breadth-first search algorithm to find the shortest path from any state to the target `CommunicationState` state. By implementing such FSMs, network systems can automatically recover from disruptions, ensuring continuous and reliable communication.
 
