@@ -4170,23 +4170,23 @@ class RequestFSMsController:
         
         self.model = model
         self.view = view
+        self.state = RequestState(self)
         # self.state = RequestState.Initiation(self)
         database.set(model.uuid,model.to_dict())
-        self.set_state(RequestState.Initiation)
     
     ################# public
     def get_transitions(self):        return RequestState._transitions
-    def current_state(self):          return self.state.__class__.__name__
+    def current_state(self):          return self.state._state
 
     def resume_state(self,target_state, max_attempts=100):
-        self._resume_state(target_state, max_attempts)
+        self.state.resume_state(target_state, max_attempts)
 
-    def to_Initiation(self):          self.state.to_Initiation()
-    def to_WaitConnection(self):      self.state.to_WaitConnection()
-    def to_WaitSearching(self):       self.state.to_WaitSearching()
-    def to_ResponseReceived(self):    self.state.to_ResponseReceived()
-    def to_Close(self):               self.state.to_Close()
-    def to_Failure(self):             self.state.to_Failure()
+    def to_Initiation(self):       self.state.to_Initiation()
+    def to_WaitConnection(self):   self.state.to_WaitConnection()
+    def to_WaitSearching(self):    self.state.to_WaitSearching()
+    def to_ResponseReceived(self): self.state.to_ResponseReceived()
+    def to_Close(self):            self.state.to_Close()
+    def to_Failure(self):          self.state.to_Failure()
 
     ################# private
     ######################## socket controlls (will call from state controlls)
@@ -4202,56 +4202,7 @@ class RequestFSMsController:
             raise ValueError('recieve invalid data (empty) from server!')
         database.set(self.model.uuid,self.model.to_dict())
 
-    ######################## state controlls
-    def set_state(self, state_class): self.state:RequestState.Base = state_class(self)
-
-    def find_path(self, transitions:dict, start_state, end_state):
-        queue = deque([[start_state]])    
-        visited = set()    
-        while queue:
-            path = queue.popleft()
-            state = path[-1]        
-            if state == end_state:
-                return path
-            if state not in visited:
-                visited.add(state)            
-                next_states = transitions.get(state, [])
-                for next_state in next_states:
-                    new_path = list(path)
-                    new_path.append(next_state)
-                    queue.append(new_path)
-        return []
-    
-    def _resume_state(self,target_state, max_attempts=100):
-        print(f'Set target state: {target_state} ( current is {self.current_state()})')
-        def next_action(task:RequestFSMsController,target_state):
-            path = self.find_path(task.get_transitions(), task.current_state(), target_state)
-            if len(path)<=1: return None
-            return path[1]
-            
-        while self.current_state() != target_state:
-            cls = next_action(self,target_state)
-            if cls is None:raise ValueError('no next acion! unreachable!')
-            if max_attempts<0:raise ValueError(f'over max_attempts!')
-            
-            print(f'Current: {self.current_state()}, try to_{cls}')
-            getattr(self,f'to_{cls}')()
-            max_attempts -= 1
-        print(f'Success to target state: {self.current_state()}')
-
-
-############################ for FSMs 
-def handle_errors(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        self:RequestState.Base=self
-        try:
-            return func(self, *args, **kwargs)
-        except Exception as e:
-            print(f'[{self.__class__.__name__}]: {e}')
-            self.to_Failure()
-    return wrapper    
-
+########################### a simpler implementation
 class RequestState:
     @dataclass
     class States:
@@ -4271,103 +4222,99 @@ class RequestState:
         States.Failure:         [States.Initiation]
     }
     _states = list(_transitions.keys())
+
+    def __init__(self, controller: RequestFSMsController):
+        self.controller = controller
+        self.model = self.controller.model
+        
+        self.controller.init_socket()
+        self._state = RequestState.States.Initiation
+
+    def to_Failure(self):
+        self._state = RequestState.States.Failure
     
-    class Base:
-        
-        def __init__(self, controller: RequestFSMsController):
-            self.controller = controller
-            self.model = self.controller.model
+    def handle_errors(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            self:RequestState=self
+            valid_transitions = self._transitions[self._state]
+            target_transition = func.__name__.replace('to_','')        
+            if target_transition not in valid_transitions:            
+                raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f'[{self.__class__.__name__}]: {e}')
+                self.to_Failure()
+        return wrapper
+    
+    @handle_errors
+    def to_Initiation(self):
+        self.controller.init_socket()
+        self._state = RequestState.States.Initiation
+    
+    @handle_errors
+    def to_Close(self):
+        self.controller.close()
+        self._state = RequestState.States.Close
 
-        def _Initiation(self):
-            self.controller._socket = None
-            self.controller.set_state(RequestState.Initiation)
+    @handle_errors
+    def to_WaitConnection(self):
+        self._state = RequestState.States.WaitConnection
+        self.controller.connect()
 
-        def _Failure(self):
-            self.controller.set_state(RequestState.Failure)
+    @handle_errors
+    def to_WaitSearching(self):
+        self.controller.send()
+        self._state = RequestState.States.WaitSearching
+
+    @handle_errors
+    def to_ResponseReceived(self):
+        self.controller.recieve()
+        print('receive_body = ',self.model.receive_body)
+        self._state = RequestState.States.ResponseReceived
+
+    def find_path(self, transitions:dict, start_state, end_state):
+        queue = deque([[start_state]])    
+        visited = set()    
+        while queue:
+            path = queue.popleft()
+            state = path[-1]        
+            if state == end_state:
+                return path
+            if state not in visited:
+                visited.add(state)            
+                next_states = transitions.get(state, [])
+                for next_state in next_states:
+                    new_path = list(path)
+                    new_path.append(next_state)
+                    queue.append(new_path)
+        return []
+    
+    def resume_state(self,target_state, max_attempts=100):
+        print(f'Set target state: {target_state} ( current is {self._state})')
+        def next_action(task:RequestState,target_state):
+            path = self.find_path(self._transitions, task._state, target_state)
+            if len(path)<=1: return None
+            return path[1]
             
-        def _Close(self):
-            self.controller.close()
-            self.controller.set_state(RequestState.Close)
-        
-        def _defult_error(self,to): 
-            raise NotImplementedError(f"Invalid transition from [{self.__class__.__name__}] -> [{to}]")
-
-        def to_Initiation(self):      self._defult_error("Initiation")
-        def to_WaitConnection(self):  self._defult_error("WaitConnection")
-        def to_WaitSearching(self):   self._defult_error("WaitSearching")
-        def to_ResponseReceived(self):self._defult_error("ResponseReceived")
-        def to_Close(self):           self._defult_error("Close")
-        def to_Failure(self):         self._defult_error("Failure")
-
-
-    class Close(Base):
-        _transitions = ['Initiation']
-        @handle_errors
-        def to_Initiation(self):self._Initiation()
-
-    class Failure(Base):
-        _transitions = ['Initiation']
-        @handle_errors
-        def to_Initiation(self):self._Initiation()
-
-    ##############################  following code is an interactive controller with the above server
-
-    class Initiation(Base):
-        # These to_XXXX functions need to implement
-        _transitions = ['WaitConnection', 'Failure']
-        
-        @handle_errors
-        def __init__(self, controller: RequestFSMsController):
-            super().__init__(controller)
-            self.controller.init_socket()
-
-        @handle_errors
-        def to_WaitConnection(self):
-            self.controller.set_state(RequestState.WaitConnection)
-            self.controller.connect()
+        while self._state != target_state:
+            cls = next_action(self,target_state)
+            if cls is None:raise ValueError('no next acion! unreachable!')
+            if max_attempts<0:raise ValueError(f'over max_attempts!')
             
-        def to_Failure(self):self._Failure()
+            print(f'Current: {self._state}, try to_{cls}')
+            getattr(self,f'to_{cls}')()
+            max_attempts -= 1
+        print(f'Success to target state: {self._state}')
 
-    class WaitConnection(Base):
-        _transitions = ['WaitSearching', 'Close', 'Failure']
-        
-        @handle_errors
-        def to_WaitSearching(self):
-            self.controller.send()
-            self.controller.set_state(RequestState.WaitSearching)
-        
-        @handle_errors
-        def to_Close(self):self._Close()
-
-        def to_Failure(self):self._Failure()
-
-    class WaitSearching(Base):
-        _transitions = ['ResponseReceived', 'Close', 'Failure']
-        
-        @handle_errors
-        def to_ResponseReceived(self):
-            self.controller.recieve()
-            print('receive_body = ',self.model.receive_body)
-            self.controller.set_state(RequestState.ResponseReceived)
-        
-        @handle_errors
-        def to_Close(self):self._Close()
-
-        def to_Failure(self):self._Failure()
-
-    class ResponseReceived(Base):
-        _transitions = ['Close', 'Failure']
-
-        @handle_errors
-        def to_Close(self):self._Close()
-
-        def to_Failure(self):self._Failure()
 ```
 
 
 ```python
 print('```')
 # show database , it will be empty at first time
+# maybe we can try implment class View instead of print method
 print(f"show database keys : {database.keys('*')}\n")
 # we can try sending 10 requests
 for i in range(10):    
@@ -4407,19 +4354,28 @@ print('```')
     
     receive_body =  ["apple", "grape"]
     receive_body =  ["apple", "grape"]
-    [WaitSearching]: recieve invalid data (empty) from server!
+    receive_body =  ["apple", "grape"]
+    receive_body =  ["apple", "grape"]
+    receive_body =  ["apple", "grape"]
+    receive_body =  ["apple", "grape"]
+    receive_body =  ["apple", "grape"]
+    [RequestState]: recieve invalid data (empty) from server!
     Invalid transition from [Failure] -> [Close]
     receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    receive_body =  ["apple", "grape"]
-    show failures keys : ['f11204cb-2802-4a35-bdbc-fc27a9555995']
+    [RequestState]: recieve invalid data (empty) from server!
+    Invalid transition from [Failure] -> [Close]
+    show failures keys : ['7f307946-893d-4cc2-b248-11792a0250d4', '82104289-a8cf-410e-8c67-f4167f813310']
     
     
-    try resume request of f11204cb-2802-4a35-bdbc-fc27a9555995
+    try resume request of 7f307946-893d-4cc2-b248-11792a0250d4
+    Set target state: ResponseReceived ( current is Initiation)
+    Current: Initiation, try to_WaitConnection
+    Current: WaitConnection, try to_WaitSearching
+    Current: WaitSearching, try to_ResponseReceived
+    receive_body =  ["apple", "grape"]
+    Success to target state: ResponseReceived
+    
+    try resume request of 82104289-a8cf-410e-8c67-f4167f813310
     Set target state: ResponseReceived ( current is Initiation)
     Current: Initiation, try to_WaitConnection
     Current: WaitConnection, try to_WaitSearching
@@ -4436,15 +4392,15 @@ print('```')
 
 #### Designing a advance Resumable System by MVC & FSMs
 
-An advanced resumable system can be considered to have more transitions and states, especially dynamic transitions and passive states.
+An advanced resumable system can be considered to have more transitions and states, especially passive states and dynamic transitions.
 
-#### Example: Passive transition and state
+#### Passive transition and state:
 
 Let's consider the following case: waiting for a signal via socket and changing the state accordingly.
 
 In this FSM, the system starts in the Idle state. It transitions to SignalReceivedState when it receive signal.
 
-| IdleState | --ReceiveSignal--> | SignalReceivedState |
+**| IdleState | --ReceiveSignal--> | SignalReceivedState |**
 
 Here is the problem: the ReceiveSignal process will not end immediately, and we do not know the exact time it will take. 
 
@@ -4452,7 +4408,35 @@ We usually prefer to perform transitions (to set the machine state) instantly, e
 
 The following is a design for passive states. We can split a passive state into a waiting part and a fixed part.
 
-|IdleState| --StartListening--> | WaitingForSignalState | --ReceiveSignal--> | SignalReceivedState |
+**|IdleState| --StartListening--> | WaitingForSignalState | --ReceiveSignal--> | SignalReceivedState |**
+
+#### Dynamic transition and state:
+Let's consider the following case: 
+
+We have a vending machine that dispenses snacks. This vending machine has several states and transitions depending on the actions taken by the user and the machine itself. The states of the vending machine could include `Idle`, `CoinInserted`, `Dispensing`, `OutOfStock`, and `Maintenance`.
+
+1. **Idle**: The initial state of the vending machine where it waits for a user to insert a coin.
+    - **Transition**: When a coin is inserted, the machine transitions to the `CoinInserted` state.
+  
+2. **CoinInserted**: In this state, the machine waits for the user to select a snack.
+    - **Transition**: If the user selects a snack that is available, the machine transitions to the `Dispensing` state.
+    - **Transition**: If the user selects a snack that is out of stock, the machine transitions to the `OutOfStock` state.
+    - **Transition**: If the user requests a refund, the machine returns to the `Idle` state.
+
+3. **Dispensing**: The machine dispenses the selected snack to the user.
+    - **Transition**: Once the snack is dispensed, the machine checks its stock:
+        - If the stock is sufficient, it transitions back to the `Idle` state.
+        - If the stock is low or empty, it transitions to the `OutOfStock` state.
+
+4. **OutOfStock**: The machine indicates that the selected snack is out of stock.
+    - **Transition**: The machine waits for a maintenance action to replenish the stock. Once the stock is replenished, it transitions to the `Idle` state.
+
+5. **Maintenance**: The machine is being serviced or refilled.
+    - **Transition**: After maintenance, the machine transitions back to the `Idle` state, ready for normal operation.
+
+In this scenario, the states and transitions form a finite state machine that dynamically handles user interactions and machine operations. The machine can move from one state to another based on the input it receives, ensuring that it responds appropriately to different situations.
+
+This finite state machine ensures the vending machine operates efficiently, handling user actions and stock levels dynamically to provide a seamless user experience.
 
 ---
 
