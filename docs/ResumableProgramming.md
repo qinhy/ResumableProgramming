@@ -16,17 +16,18 @@
 
 ## Chapter 1: Basic Python
 ### Introduction
-- **Overview**: Introduce Python as a programming language, focusing on features that facilitate resumable programming.
+- **Overview**: Introduce Python as a programming language, focusing on feature of flexibility.
 - **Objective**: Equip readers with basic Python skills necessary to implement examples provided in the book.
 
 ### Section 1: Python Basics
 - Cover Python syntax, control structures, functions, and modules.
 
 ### Section 2: Advanced Python Features
-- Introduce more complex Python features such as decorators, generators, and context managers, which are crucial for writing resumable code.
+- Introduce more complex Python features such as decorators, generators, and context managers, which are crucial for writing code in the book.
 
 ### Conclusion
-- **Summary**: Recap the Python basics and their relevance to resumable programming.
+- **Summary**: Recap the Python basics and their relevance to the programming in the book.
+
 - **Future Outlook**: Discuss how these fundamentals will be used in subsequent chapters.
 
 ---
@@ -35,6 +36,7 @@
 
 ### Introduction
 - **Overview**: Define resumable programming as the ability of a process to pause at certain points and then continue from those points later, either after a failure or after a deliberate halt. This capability is crucial for developing robust and scalable applications in environments where interruptions are common or where tasks are long-running.
+
 - **Objective**: Equip readers with a foundational understanding of concepts and applications. By the end of this chapter, readers should appreciate the critical role that resumability plays in modern software development, particularly in distributed systems, cloud applications, and complex data processing workflows.
 
 
@@ -396,6 +398,7 @@ print('```')
 
 #### Key Features of This Resumable Implementation:
 - **Persistence**: The use of a `shelve` database (we will discuss more databases later), which is a simple persistent storage for Fibonacci integers, allows the function to get/set results. If the process is interrupted, the previously computed values of the sequence are saved (this is also very beneficial when the app crashes unexpectedly).
+
 - **Performance**: By saving previously computed values, we avoid redundant calculations, thus minimizing re-computation. This drastically improves performance, especially for large `n`.
 
 This approach illustrates a basic method to make the Fibonacci function resumable by using external storage for state. This can be extended to more complex algorithms and applications where resumability is crucial.
@@ -725,7 +728,7 @@ with shelve.open('machine_cache.db') as db:
     ```
     
 
-- **Fist Way: Recording Machine State After Each Action**: This approach saves the entire state of the machine after each action using a key-value store. When an action results in a crash, the machine's state is restored from the last successful operation, and the action is retried.
+- **First Way: Recording Machine State After Each Action**: This approach saves the entire state of the machine after each action using a key-value store. When an action results in a crash, the machine's state is restored from the last successful operation, and the action is retried.
     - Strengths:
       - **Direct State Management**: This method directly saves the complete state of the machine after each successful action. It's straightforward and ensures that you always revert to a known good state.
       - **Simplicity**: The approach is relatively simple to implement as it involves straightforward serialization and deserialization of the machine's state, making it easy to understand and maintain.
@@ -848,6 +851,7 @@ with shelve.open('machine_cache.db') as db:
 ## Chapter 3: SQL vs Key-Value Databases
 ### Introduction
 - **Overview**: This chapter delves into the comparison of SQL and key-value databases, focusing on their roles in maintaining state within resumable systems. These databases offer distinct approaches to data management and state persistence, crucial for applications that require robust resumability features.
+
 - **Objective**: By exploring the characteristics of both SQL and key-value databases, readers will gain insights into which database type is better suited for specific scenarios in resumable programming, enhancing the efficiency and reliability of their systems.
 
 ### Section 1: SQL Databases
@@ -856,6 +860,7 @@ with shelve.open('machine_cache.db') as db:
 
 - Definition and Core Characteristics
   - **SQL (Structured Query Language)**: SQL databases use SQL, a standard programming language specifically designed for managing and manipulating relational databases. SQL provides the means to execute queries, retrieve data, insert new data, update existing data, and delete data.
+  
   - **Structured Data**: Unlike NoSQL databases that can handle unstructured or semi-structured data, SQL databases are structured. They require a predefined schema that dictates the table structure, data types, and relationships—making them highly organized and suitable for complex queries.
 
 - Components of SQL Databases
@@ -943,7 +948,7 @@ A table in an SQL database stores data in rows and columns, similar to a spreads
 
 
 #### How: Implementing Resumability with SQL Databases
-- **Basic Examples**:In Python, managing database transactions can be done effectively using the `sqlite3` library. Transactions in SQL databases like SQLite allow you to execute multiple operations in a safe, atomic manner. If an error occurs during one of the operations, you can roll back to the original state as if none of the operations had happened. This feature is crucial for implementing resumability because it ensures data integrity and consistency.
+- **Basic Example**:In Python, managing database transactions can be done effectively using the `sqlite3` library. Transactions in SQL databases like SQLite allow you to execute multiple operations in a safe, atomic manner. If an error occurs during one of the operations, you can roll back to the original state as if none of the operations had happened. This feature is crucial for implementing resumability because it ensures data integrity and consistency.
 
     Here’s how to manage transactions in Python with `sqlite3`:
 
@@ -1595,7 +1600,7 @@ The Model-View-Controller (MVC) design pattern is pivotal in the architecture of
 - **Objective**:
 This chapter aims to dissect the MVC pattern, illustrating its fundamental role in enforcing separation of concerns—a principle that dictates that each module or layer of an application should manage a specific and unique aspect of the application's functionality. By adhering to this principle, MVC enhances the modularity of code, which is essential for building resumable applications that can maintain their state over time or during unexpected interruptions. Through practical examples and detailed explanations, we will explore how leveraging MVC can lead to more reliable, maintainable, and resumable web applications.
 
-## Section 1: Components of MVC
+### Section 1: Components of MVC
 The MVC design pattern is structured around three core components that interact seamlessly to separate the concerns of input, processing, and output. Understanding each component is crucial for leveraging MVC effectively in the development of resumable web applications. This section provides a detailed exploration of the Model, View, and Controller components.
 
 - **Model**: The Model represents the application's dynamic data structure, independent of the user interface. It directly manages the data, logic, and rules of the application. In the context of resumable applications, the Model is crucial as it not only holds the data but also the state information necessary to resume processes from a paused state. By encapsulating the state within the Model, applications can ensure data consistency and integrity throughout the lifecycle of the application and across different sessions.
@@ -2045,6 +2050,8 @@ Incorporating resumability into the MVC architecture enhances the robustness and
 
 
 ```python
+'Action Recording version'
+
 import shelve
 import math
 import random
@@ -2239,13 +2246,13 @@ The application of the MVC design pattern in your script allows for well-organiz
 
 - **Consideration of MachineAModel (Model)**:
    - Represents a virtual machine with attributes for orientation, position, and a list of actions.
-   - Should be kept simple, akin to a data structure. Includes methods to get/set the model's state (soft, not persistent).
+   - Should be kept simple, akin to a data structure. Includes methods to get/set the model's state (**soft, not persistent**).
    - Should not perform persistent operations.
    - Focus on serialization and reconstruction.
 
 - **Consideration of MachineLibrary (Controller)**:
-   - MVC defines roles but not the number of classes.
-   - Handles interactions (controlling) with **persistent storage** using the `shelve` library, such as retrieving and saving machine states.
+   - MVC defines roles but not the number of classes, we can define many controllers that we needed.
+   - MachineLibrary handles interactions (controlling) with **persistent storage** using the `shelve` library, such as retrieving and saving machine states.
    - The `with_db` decorator manages database connections and ensures they are closed properly.
    - Provides methods to create a new model, save a model's state, and reset a model's state in the database.
 
@@ -2395,7 +2402,7 @@ print('```')
 
 Overall, this implementation effectively demonstrates the use of the finite state machine design pattern in managing complex state transitions in a simple and robust way. The separation of state behaviors into distinct classes ensures that the system remains flexible and easy to manage as complexities or requirements change.
 
-### Section 2: Finite State Machine in Resumability
+### Section 2: Finite State Machine(FSM) in Resumability
 
 Finite State Machines (FSMs) are a powerful tool for managing the complexities of state in systems that require resumability. By clearly defining state transitions and actions, FSMs ensure that a system can pause and resume at any point without losing the context or consistency of its operations. This section will explore practical examples of how FSMs can be effectively used in various resumable systems, illustrating their versatility and utility.
 
@@ -2710,7 +2717,7 @@ import random
 
 class NetworkTask:
     def __init__(self): self.state = InitiationState()
-    def transition_to(self, state): self.state = state
+    def set_state(self, state): self.state = state
     def initiation(self): self.state.initiation(self)
     def connectionEstablished(self): self.state.connectionEstablished(self)
     def closure(self): self.state.closure(self)
@@ -2744,24 +2751,24 @@ class NetworkState:
 class InitiationState(NetworkState):
     @staticmethod
     def _transitions(): return [WaitingState]
-    def waiting(self, task: NetworkTask):                task.transition_to(WaitingState())
+    def waiting(self, task: NetworkTask):                task.set_state(WaitingState())
 
 class ConnectionEstablishedState(NetworkState):
     @staticmethod
     def _transitions(): return [ConnectionLostState,CommunicationState,ClosureState]    
-    def connectionLost(self, task: NetworkTask):         task.transition_to(ConnectionLostState())
-    def communication(self, task: NetworkTask):          task.transition_to(CommunicationState())
-    def closure(self, task: NetworkTask):                task.transition_to(ClosureState())
+    def connectionLost(self, task: NetworkTask):         task.set_state(ConnectionLostState())
+    def communication(self, task: NetworkTask):          task.set_state(CommunicationState())
+    def closure(self, task: NetworkTask):                task.set_state(ClosureState())
 
 class ClosureState(NetworkState):
     @staticmethod
     def _transitions(): return [InitiationState]
-    def initiation(self, task: NetworkTask):             task.transition_to(InitiationState())
+    def initiation(self, task: NetworkTask):             task.set_state(InitiationState())
 
 class ConnectionLostState(NetworkState):
     @staticmethod
     def _transitions(): return [InitiationState]
-    def initiation(self, task: NetworkTask):             task.transition_to(InitiationState())
+    def initiation(self, task: NetworkTask):             task.set_state(InitiationState())
 
 class WaitingState(NetworkState):    
     def simulate_waiting(self, task: NetworkTask):
@@ -2775,13 +2782,13 @@ class WaitingState(NetworkState):
      
     @staticmethod
     def _transitions(): return [ConnectionEstablishedState,FailureState]
-    def connectionEstablished(self, task: NetworkTask):  task.transition_to(ConnectionEstablishedState())
-    def failure(self, task: NetworkTask):                task.transition_to(FailureState())
+    def connectionEstablished(self, task: NetworkTask):  task.set_state(ConnectionEstablishedState())
+    def failure(self, task: NetworkTask):                task.set_state(FailureState())
 
 class FailureState(NetworkState):
     @staticmethod
     def _transitions(): return [InitiationState]
-    def initiation(self, task: NetworkTask):             task.transition_to(InitiationState())
+    def initiation(self, task: NetworkTask):             task.set_state(InitiationState())
 
 class CommunicationState(NetworkState):
     def simulate_communication(self, task: NetworkTask):
@@ -2793,8 +2800,8 @@ class CommunicationState(NetworkState):
         
     @staticmethod
     def _transitions(): return [ClosureState, ConnectionLostState]
-    def closure(self, task: NetworkTask):                task.transition_to(ClosureState())
-    def connectionLost(self, task: NetworkTask):         task.transition_to(ConnectionLostState())
+    def closure(self, task: NetworkTask):                task.set_state(ClosureState())
+    def connectionLost(self, task: NetworkTask):         task.set_state(ConnectionLostState())
 ```
 
 
@@ -3016,8 +3023,6 @@ print('```')
 This code defines the state transitions and uses a breadth-first search algorithm to find the shortest path from any state to the target `CommunicationState` state. By implementing such FSMs, network systems can automatically recover from disruptions, ensuring continuous and reliable communication.
 
 In summary, FSMs are invaluable for managing state transitions in resumable systems. They provide a clear and structured approach to handling various states and transitions, ensuring that systems can pause and resume operations without losing context or consistency. This example demonstrates how FSMs can be applied to a network connection recovery system, highlighting their practical utility and importance.
-
-- **Future Outlook**: Look at evolving uses of state machines in software development.
 
 ### Conclusion
 
@@ -4057,7 +4062,7 @@ from dataclasses import dataclass
 import uuid
 from pymongo import MongoClient, errors
 
-class MongoDBStorage:    
+class MongoDBStorage:
     def __init__(self):        
         """ Create a database connection to a MongoDB database """
         try:
@@ -4329,7 +4334,7 @@ for i in range(10):
     except Exception as e:
         print(e)
 
-# show database , and find failure requests
+# show failure requests
 failures = [k for k in database.keys('*') if database.get(k)['receive_body']=='NULL']
 print(f"show failures keys : {failures}\n")
 
@@ -4388,7 +4393,7 @@ print('```')
     ```
     
 
-### Section 3: Advance resumable MVC&FSMs
+### Section 3: Advance Resumable MVC&FSMs
 
 #### Designing a advance Resumable System by MVC & FSMs
 
@@ -4411,42 +4416,1047 @@ The following is a design for passive states. We can split a passive state into 
 **|IdleState| --StartListening--> | WaitingForSignalState | --ReceiveSignal--> | SignalReceivedState |**
 
 #### Dynamic transition and state:
-Let's consider the following case: 
 
-We have a vending machine that dispenses snacks. This vending machine has several states and transitions depending on the actions taken by the user and the machine itself. The states of the vending machine could include `Idle`, `CoinInserted`, `Dispensing`, `OutOfStock`, and `Maintenance`.
+In previous examples, we consider that the list of states and the table of transitions would remain unchanged over time.
 
-1. **Idle**: The initial state of the vending machine where it waits for a user to insert a coin.
-    - **Transition**: When a coin is inserted, the machine transitions to the `CoinInserted` state.
-  
-2. **CoinInserted**: In this state, the machine waits for the user to select a snack.
-    - **Transition**: If the user selects a snack that is available, the machine transitions to the `Dispensing` state.
-    - **Transition**: If the user selects a snack that is out of stock, the machine transitions to the `OutOfStock` state.
-    - **Transition**: If the user requests a refund, the machine returns to the `Idle` state.
+In dynamic situations, transitions or states change over time. Consider this example:
 
-3. **Dispensing**: The machine dispenses the selected snack to the user.
-    - **Transition**: Once the snack is dispensed, the machine checks its stock:
-        - If the stock is sufficient, it transitions back to the `Idle` state.
-        - If the stock is low or empty, it transitions to the `OutOfStock` state.
+A robot is trying to clean a table that has many items on it. For instance, there is an apple, some waste paper, and other things on the table. The robot will move each item as follows:
 
-4. **OutOfStock**: The machine indicates that the selected snack is out of stock.
-    - **Transition**: The machine waits for a maintenance action to replenish the stock. Once the stock is replenished, it transitions to the `Idle` state.
+- Apple -> fridge
+- Waste paper -> trash bin
 
-5. **Maintenance**: The machine is being serviced or refilled.
-    - **Transition**: After maintenance, the machine transitions back to the `Idle` state, ready for normal operation.
+We can define states and transitions as follows:
 
-In this scenario, the states and transitions form a finite state machine that dynamically handles user interactions and machine operations. The machine can move from one state to another based on the input it receives, ensuring that it responds appropriately to different situations.
+- states: [idle, catch_apple, to_fridge, catch_waste_paper, to_trash_bin, place]
+- transitions: 
+    - idle -> [catch_apple, catch_waste_paper, to_table]
+    - catch_apple -> [to_fridge]
+    - to_fridge -> [place]
+    - catch_waste_paper -> [to_trash_bin]
+    - to_trash_bin -> [place]
+    - place -> [idle]
 
-This finite state machine ensures the vending machine operates efficiently, handling user actions and stock levels dynamically to provide a seamless user experience.
+Now, we want to add a process for handling a book, specifically "book -> bookshelf," when a book is on the table. In Python, we can easily modify the instance’s members to process the book with the following code:
+
+```python
+    robotA.add_state('catch_book')
+    robotA.add_state('to_bookshelf')
+
+    robotA.add_transition('catch_book', ['to_bookshelf'])
+    robotA.add_transition('to_bookshelf', ['place'])
+
+    robotA.add_transition_func('catch_book', lambda: 'try catching book')
+    robotA.add_transition_func('to_bookshelf', lambda: 'try going to bookshelf')
+```
+
+How do we handle an increasing number of transitions and states? 
+
+- We have a path solver of `find_path`! In the previous examples, we used a very simple one, but we can introduce much smarter solvers.
+
+### Conclusion
+
+Throughout this chapter, we've explored the integration of the Model-View-Controller (MVC) framework with Finite State Machines (FSMs) to enhance resumability in software systems. This combination provides a robust architecture for managing complex state transitions in a clear and maintainable manner. The practical examples and case studies illustrated not only the theoretical aspects of MVC and FSM integration but also demonstrated their practical applications in real-world scenarios.
+
+#### Key Takeaways:
+- **Structured System Design**: Combining MVC and FSMs helps in structuring applications that are both resilient and easy to manage. The MVC framework ensures a clear separation of concerns, while FSMs offer precise control over state transitions.
+
+- **Enhanced Error Handling and Resilience**: The use of FSMs within the MVC architecture allows systems to handle errors gracefully and recover from unexpected states, thereby enhancing the resilience of the application.
+
+- **Improved Maintainability and Scalability**: The clear demarcation of responsibilities and states leads to better maintainability. Systems designed with MVC and FSMs can be easily scaled and adapted to new requirements without extensive modifications.
+
+### Additional Notes:
+- **Future Directions**: As systems continue to grow in complexity and scale, the integration of MVC and FSMs will become increasingly crucial. Future research and development might focus on automating state management and further enhancing the scalability of these systems.
+
+- **Implementation Challenges**: While the benefits are substantial, the implementation of FSMs within an MVC framework requires careful planning and understanding of both state management and application architecture. Developers must consider the specific needs of their applications and the potential complexity that FSMs might introduce.
+
+- **Educational Opportunities**: There is a significant opportunity for educational programs to incorporate teaching modules that focus on advanced architectural patterns like MVC combined with FSMs. This knowledge will empower upcoming developers to build more robust and efficient systems.
+
+- **Community Contributions**: Open-source contributions and community-driven projects can play a pivotal role in refining the MVC and FSM integration techniques. Sharing real-world problems and solutions can help in evolving these architectural patterns to better meet the needs of modern software development.
 
 ---
 
-## Chapter 7: Testing Resumable Systems
-- (Existing content)
+## Chapter 7: Practical Applications and Case Studies
 
-## Chapter 8: Resumability in Distributed Systems
-- (Existing content)
+### Introduction
 
-## Chapter 9: Practical Applications and Case Studies
+In this chapter, we delve into the practical applications and case studies of resumable programming, showcasing real-world scenarios where the techniques and concepts discussed in the previous chapters are implemented effectively. Resumable programming is not just a theoretical concept but a vital tool in the development of robust, scalable, and fault-tolerant systems. By examining various case studies across different industries, this chapter aims to illustrate the diverse applications of resumability, demonstrating how it enhances system reliability, user experience, and overall performance.
+
+**Objectives:**
+- **Illustrate Real-World Implementation**: Provide insights into how resumable programming is integrated into commercial and open-source projects.
+- **Demonstrate Benefits**: Highlight the tangible benefits that resumable programming brings to systems, including increased uptime, better error handling, and smoother user interactions.
+- **Inspire Innovation**: Encourage readers to consider how the principles of resumability can be adapted and applied in their own projects.
+
+Through a series of case studies, ranging from web applications to distributed systems and even embedded devices, this chapter will explore how developers around the world are leveraging resumable programming to solve complex challenges. Each case study will detail the problem faced, the resumability approach taken, and the outcomes achieved, providing a comprehensive overview of the practical deployment of resumable systems.
+
+### Section 0: Preparation
+In the previous example, we needed **persistent storage** to store states and data models. In this chapter, we will use the following NoSQL storage code.
+
+
+```python
+from pymongo import MongoClient, errors
+
+# The following code is for those who want a ready-to-use production solution.
+class MongoDBStorage:
+    def __init__(self):        
+        """ Create a database connection to a MongoDB database """
+        try:
+            # Please change following settings to MongoDB Atlas Cloud Platform
+            # self.conn = MongoClient('mongodb+srv://**USER_NAME**:**PASSWORD**@atlascluster.xxxx.mongodb.net/')
+            self.conn = MongoClient('mongodb://localhost:27017/')
+            self.db = self.conn.get_database('ResumableProgramming')
+            self.collection = self.db.get_collection('Chapter7')
+        except errors.ConnectionFailure as e:
+            print("Connection error:", e)
+
+    def _ID_KEY(self):return '_id'
+
+    def exists(self, key: str)->bool:
+        return self.collection.find_one({self._ID_KEY(): key}) is not None
+
+    def set(self, key: str, value: dict):
+        self.collection.update_one({self._ID_KEY(): key}, {"$set": value}, upsert=True)
+
+    def get(self, key: str)->dict:
+        res = self.collection.find_one({self._ID_KEY(): key})            
+        if res: del res['_id']
+        return res
+
+    def delete(self, key: str):
+        self.collection.delete_one({self._ID_KEY(): key})
+
+    def keys(self, pattern: str = '*')->list[str]:
+        regex = '^'+pattern.replace('*', '.*')
+        return [doc['_id'] for doc in self.collection.find({self._ID_KEY(): {"$regex": regex}})]
+    
+    def clean(self):
+        for k in self.keys():self.delete(k)
+
+# If you do not have MongoDB, we also provide the following simple local solution.
+import shelve,re
+
+class ShelveStorage:
+    def __init__(self, filename: str = 'storage.db'):
+        """Create a storage connection to a Shelve database"""
+        try:
+            self.filename = filename
+            self.db = shelve.open(filename, writeback=True)
+        except Exception as e:
+            print("Shelve open error:", e)
+            self.db = None
+
+    def exists(self, key: str) -> bool:
+        return key in self.db
+
+    def set(self, key: str, value: dict):
+        try:
+            self.db[key] = value
+            self.db.sync()  # Ensure the data is written to disk
+        except Exception as e:
+            print("Set error:", e)
+
+    def get(self, key: str) -> dict:
+        try:
+            return self.db.get(key, None)
+        except Exception as e:
+            print("Get error:", e)
+            return None
+
+    def delete(self, key: str):
+        try:
+            if key in self.db:
+                del self.db[key]
+                self.db.sync()  # Ensure the data is written to disk
+        except Exception as e:
+            print("Delete error:", e)
+
+    def keys(self, pattern: str = '*') -> list[str]:
+        try:
+            regex = '^' + pattern.replace('*', '.*')
+            return [key for key in self.db.keys() if re.match(regex, key)]
+        except Exception as e:
+            print("Keys error:", e)
+            return []
+    
+    def clean(self):
+        for k in self.keys():self.delete(k)
+
+    def close(self):
+        if self.db: self.db.close()
+
+# test the storage
+def test_storage():
+    # storage = ShelveStorage()
+    storage = MongoDBStorage()
+
+    try:
+        # Test set and get
+        storage.set('key1', {'name': 'Alice', 'age': 30})
+        result = storage.get('key1')
+        assert result == {'name': 'Alice', 'age': 30}, f"Expected {{'name': 'Alice', 'age': 30}}, got {result}"
+
+        # Test exists
+        storage.set('key2', {'name': 'Bob', 'age': 25})
+        assert storage.exists('key2'), "Expected key2 to exist"
+        assert not storage.exists('key3'), "Expected key3 to not exist"
+
+        # Test delete
+        storage.set('key4', {'name': 'Charlie', 'age': 40})
+        storage.delete('key4')
+        assert not storage.exists('key4'), "Expected key4 to be deleted"
+        assert storage.get('key4') is None, "Expected key4 to be None after deletion"
+        storage.clean()
+
+        # Test keys
+        storage.set('keyA', {'value': 1})
+        storage.set('keyB', {'value': 2})
+        storage.set('keyC', {'value': 3})
+
+        keys = storage.keys('key*')
+        assert set(keys) == {'keyA', 'keyB', 'keyC'}, f"Expected keys {{'keyA', 'keyB', 'keyC'}}, got {set(keys)}"
+
+        # Test close and persistence
+        storage.set('key5', {'name': 'David', 'age': 50})
+        del storage
+        
+        # storage = ShelveStorage()
+        storage = MongoDBStorage()
+        storage.get('key5') == {'name': 'David', 'age': 50}, f"Expected {{'name': 'David', 'age': 50}}, got {storage.get('key5')}"
+
+        print("All tests passed successfully!")
+
+    finally:
+        storage.clean()
+
+# Run the tests
+test_storage()
+```
+
+    All tests passed successfully!
+    
+
+Furthermore, you can also try a cloud key-value solution like Firestore or AWS DynamoDB, which will make your solution global and highly resilient.
+
+### Section 1: Resumable Large File Uploading Service
+Let's consider a large file uploading service (in AWS Lambda and S3).
+
+1. The user selects a large file and uploads it.
+2. This service will upload the file as chunks into S3.
+3. When the uploading is complete, we can merge all chuncks by using S3 SDK.
+4. User can pause uploading any time and resume it.
+
+Why do we need to record state for uploading (in AWS Lambda and S3)?
+- Many cloud solutions, such as AWS Lambda, can only run for a maximum of 15 minutes.
+- Sometimes the uploading will take longer than 15 minutes!
+- S3 do not manage the file uploading states for user.
+
+In this example, the server needs to track the state of the user's large file and uploading task. 
+
+The possible states and transitions are like following python code:
+
+
+
+```python
+class S3LargeUploadingState:
+    class States:
+        idle = 'idle'
+        recieving = 'recieving'
+        recieved = 'recieved'
+        recieve_failure = 'recieve_failure'
+        merged = 'merged'
+        merge_failure = 'merge_failure'
+
+    _transitions = {
+        States.idle:             [States.recieving],
+        States.recieving:        [States.recieved, States.recieve_failure, States.idle],
+        States.recieve_failure:  [States.recieving], # retry recieving
+        States.recieved:         [States.merged, States.merge_failure],
+        States.merge_failure:    [States.merged],
+        States.merged:           [], # end of task life
+        
+    }
+    _states = list(_transitions.keys())
+```
+
+Let's consider this service MVC(FSMs)'s Model and Controller.
+
+
+```python
+import os
+from functools import wraps
+
+# aws settings
+import boto3
+BUCKET_NAME = os.environ['AWS_S3_BUCKET_NAME']
+def get_s3_client():
+    return boto3.client(
+        service_name='s3',
+        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+        region_name=os.environ['AWS_DEFAULT_REGION'])
+
+# easy to change back end
+class DBStorage(MongoDBStorage):
+    pass
+
+class S3LargeUploadingModel:
+    def __init__(self,file_name=None,file_size=0,file_hash=None,
+                upload_id=None,chunk_size = 5 * 1024 * 1024,
+                parts = [],) -> None:
+        
+        # Initialize the file name as None, to be set when the upload process starts
+        self.file_name = file_name
+        
+        # Initialize the file size as None, to be set when the file information is provided
+        self.file_size = file_size
+        
+        # Initialize the file hash as None, can be used for data integrity checks
+        self.file_hash = file_hash
+        
+        # Initialize the upload ID as None, which will be assigned once the upload session is initiated
+        self.upload_id = upload_id
+        
+        # Set the chunk size to 5 MB (5 * 1024 * 1024 bytes); this size dictates how large each part of the file upload will be
+        self.chunk_size = chunk_size
+        
+        # Initialize the total number of chunks as None, which will be calculated based on the file size and chunk size
+        self.total_chunks = math.ceil(file_size / chunk_size)
+        
+        # Initialize an empty list to hold parts metadata, containing dictionaries with PartNumber and ETag for each uploaded chunk
+        self.parts:list[str,dict] = parts  # List of dictionaries: [{'PartNumber': xxx, 'ETag': xxx}]
+
+        self.FSMs_state=S3LargeUploadingFSMsController.S3LargeUploadingState.States.idle
+
+    def is_recieved(self):
+        return len(self.parts)==self.total_chunks
+
+    # do not random gen id, for to identify file
+    @staticmethod
+    def gen_id(file_name,file_size,file_hash):
+        return f'{file_name},{file_size},{file_hash}'
+    
+    def get_id(self):
+        return S3LargeUploadingModel.gen_id(
+                    self.file_name,self.file_size,self.file_hash)
+    
+    def to_dict(self):
+        return self.__dict__
+    
+    def from_dict(self,data):
+        for k in self.__dict__.keys():
+            setattr(self,k,data[k])
+        return self
+    
+class S3LargeUploadingFSMsController:
+    
+    class S3LargeUploadingState:
+        class States:
+            idle = 'idle'
+            recieving = 'recieving'
+            recieved = 'recieved'
+            recieve_failure = 'recieve_failure'
+            merged = 'merged'
+            merge_failure = 'merge_failure'
+
+        _transitions = {
+            States.idle:             [States.recieving],
+            States.recieving:        [States.recieved, States.recieve_failure, States.idle],
+            States.recieve_failure:  [States.recieving], # retry recieving
+            States.recieved:         [States.merged, States.merge_failure],
+            States.merge_failure:    [States.merged],
+            States.merged:           [], # end of task life
+            
+        }
+        _states = list(_transitions.keys())
+        
+    def __init__(self,model:S3LargeUploadingModel) -> None:
+        self.model = model
+    
+    # public
+    @staticmethod
+    def new_or_find_file_uploading(file_name,file_size,file_hash):
+        # find the file is recorded
+        id = S3LargeUploadingModel.gen_id(file_name,file_size,file_hash)
+        model_data = DBStorage().get(id)
+        if model_data: return S3LargeUploadingFSMsController(
+                                    S3LargeUploadingModel(
+                                        ).from_dict(model_data))
+
+        # new request for file uploading, hard operation
+        response = get_s3_client().create_multipart_upload(Bucket=BUCKET_NAME, Key=file_name)
+        upload_id = response['UploadId']    
+        model = S3LargeUploadingModel(file_name,file_size,file_hash,upload_id)
+        return S3LargeUploadingFSMsController(model).save_model()
+    
+    def save_model(self):
+        DBStorage().set(self.model.get_id(),self.model.to_dict())
+        return self
+        
+    def delete_model(self):
+        return DBStorage().delete(self.model.get_id())
+    
+    def current_state(self):
+        return self.model.FSMs_state    
+
+    def set_state(self,state):
+        self.model.FSMs_state=state
+        self.save_model()
+
+    ################################# privates will use in it self or FSMs part
+        
+    def _merge_chunk(self):        
+        # Complete the multipart upload
+        response = get_s3_client().complete_multipart_upload(
+            Bucket=BUCKET_NAME,
+            Key=self.model.file_name,
+            UploadId=self.model.upload_id,
+            MultipartUpload={'Parts': self.model.parts}
+        )
+        print(f"File {self.model.file_name} has been uploaded and merged on S3 successfully.")
+
+    def _append_chunk(self,chunk_data):
+        this_chunk_No = len(self.model.parts) + 1
+
+        # Upload the chunk as a part of the multipart upload
+        part_response = get_s3_client().upload_part(
+            Bucket=BUCKET_NAME,
+            Key=self.model.file_name,
+            PartNumber=this_chunk_No,
+            UploadId=self.model.upload_id,
+            Body=chunk_data
+        )
+
+        # Store part information to complete the multipart upload later
+        self.model.parts.append({
+            'PartNumber': this_chunk_No,
+            'ETag': part_response['ETag']
+        })
+        self.save_model()
+
+    ################## public FSMs part    
+    def validate_transition(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            self:S3LargeUploadingFSMsController=self
+            valid_transitions = self.S3LargeUploadingState._transitions[self.current_state()]
+            target_transition = func.__name__.replace('to_','')        
+            if target_transition not in valid_transitions:            
+                raise ValueError(f"Invalid transition from [{self.current_state()}] -> [{target_transition}]")
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f'[{self.__class__.__name__}]: {e}')
+        return wrapper
+    
+    @validate_transition
+    def to_idle(self):
+        self.set_state(S3LargeUploadingState.States.idle)
+        
+    @validate_transition
+    def to_recieving(self,chunk_data):
+        # start recieving flows
+        if chunk_data:
+            self.set_state(S3LargeUploadingState.States.recieving)
+            try:
+                if not self.model.is_recieved():
+                    self._append_chunk(chunk_data)
+            except Exception as e:
+                print(e)            
+                self.to_recieve_failure()
+
+    @validate_transition
+    def to_recieve_failure(self):
+        self.set_state(S3LargeUploadingState.States.recieve_failure)
+
+    @validate_transition
+    def to_recieved(self):
+        if self.model.is_recieved():
+            self.set_state(S3LargeUploadingState.States.recieved)
+        else:
+            self.to_idle()
+            
+    @validate_transition
+    def to_merged(self):
+        try:
+            self._merge_chunk()
+            self.set_state(S3LargeUploadingState.States.merged)
+        except Exception as e:
+            print(e)            
+            self.to_merge_failure()
+
+    @validate_transition
+    def to_merge_failure(self):
+        self.set_state(S3LargeUploadingState.States.merge_failure)
+    
+    def find_path(self, transitions:dict, start_state, end_state):
+        queue = deque([[start_state]])    
+        visited = set()    
+        while queue:
+            path = queue.popleft()
+            state = path[-1]        
+            if state == end_state:
+                return path
+            if state not in visited:
+                visited.add(state)            
+                next_states = transitions.get(state, [])
+                for next_state in next_states:
+                    new_path = list(path)
+                    new_path.append(next_state)
+                    queue.append(new_path)
+        return []
+    
+    def next_action(self,target_state):
+        path = self.find_path(self.S3LargeUploadingState._transitions,
+                              self.S3LargeUploadingState._states, target_state)
+        if len(path)<=1: return None
+        return path[1]
+```
+
+
+```python
+# server by lib of fastapi
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi.responses import FileResponse, JSONResponse
+
+app = FastAPI()
+
+@app.get("/")
+def serve_html():
+    return FileResponse("index.html")
+
+def main_loop(file_name, file_size, file_hash, file:UploadFile=None):
+    STATES = S3LargeUploadingState.States
+    try:
+        # Initialize the controller and determine the current state and next action
+        controller = S3LargeUploadingFSMsController.new_or_find_file_uploading(file_name, file_size, file_hash)
+        chunk_data = file.file.read() if file else None # Read the chunk data
+        current = controller.current_state()
+        action = controller.next_action(target_state=STATES.merged)
+
+        if current == STATES.merged and action is None:
+            # If already merged and no further action needed, finish
+            print({'message': f'Current: {current}, finish!'})
+            # finish and delete the record in DB.
+            controller.delete_model()
+            return JSONResponse(content={'message': f'Current: {current}, finish!'})
+        
+        # Perform the next action based on the current state
+        print(f'Current: {current}, try to_{action}')   
+        if action == STATES.recieving:
+            if chunk_data is not None:
+                getattr(controller, f'to_{action}')(chunk_data)
+        else:
+            getattr(controller, f'to_{action}')()
+
+        return JSONResponse(content={
+            'data': controller.model.to_dict(),
+            'message': f'Current: {current}, try to_{action}'
+        })
+        
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/start_upload/")
+def start_upload(
+    file_name: str = Form(...),
+    file_size: int = Form(...),
+    file_hash: str = Form(...)):
+    return main_loop(file_name, file_size, file_hash)
+
+
+@app.post("/upload_chunk/")
+def upload_chunk(
+    file: UploadFile = File(...),
+    file_name: str = Form(...),
+    file_size: int = Form(...),
+    file_hash: str = Form(...)):
+    return main_loop(file_name, file_size, file_hash, file)
+
+```
+
+Make sure you have Python and FastAPI installed. If you haven't installed FastAPI yet, run:
+
+```bash
+pip install fastapi[all] uvicorn
+```
+
+Run the server using `uvicorn` (the ASGI server used with FastAPI):
+
+```bash
+uvicorn <python source code >:app --reload
+```
+
+The source code consists of previous Python code blocks, which we can merge into one file.
+
+This will start the FastAPI server on `http://127.0.0.1:8000`.
+
+The server provides three endpoints:
+
+1. **GET `/`**: Serves the HTML file (`index.html`). Make sure you have this file in the same directory as your server script.
+   
+2. **POST `/start_upload/`**: Initializes the upload process for a large file by recording metadata such as the file name, size, and hash.
+   
+3. **POST `/upload_chunk/`**: Handles uploading chunks of the file. Each chunk is processed and stored, and the state of the upload is managed.
+
+The final step in our implementation is to develop the front-end `index.html`.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chunked File Upload to S3</title>
+</head>
+
+<body>
+    <div class="container">
+        <input type="file" id="fileInput" />
+        <progress id="progress" value="0" max="100"></progress>
+    </div>
+    <div id="status"></div>
+    <div id="debugmsg" hidden></div>
+    <script>
+        var file_name = null;
+        var file_size = null;
+        var file_hash = null;
+        var file_server_data = null;
+
+        const requestForm = (file = null) => {
+            const formData = new FormData();
+            if (file) formData.append('file', file);
+            formData.append('file_name', file_name);
+            formData.append('file_size', file_size);
+            formData.append('file_hash', file_hash);
+            return formData;
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            file_name = file.name;
+            file_size = file.size;
+
+            const chunkSize = 5 * 1024 * 1024; // 5MB chunks
+            const chunks = Math.ceil(file.size / chunkSize);
+            const progress = document.getElementById('progress');
+            progress.value = 0;
+
+            document.getElementById('status').innerText = 'Calculating SHA-256 Hash ...';
+
+            calculateHash(file, chunkSize, chunks, progress).then(function (hashBuffer) {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                file_hash = hashArray.map(function (byte) {
+                    return byte.toString(16).padStart(2, '0');
+                }).join('');
+                document.getElementById('status').innerText += 'end';
+                document.getElementById('debugmsg').innerText += `${file_name} SHA-256 Hash: ${file_hash}\n`;
+                document.getElementById('status').innerText = 'Uploading ...';
+                startUpload().then(function (file_server_data) {
+                    document.getElementById('debugmsg').innerText += JSON.stringify(file_server_data);
+                    uploadChunk(file, file_server_data.chunk_size,
+                        file_server_data.parts.length, file_server_data.total_chunks);
+                });
+            }).catch(function (error) {
+                document.getElementById('debugmsg').innerText += `Error: ${error.message}\n`;
+            });
+        });
+
+        function startUpload() {
+            return new Promise(function (resolve, reject) {
+                fetch('/start_upload/', {
+                    method: 'POST',
+                    body: requestForm()
+                }).then(function (res) {
+                    return res.json();
+                }).then(function (data) {
+                    resolve(data.data);
+                }).catch(function (error) {
+                    reject(error);
+                });
+            });
+        }
+
+        function uploadChunk(file, chunkSize, chunkNumber, totalChunks) {
+            const progress = document.getElementById('progress');
+            progress.value = (chunkNumber / totalChunks) * 100;
+            if (chunkNumber >= totalChunks) {
+                startUpload().then(function (file_server_data) {
+                    document.getElementById('debugmsg').innerText += JSON.stringify(file_server_data) + '\n';
+                    // file will be merged and record will be removed, undefined means end.
+                    if (file_server_data !== undefined) {
+                        uploadChunk(file, file_server_data.chunk_size, file_server_data.parts.length, file_server_data.total_chunks);
+                    } else {
+                        document.getElementById('status').innerText += 'end';
+                    }
+                });
+                return;
+            }
+            const start = chunkNumber * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const blob = file.slice(start, end);
+
+            fetch('/upload_chunk/', {
+                method: 'POST',
+                body: requestForm(blob)
+            }).then(function (res) {
+                return res.json();
+            }).then(function (data) {
+                file_server_data = data.data;
+                document.getElementById('debugmsg').innerText += JSON.stringify(file_server_data) + '\n';
+                uploadChunk(file, file_server_data.chunk_size, file_server_data.parts.length, file_server_data.total_chunks);
+            }).catch(function (error) {
+                console.error('Error uploading chunk:', error);
+                alert(`Failed to upload chunk ${chunkNumber + 1}. Please try again.`);
+            });
+        }
+
+        function calculateHash(file, chunkSize, chunks, progress) {
+            const crypto = window.crypto || window.msCrypto; // for IE 11
+            const hashAlgorithm = 'SHA-256';
+
+            return new Promise(function (resolve, reject) {
+                var hashBuffer = new ArrayBuffer(0);
+                function processChunk(i) {
+                    if (i >= chunks) {
+                        resolve(hashBuffer);
+                        return;
+                    }
+                    const start = i * chunkSize;
+                    const end = Math.min(start + chunkSize, file.size);
+                    const chunk = file.slice(start, end);
+
+                    chunk.arrayBuffer().then(function (chunkBuffer) {
+                        crypto.subtle.digest(hashAlgorithm, new Uint8Array(chunkBuffer)).then(function (digest) {
+                            hashBuffer = digest;
+                            progress.value = ((i + 1) / chunks) * 100;
+                            processChunk(i + 1);
+                        }).catch(reject);
+                    }).catch(reject);
+                }
+                processChunk(0);
+            });
+        }
+    </script>
+</body>
+
+</html>
+```
+
+#### Key Features of This Resumable Implementation
+
+- **State Machine for Managing Upload States**:
+   - A `S3LargeUploadingState` class implements a state machine to manage the different stages of the upload process. The states include `idle`, `receiving`, `received`, `receive_failure`, `merged`, and `merge_failure`. Transitions between these states are managed based on conditions and errors.
+   - The state transition methods in `S3LargeUploadingState` are wrapped with a `validate_transition` decorator to validate transitions and handle exceptions. Invalid state transitions raise an error, and exceptions within a transition trigger specific failure states.
+
+- **Persistent Model Management with a Backend Database**:
+   - The code leverages a `DBStorage` class (inherited from `MongoDBStorage`) for persisting the state of file uploads, such as file metadata and upload progress, enabling resumable uploads. This is crucial for handling large files that may require multiple sessions to complete the upload process.
+
+   - The backend for managing storage can be easily replaced or extended, as demonstrated by the `DBStorage` class, which inherits from a more generic `MongoDBStorage`. This design allows for easy adaptation to different backend storage systems.
+
+- **Simplified API for External Use**:
+    - The `S3LargeUploadingController` class provides a high-level API for interacting with the upload process, allowing external callers to trigger state transitions and manage uploads without needing to interact with lower-level details.
+
+    - The `next_action` method in `S3LargeUploadingState` class finds the shortest path for transitioning from the current state to a **target** state, providing a clear mechanism for managing complex state transitions.
+
+### Section 2: Video File Conversion Service
+Let's consider a video file conversion service (in AWS Lambda).
+
+1. The user selects a video file and uploads it. (We can reuse previous example!)
+2. The server converts the uploaded video file.
+3. When the conversion is complete, the server notifies the user.
+
+Many cloud solutions, such as AWS Lambda, can only run for a maximum of 15 minutes.
+
+In this example, the server needs to track the state of the user's video file and perform tasks accordingly. 
+
+The possible states and transitions are like following python code:
+
+
+```python
+states = [ 'idle', 'recieving', 'recieved', 'recieve_failure', 'converting', 'converted', 'convert_failure']
+transitions = {
+    'idle' :             ['recieving'],
+    'recieving' :        ['recieved', 'recieve_failure'],
+    'recieved' :         ['converting'],
+    'recieve_failure' :  ['idle'],
+    
+    'converting' :       ['converted', 'convert_failure'],
+    'convert_failure' :  ['recieved'],
+}
+```
+
+Let's consider this service MVC(FSMs)'s Model and basic Controller. And the Controller's states.
+
+
+```python
+"This model needs UUIDs to identify itself and related files."
+"We also need to record the process to ensure the state can be restored."
+
+from collections import deque
+from functools import wraps
+import uuid
+
+# easy to change back end
+class DBStorage(MongoDBStorage):
+    pass
+
+class FileConversionModel:
+    # Define the size unit as 5MB
+    SIZE_UNIT = 5 * 1024 * 1024
+    
+    def __init__(self, uuid=None, filename=None, filesize=None) -> None:
+        if filesize <= 0:
+            raise ValueError('file size must greater than 0')
+        
+        # Initialize the file conversion model with given parameters
+        self.uuid = uuid
+        self.filename = filename
+        self.filesize = filesize
+        
+        # Attributes related to the raw file
+        self.raw_file_uuid = None
+        self.recieved_chunks = []  # To track received chunks
+        self.total_chunks = 0      # Total number of chunks to be received
+
+        # Attributes related to the converted file
+        self.converted_file_uuid = None
+        self.converted_count = 0  # Counter for converted count
+        self.total_count = 0      # Total count to be converted
+
+        self.state = FileConversionState.States.idle
+
+        self.init_chunks(filesize)
+    
+    def init_chunks(self, filesize):
+        # Calculate the total number of chunks based on file size and size unit
+        self.total_chunks = filesize // FileConversionModel.SIZE_UNIT
+        
+        # If the file size is less than or equal to one unit, set total chunks to 1
+        if filesize <= FileConversionModel.SIZE_UNIT:
+            self.total_chunks = 1
+        # If there's a remainder after dividing by the size unit, add one more chunk
+        elif filesize % FileConversionModel.SIZE_UNIT > 0:
+            self.total_chunks += 1
+        
+        # Initialize a list to track received chunks with False (not received)
+        self.recieved_chunks = [False for i in range(self.total_chunks)]
+
+    def to_dict(self):
+        return self.__dict__
+
+    def from_dict(self,uuid,data):
+        self.uuid = uuid
+        for k in self.__dict__.keys():
+            setattr(self,data[k])
+    
+    def is_empty(self):
+        return sum(self.recieved_chunks)==0
+
+    def is_converted(self):
+        return self.converted_count==self.total_count
+    
+    def is_recieved(self):
+        return sum(self.recieved_chunks)==self.total_chunks
+
+class FileConversionController:
+    def __init__(self,model:FileConversionModel) -> None:
+        self.model = model
+    
+    # # hard operation
+    # def update_model(self,key,value):
+    #     if not hasattr(self.model,key):raise ValueError(f'no such key of {key} in model')
+    #     setattr(self.model,key,value)
+    #     self.save_model()
+
+    def save_model(self):
+        # connect db
+        DBStorage().set(model.uuid,model.to_dict())
+        return self
+    
+    @staticmethod
+    def new_file_conversion(filename,filesize):
+        # new request for file conversion, hard operation
+        model = FileConversionModel(uuid.uuid4(),filename,filesize)
+        return FileConversionController(model).save_model()
+    
+    @staticmethod
+    def find_file_conversion(uuid):
+        model = DBStorage().get(uuid)
+        if model is None:raise ValueError('no such data of {uuid}')
+        return FileConversionController(model)
+    
+    def append_raw_file(self,chunk_No,chunk_data):
+        # to complete raw file when get new chunk from user
+        if self.model.total_chunks>1:
+            with open(f'{self.model.filename}.{chunk_No}.bin','wb') as f:
+                f.write(chunk_data)
+        else:
+            with open(f'{self.model.filename}','wb') as f:
+                f.write(chunk_data)
+        self.model.recieved_chunks[chunk_No]=True
+        if self.model.is_recieved() and self.model.total_chunks>1:
+            # merge parts into a file
+            pass
+        self.save_model()
+
+    def convert_raw_file(self):
+        # to convert raw file, and it will be a long process
+        start = self.model.converted_count
+        for f in range(start,self.model.total_count):
+            # do conversion on each frame
+            pass
+            self.model.converted_count=f
+            if f%100==0:#save our process every 100 count
+                self.save_model()
+        self.save_model()
+
+class FileConversionState:
+    class States:
+        idle = 'idle'
+        recieving = 'recieving'
+        recieved = 'recieved'
+        recieve_failure = 'recieve_failure'
+        converting = 'converting'
+        converted = 'converted'
+        convert_failure = 'convert_failure'
+
+    _transitions = {
+        States.idle:            [States.recieving],
+        States.recieving:       [States.recieved, States.recieve_failure],
+        States.recieved:        [States.converting],
+        States.recieve_failure: [States.idle],
+        
+        States.converting:      [States.converted, States.convert_failure],
+        States.convert_failure: [States.recieved],
+    }
+    _states = list(_transitions.keys())
+
+    def __init__(self, controller:FileConversionController):
+        self.controller = controller
+        self.model = self.controller.model
+        self._state = self.model.state
+
+    def set_state(self,state):
+        self._state=state
+        self.model.state=state
+        self.controller.save_model()
+    
+    def handle_errors(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            self:FileConversionState=self
+            valid_transitions = self._transitions[self._state]
+            target_transition = func.__name__.replace('to_','')        
+            if target_transition not in valid_transitions:            
+                raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f'[{self.__class__.__name__}]: {e}')
+        return wrapper
+
+    @handle_errors
+    def to_recieving(self):
+        #start recieving flows
+        pass
+
+    @handle_errors
+    def to_recieved(self):
+        if self.model.is_recieved():
+            self.set_state(FileConversionState.States.recieved)
+
+    @handle_errors
+    def to_recieve_failure(self):
+        self.set_state(FileConversionState.States.recieve_failure)
+
+    @handle_errors
+    def to_converting(self):
+        self.set_state(FileConversionState.States.converting)
+        #start converting flows
+        pass
+
+    @handle_errors
+    def to_converted(self):
+        if self.model.is_converted():
+            self.set_state(FileConversionState.States.converted)
+
+    @handle_errors
+    def to_convert_failure(self):
+        self.set_state(FileConversionState.States.convert_failure)
+
+    def find_path(self, transitions:dict, start_state, end_state):
+        queue = deque([[start_state]])    
+        visited = set()    
+        while queue:
+            path = queue.popleft()
+            state = path[-1]        
+            if state == end_state:
+                return path
+            if state not in visited:
+                visited.add(state)            
+                next_states = transitions.get(state, [])
+                for next_state in next_states:
+                    new_path = list(path)
+                    new_path.append(next_state)
+                    queue.append(new_path)
+        return []
+    
+    def resume_state(self,target_state, max_attempts=100):
+        print(f'Set target state: {target_state} ( current is {self._state})')
+        def next_action(task:FileConversionState,target_state):
+            path = self.find_path(self._transitions, task._state, target_state)
+            if len(path)<=1: return None
+            return path[1]
+            
+        while self._state != target_state:
+            cls = next_action(self,target_state)
+            if cls is None:raise ValueError('no next acion! unreachable!')
+            if max_attempts<0:raise ValueError(f'over max_attempts!')
+            
+            print(f'Current: {self._state}, try to_{cls}')
+            getattr(self,f'to_{cls}')()
+            max_attempts -= 1
+        print(f'Success to target state: {self._state}')
+
+```
+
+
+```python
+
+```
+
+
+
+
+
+### Conclusion
+...
+
+### Additional Notes
+...
+
+---
+
+
+## Chapter 8: Testing Resumable Systems
+
+### Introduction
+...
+
+### Conclusion
+...
+
+### Additional Notes
+...
+
+## Chapter 9: Resumability in Distributed Systems
 - (Existing content)
 
 ## Chapter 10: Architectural Considerations for Resumability
