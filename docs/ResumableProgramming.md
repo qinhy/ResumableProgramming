@@ -5629,8 +5629,15 @@ print('```')
 ```
 
     ```
+    start conversion of 2ba9d25e-0640-4d32-9eac-cd5f8ba22eb1
     Set target state: complete_mp4 ( current is idle)
     Current: idle, try to_resize_stage
+    simulate some error!
+    Current: idle, try to_resize_stage
+    Current: resize_stage, try to_complete_mp4
+    simulate some error!
+    Current: resize_stage, try to_complete_mp4
+    simulate some error!
     Current: resize_stage, try to_complete_mp4
     Success to target state: complete_mp4
     ```
