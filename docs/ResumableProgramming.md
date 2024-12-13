@@ -5645,8 +5645,6 @@ print('```')
 
 
 
-
-
 ### Conclusion
 ...
 
@@ -5673,72 +5671,55 @@ print('```')
 
 ### Introduction
 ...
+
 ### Section 0: Preparation
 To design a task states
 
-#### Updated States
-1. **Created**:  
-   - The initial state of a task after it is created but not yet acted upon.
-2. **Assigned**:  
-   - The task is assigned to a user, team, or system for action.  
-3. **In Progress**:  
-   - Work on the task has started.
-4. **Paused**:  
-   - The task is temporarily on hold but may resume later.
-5. **Error**:
-   - An error occurred (e.g., camera overheating). In this state, the error is analyzed to decide the next action.
-6. **Completed**:  
-   - The task has been successfully finished.
-7. **Canceled**:  
-   - The task has been terminated without completion.
-8. **Failed**:  
-   - The task could not be completed due to errors, issues, or other reasons.
-9. **Closed**:  
-   - The task is finalized and no further changes can be made.
+- Updated States
+   1. **Created**:  The initial state of a task after it is created but not yet acted upon.
+   2. **Assigned**:  The task is assigned to a user, team, or system for action.  
+   3. **In Progress**:  Work on the task has started. It is sometimes divided into multiple steps or stages.
+   4. **Paused**:  The task is temporarily on hold but may resume later.
+   5. **Error**:An error occurred (e.g., camera overheating). In this state, the error is analyzed to decide the next action.
+   6. **Completed**:  The task has been successfully finished.
+   7. **Canceled**:  The task has been terminated without completion.
+   8. **Failed**:  The task could not be completed due to errors, issues, or other reasons.
+   9. **Closed**:  The task is finalized and no further changes can be made.
 
 
-#### Transitions
-1. **Created → Assigned**:
-   - The task to start the task is assigned to the control system.
+- Transitions
+   1. **Created → Assigned**: The task to start the task is assigned to the control system.
 
-2. **Assigned → In Progress**:
-   - Attempting to start the task.
+   2. **Assigned → In Progress**: Attempting to start the task.
 
-3. **In Progress → Error**:
-   - The task encounters an error (e.g., camera overheating).
+   3. **In Progress → Error**: The task encounters an error (e.g., camera overheating).
 
-4. **Error → Paused**:
-   - If the error is recoverable (e.g., camera overheating), the task transitions to `Paused` for a retry.
+   4. **Error → Paused**: If the error is recoverable (e.g., camera overheating), the task transitions to `Paused` for a retry.
 
-5. **Error → Failed**:
-   - If the error is critical (e.g., hardware failure), the task transitions to `Failed`.
+   5. **Error → Failed**: If the error is critical (e.g., hardware failure), the task transitions to `Failed`.
 
-6. **Paused → Assigned**:
-   - After a recovery period, the task retries.
+   6. **Paused → Assigned**: After a recovery period, the task retries.
 
-7. **In Progress → Completed**:
-   - The task starts successfully, and the task completes.
+   7. **In Progress → Completed**: The task starts successfully, and the task completes.
 
-8. **Any State → Canceled**:
-   - The task is manually or automatically canceled, halting retries.
+   8. **Any State → Canceled**: The task is manually or automatically canceled, halting retries.
 
 
-#### FSM Diagram
 ```plaintext
 [Created] --> [Assigned] --> [In Progress] --> [Completed]
-                                |
-                                v
-                             [Error]
-                              /   \
-                 (Recoverable)   (Critical)
-                    |               |
-                    v               v
-               [Paused]         [Failed]
-                    |
-          (Recovery Timer)
-                    |
-                    v
-                [Assigned]
+                          ^     |
+            |-------------|     v
+            |                [Error]
+            |                 /   \
+            |    (Recoverable)   (Critical)
+            |       |               |
+            |       v               v
+            |  [Paused]         [Failed]
+            |       |
+            |   (Recovery Timer)
+            |       |
+            |       v
+            --- [Assigned]
 ```
 
 
@@ -5832,7 +5813,8 @@ class TaskStateMachine:
             
         while self._state != target_state:
             cls = next_action(self,target_state)
-            if cls is None:raise ValueError('no next acion! unreachable!')
+            if cls is None:raise ValueError(
+                f"no next acion! unreachable from '{self._state}' to '{target_state}'")
             if max_attempts<0:raise ValueError(f'over max_attempts!')
             
             print(f'Current: {self._state}, try to_{cls}')
@@ -5928,21 +5910,20 @@ def test_task_state_machine():
         print(f"Test failed: {e}")
 
 # Run the tests
+print('```')
 test_task_state_machine()
+print('```')
 ```
 
+    ```
     
     ########### Test Case 1: Transition from 'created' to 'completed'
     Set target state: completed ( current is created)
     Current: created, try to_assigned
     Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
     Error detected: hardware_failure
     hardware critical failure!
-    Test failed: no next acion! unreachable!
+    Test failed: no next acion! unreachable from 'failed' to 'completed'
     
     ########### Test Case 2: Transition from 'created' to 'failed' when task_start
     Set target state: failed ( current is created)
@@ -5985,27 +5966,9 @@ test_task_state_machine()
     Current: created, try to_assigned
     Current: assigned, try to_canceled
     Success to target state: canceled
+    ```
     
 
-
-#### Key Enhancements
-1. **Error Evaluation**:
-   - The `Error` state evaluates the severity of the issue and routes the task accordingly.
-   - Example criteria:
-     - Overheating: Recoverable, transition to `Paused`.
-     - Hardware failure: Critical, transition to `Failed`.
-
-2. **Retry Handling**:
-   - `Paused → Assigned` loop ensures retries after recoverable errors.
-   - Include a delay in the `Paused` state for recovery.
-
-3. **Task Termination**:
-   - Transition to `Failed` for unrecoverable errors, stopping the task.
-
-4. **Manual Cancellation**:
-   - A `Canceled` transition is available for external termination of the task.
-
-This enhanced FSM design adds robustness by introducing error analysis and dynamic decision-making.
 ### Conclusion
 ...
 
