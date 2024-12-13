@@ -5381,6 +5381,7 @@ from typing import Callable
 import uuid
 import cv2
 import os
+import random
 import numpy as np  # Assuming you are using OpenCV to work with videos
 
 # easy to change back end ShelveStorage or MongoDBStorage( need mongoDB )
@@ -5390,7 +5391,7 @@ class DBStorage(ShelveStorage):
 
 class VideoConversionModel:
     
-    def __init__(self, uuid = None, filename=None, width_limit=320, converted_count=-1, state=None):
+    def __init__(self, uuid = None, filename=None, width_limit=320, fps_ratio=1/4, converted_count=-1, state=None):
         # conversion_task_uuid
         self.uuid = uuid
         self.filename = filename    
@@ -5406,7 +5407,7 @@ class VideoConversionModel:
         ratio = cap.get(cv2.CAP_PROP_FRAME_WIDTH)/width_limit
         self.thumbnail_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)/ratio)
         self.thumbnail_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)/ratio)
-        self.thumbnail_fps = cap.get(cv2.CAP_PROP_FPS)        
+        self.thumbnail_fps_ratio = int(1/fps_ratio) # cap.get(cv2.CAP_PROP_FPS)*fps_ratio
         
         self.thumbnail_bin_path = f'{self.uuid}.thumbnail.{self.filename}.bin'
         self.thumbnail_mp4_path = f'thumbnail.{self.filename}'
@@ -5437,9 +5438,10 @@ class VideoConversionModel:
         return self.__dict__
     
     @staticmethod
-    def from_dict(data):
-        return VideoConversionModel(data['uuid'],data['filename'],
-                                data['width_limit'],data['converted_count'],data['state'])
+    def from_dict(data:dict):
+        model = VideoConversionModel(data['uuid'],data['filename'])
+        for k,v in data.items():
+            if hasattr(model,k):model.__dict__[k]=v
 
 class VideoConversionFSMsController:
     
@@ -5492,16 +5494,18 @@ class VideoConversionFSMsController:
             self.set_state(VideoConversionFSMsController.VideoConversionState.States.resize_stage)
             try:
                 while self.model.converted_count < self.model.total_count:
+
                     # Transition to reading state
                     ret, frame = self.controller.cap.read()
                     if not ret:
                         raise RuntimeError(f"can not read frame.")
-
-                    # Transition to resizing state
-                    frame = cv2.resize(frame, (self.model.thumbnail_width, self.model.thumbnail_height))
-
-                    # Transition to writing state
-                    with open(self.model.thumbnail_bin_path,'ab') as f: f.write(frame.tobytes())
+                    
+                    # skip images for small fps
+                    if self.model.converted_count%self.model.thumbnail_fps_ratio==0:
+                        # Transition to resizing state
+                        frame = cv2.resize(frame, (self.model.thumbnail_width, self.model.thumbnail_height))
+                        # Transition to writing state
+                        with open(self.model.thumbnail_bin_path,'ab') as f: f.write(frame.tobytes())
                     
                     self.model.converted_count += 1
                     self.controller.save_model()
@@ -5522,14 +5526,16 @@ class VideoConversionFSMsController:
                     out = cv2.VideoWriter(
                         self.model.thumbnail_mp4_path,
                         cv2.VideoWriter_fourcc(*'mp4v'),  # Codec for mp4 files
-                        self.model.thumbnail_fps,
+                        self.controller.cap.get(cv2.CAP_PROP_FPS)/self.model.thumbnail_fps_ratio,
+                        # self.model.thumbnail_fps_ratio,
                         (self.model.thumbnail_width, self.model.thumbnail_height)
                     )
                     with open(self.model.thumbnail_bin_path, 'rb') as f: raw_data = f.read()
                     # Read the frames data
                     frames = np.frombuffer(raw_data, dtype=np.uint8).reshape(
-                        (self.model.total_count, self.model.thumbnail_height, self.model.thumbnail_width, 3))
-                    for frame in frames: out.write(frame)
+                        (-1, self.model.thumbnail_height, self.model.thumbnail_width, 3))
+                    for frame in frames:
+                        out.write(frame)
                     out.release()
 
                     os.remove(self.model.thumbnail_bin_path)
@@ -5556,7 +5562,7 @@ class VideoConversionFSMsController:
                         queue.append(new_path)
             return []
         
-        def resume_state(self,target_state, max_attempts=100):
+        def resume_state(self,target_state, max_attempts=100,simulate_error=False):
             print(f'Set target state: {target_state} ( current is {self._state})')
             def next_action(task:VideoConversionFSMsController.VideoConversionState
                             ,target_state):
@@ -5568,8 +5574,12 @@ class VideoConversionFSMsController:
                 cls = next_action(self,target_state)
                 if cls is None:raise ValueError('no next acion! unreachable!')
                 if max_attempts<0:raise ValueError(f'over max_attempts!')
-                
                 print(f'Current: {self._state}, try to_{cls}')
+                
+                if simulate_error and random.random()>0.3:
+                    print('simulate some error!')
+                    continue
+                
                 getattr(self,f'to_{cls}')()
                 max_attempts -= 1
             print(f'Success to target state: {self._state}')
@@ -5592,9 +5602,9 @@ class VideoConversionFSMsController:
         return self
     
     @staticmethod
-    def new_video_conversion(filename):
+    def new_video_conversion(filename, width_limit=320, fps_ratio=1/4):
         # new request for file conversion, hard operation
-        model = VideoConversionModel(uuid.uuid4(),filename)
+        model = VideoConversionModel(uuid.uuid4(),filename,width_limit,fps_ratio)
         return VideoConversionFSMsController(model).save_model()
     
     @staticmethod
@@ -5603,17 +5613,18 @@ class VideoConversionFSMsController:
         if model is None:raise ValueError(f'no such data of {uuid}')
         return VideoConversionFSMsController(VideoConversionModel.from_dict(model))
     
-    def start_conversion(self):
+    def start_conversion(self,simulate_error=False):
         state:VideoConversionFSMsController.VideoConversionState = self.state
-        state.resume_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4)
+        state.resume_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4,simulate_error=simulate_error)
 
 ```
 
 
 ```python
 print('```')
-conversion = VideoConversionFSMsController.new_video_conversion('test.mp4')
-conversion.start_conversion()
+conversion = VideoConversionFSMsController.new_video_conversion('test.mp4',width_limit=320,fps_ratio=1/4)
+print(f'start conversion of {conversion.model.uuid}')
+conversion.start_conversion(simulate_error=True)
 print('```')
 ```
 
