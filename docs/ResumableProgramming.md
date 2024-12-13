@@ -4718,19 +4718,20 @@ class ShelveStorage:
 
     def set(self, key: str, value: dict):
         try:
-            self.db[key] = value
+            self.db[f'{key}'] = value
             self.db.sync()  # Ensure the data is written to disk
         except Exception as e:
             print("Set error:", e)
 
     def get(self, key: str) -> dict:
         try:
-            return self.db.get(key, None)
+            return self.db.get(f'{key}', None)
         except Exception as e:
             print("Get error:", e)
             return None
 
     def delete(self, key: str):
+        key = f'{key}'
         try:
             if key in self.db:
                 del self.db[key]
@@ -4754,8 +4755,8 @@ class ShelveStorage:
 
 # test the storage
 def test_storage():
-    # storage = ShelveStorage()
-    storage = MongoDBStorage()
+    storage = ShelveStorage()
+    # storage = MongoDBStorage()
 
     try:
         # Test set and get
@@ -4787,8 +4788,8 @@ def test_storage():
         storage.set('key5', {'name': 'David', 'age': 50})
         del storage
         
-        # storage = ShelveStorage()
-        storage = MongoDBStorage()
+        storage = ShelveStorage()
+        # storage = MongoDBStorage()
         storage.get('key5') == {'name': 'David', 'age': 50}, f"Expected {{'name': 'David', 'age': 50}}, got {storage.get('key5')}"
 
         print("All tests passed successfully!")
@@ -5078,6 +5079,7 @@ class S3LargeUploadingFSMsController:
                               self.S3LargeUploadingState._states, target_state)
         if len(path)<=1: return None
         return path[1]
+
 ```
 
 
@@ -5334,47 +5336,36 @@ The final step in our implementation is to develop the front-end `index.html`.
 
       - The `next_action` method in `S3LargeUploadingState` class finds the shortest path for transitioning from the current state to a **target** state, providing a clear mechanism for managing complex state transitions.
 
-### Section 2: [TODO:Change topic]Video File Conversion Service
-Let's consider a video file conversion service (in AWS Lambda).
+### Section 2: Video File Conversion Service
+The previous example requires an AWS account, which can make it challenging to learn.
+However, there's no need to worry if you find it difficult to understand.
+In this section, we will introduce a simpler server-side service focused on large file conversion.
+For example, many video sites use video thumbnails for previews, instead of displaying the entire large video file.
 
-1. The user selects a video file and uploads it. (We can reuse previous example!)
-2. The server converts the uploaded video file.
-3. When the conversion is complete, the server notifies the user.
+In this example, the server needs to track the state of a large video file conversion task to ensure a consistent workflow, even in case of unexpected interruptions. The task involves three key steps:
 
-Many cloud solutions, such as AWS Lambda, can only run for a maximum of 15 minutes.
+1. Reading chunks of the file, frame by frame and Resizing each frame.
+2. Writing each resized frame into an output file.
 
-In this example, the server needs to track the state of the user's video file and perform tasks accordingly. 
-
-The possible states and transitions are like following python code:
+To avoid restarting the task from the beginning after a crash, we need to manage its state effectively. The possible states and their transitions are illustrated in the following Python code:
 
 
 ```python
-class S3LargeUploadingState:
+class VideoConversionState:
     class States:
         idle = 'idle'
-        recieving = 'recieving'
-        recieved = 'recieved'
-        recieve_failure = 'recieve_failure'
-
-        merged = 'merged'
-        merge_failure = 'merge_failure'
-
-        converting = 'converting'
-        converted = 'converted'
-        convert_failure = 'convert_failure'
+        resize_stage = 'resize_stage'
+        error = 'error'
+        complete_mp4 = 'complete_mp4'
 
     _transitions = {
-        States.idle:             [States.recieving],
-        States.recieving:        [States.recieved, States.recieve_failure, States.idle],
-        States.recieve_failure:  [States.recieving], # retry recieving
-        States.recieved:         [States.merged, States.merge_failure],
-        States.merge_failure:    [States.merged],
-        States.merged:           [States.converting],
-        States.converting:       [States.converted, States.convert_failure],
-        States.converted:        [], # end of task life
+        States.idle:    [States.resize_stage],
+        States.resize_stage:  [States.resize_stage,States.error,States.complete_mp4],
+        States.error:   [States.idle],
+        States.complete_mp4:[],
+
     }
     _states = list(_transitions.keys())
-
 ```
 
 Let's consider this service MVC(FSMs)'s Model and basic Controller. And the Controller's states.
@@ -5386,236 +5377,253 @@ Let's consider this service MVC(FSMs)'s Model and basic Controller. And the Cont
 
 from collections import deque
 from functools import wraps
+from typing import Callable
 import uuid
+import cv2
+import os
+import numpy as np  # Assuming you are using OpenCV to work with videos
 
-# easy to change back end
-class DBStorage(MongoDBStorage):
+# easy to change back end ShelveStorage or MongoDBStorage( need mongoDB )
+# Chapter 7. Section 0: Preparation
+class DBStorage(ShelveStorage):
     pass
 
-class FileConversionModel:
-    # Define the size unit as 5MB
-    SIZE_UNIT = 5 * 1024 * 1024
+class VideoConversionModel:
     
-    def __init__(self, uuid=None, filename=None, filesize=None) -> None:
-        if filesize <= 0:
-            raise ValueError('file size must greater than 0')
-        
-        # Initialize the file conversion model with given parameters
+    def __init__(self, uuid = None, filename=None, width_limit=320, converted_count=-1, state=None):
+        # conversion_task_uuid
         self.uuid = uuid
-        self.filename = filename
-        self.filesize = filesize
-        
-        # Attributes related to the raw file
-        self.raw_file_uuid = None
-        self.recieved_chunks = []  # To track received chunks
-        self.total_chunks = 0      # Total number of chunks to be received
+        self.filename = filename    
+        self.filesize = self.get_filesize(filename)  # Placeholder for actual file size calculation
 
-        # Attributes related to the converted file
-        self.converted_file_uuid = None
-        self.converted_count = 0  # Counter for converted count
-        self.total_count = 0      # Total count to be converted
-
-        self.state = FileConversionState.States.idle
-
-        self.init_chunks(filesize)
-    
-    def init_chunks(self, filesize):
-        # Calculate the total number of chunks based on file size and size unit
-        self.total_chunks = filesize // FileConversionModel.SIZE_UNIT
+        if self.filesize <= 0:
+            raise ValueError('File size must be greater than 0')
         
-        # If the file size is less than or equal to one unit, set total chunks to 1
-        if filesize <= FileConversionModel.SIZE_UNIT:
-            self.total_chunks = 1
-        # If there's a remainder after dividing by the size unit, add one more chunk
-        elif filesize % FileConversionModel.SIZE_UNIT > 0:
-            self.total_chunks += 1
+        cap = cv2.VideoCapture(filename)
+        if not cap.isOpened(): raise RuntimeError(f"Failed to open video file: {filename}")
         
-        # Initialize a list to track received chunks with False (not received)
-        self.recieved_chunks = [False for i in range(self.total_chunks)]
+        # Get frame width and height, adjust width up to 320 for thumbnail
+        ratio = cap.get(cv2.CAP_PROP_FRAME_WIDTH)/width_limit
+        self.thumbnail_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)/ratio)
+        self.thumbnail_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)/ratio)
+        self.thumbnail_fps = cap.get(cv2.CAP_PROP_FPS)        
+        
+        self.thumbnail_bin_path = f'{self.uuid}.thumbnail.{self.filename}.bin'
+        self.thumbnail_mp4_path = f'thumbnail.{self.filename}'
+
+        # Attributes related to the task
+        self.converted_count = converted_count if converted_count>0 else 0
+        self.total_count = self.calculate_total_frames(filename)
+
+        self.state = state if state else VideoConversionFSMsController.VideoConversionState.States.idle
+
+    def get_filesize(self,filename):
+        if not filename or not os.path.isfile(filename):
+            raise FileNotFoundError(f"File '{filename}' does not exist.")
+        return os.path.getsize(filename)
+
+    def calculate_total_frames(self,filename):
+        # Open the video file using OpenCV
+        video_capture = cv2.VideoCapture(filename)        
+        if not video_capture.isOpened():
+            raise ValueError(f"Unable to open video file: {filename}")
+        # Get the total frame count from the video
+        total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))        
+        # Release the video capture object
+        video_capture.release()
+        return total_frames
 
     def to_dict(self):
         return self.__dict__
-
-    def from_dict(self,uuid,data):
-        self.uuid = uuid
-        for k in self.__dict__.keys():
-            setattr(self,data[k])
     
-    def is_empty(self):
-        return sum(self.recieved_chunks)==0
+    @staticmethod
+    def from_dict(data):
+        return VideoConversionModel(data['uuid'],data['filename'],
+                                data['width_limit'],data['converted_count'],data['state'])
 
-    def is_converted(self):
-        return self.converted_count==self.total_count
+class VideoConversionFSMsController:
     
-    def is_recieved(self):
-        return sum(self.recieved_chunks)==self.total_chunks
+    class VideoConversionState:
+        class States:
+            idle = 'idle'
+            resize_stage = 'resize_stage'
+            error = 'error'
+            complete_mp4 = 'complete_mp4'
 
-class FileConversionController:
-    def __init__(self,model:FileConversionModel) -> None:
+        _transitions = {
+            States.idle:    [States.resize_stage],
+            States.resize_stage:  [States.resize_stage,States.error,States.complete_mp4],
+            States.error:   [States.idle],
+            States.complete_mp4:[],
+
+        }
+        _states = list(_transitions.keys())
+
+        def __init__(self, controller:'VideoConversionFSMsController'):
+            self.controller = controller
+            self.model = self.controller.model
+            self._state = self.model.state
+
+        def set_state(self,state):
+            self._state=state
+            self.model.state=state
+            self.controller.save_model()
+        
+        def handle_errors(func:Callable):
+            @wraps(func)
+            def wrapper(self:'VideoConversionFSMsController.VideoConversionState',
+                        *args, **kwargs):
+                valid_transitions = self._transitions[self._state]
+                target_transition = func.__name__.replace('to_','')
+                if target_transition not in valid_transitions:            
+                    raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
+                try:
+                    return func(self, *args, **kwargs)
+                except Exception as e:
+                    print(f'[{self.__class__.__name__}]: {e}')
+            return wrapper
+
+        @handle_errors
+        def to_idle(self):
+            self.set_state(VideoConversionFSMsController.VideoConversionState.States.idle)
+
+        @handle_errors
+        def to_resize_stage(self):
+            self.set_state(VideoConversionFSMsController.VideoConversionState.States.resize_stage)
+            try:
+                while self.model.converted_count < self.model.total_count:
+                    # Transition to reading state
+                    ret, frame = self.controller.cap.read()
+                    if not ret:
+                        raise RuntimeError(f"can not read frame.")
+
+                    # Transition to resizing state
+                    frame = cv2.resize(frame, (self.model.thumbnail_width, self.model.thumbnail_height))
+
+                    # Transition to writing state
+                    with open(self.model.thumbnail_bin_path,'ab') as f: f.write(frame.tobytes())
+                    
+                    self.model.converted_count += 1
+                    self.controller.save_model()
+                        
+            except Exception as e:
+                self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
+
+        @handle_errors
+        def to_error(self,e):
+            self.set_state(VideoConversionFSMsController.VideoConversionState.States.error)
+            print(e)
+
+        @handle_errors
+        def to_complete_mp4(self):
+            try:
+                if self.model.converted_count >= self.model.total_count:
+                    # convert bin file into mp4
+                    out = cv2.VideoWriter(
+                        self.model.thumbnail_mp4_path,
+                        cv2.VideoWriter_fourcc(*'mp4v'),  # Codec for mp4 files
+                        self.model.thumbnail_fps,
+                        (self.model.thumbnail_width, self.model.thumbnail_height)
+                    )
+                    with open(self.model.thumbnail_bin_path, 'rb') as f: raw_data = f.read()
+                    # Read the frames data
+                    frames = np.frombuffer(raw_data, dtype=np.uint8).reshape(
+                        (self.model.total_count, self.model.thumbnail_height, self.model.thumbnail_width, 3))
+                    for frame in frames: out.write(frame)
+                    out.release()
+
+                    os.remove(self.model.thumbnail_bin_path)
+                    self.set_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4)
+                else:
+                    self.to_resize_stage()
+            except Exception as e:
+                self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
+
+        def find_path(self, transitions:dict, start_state, end_state):
+            queue = deque([[start_state]])    
+            visited = set()    
+            while queue:
+                path = queue.popleft()
+                state = path[-1]        
+                if state == end_state:
+                    return path
+                if state not in visited:
+                    visited.add(state)            
+                    next_states = transitions.get(state, [])
+                    for next_state in next_states:
+                        new_path = list(path)
+                        new_path.append(next_state)
+                        queue.append(new_path)
+            return []
+        
+        def resume_state(self,target_state, max_attempts=100):
+            print(f'Set target state: {target_state} ( current is {self._state})')
+            def next_action(task:VideoConversionFSMsController.VideoConversionState
+                            ,target_state):
+                path = self.find_path(self._transitions, task._state, target_state)
+                if len(path)<=1: return None
+                return path[1]
+                
+            while self._state != target_state:
+                cls = next_action(self,target_state)
+                if cls is None:raise ValueError('no next acion! unreachable!')
+                if max_attempts<0:raise ValueError(f'over max_attempts!')
+                
+                print(f'Current: {self._state}, try to_{cls}')
+                getattr(self,f'to_{cls}')()
+                max_attempts -= 1
+            print(f'Success to target state: {self._state}')
+
+    def __init__(self,model:VideoConversionModel) -> None:
         self.model = model
-    
-    # # hard operation
-    # def update_model(self,key,value):
-    #     if not hasattr(self.model,key):raise ValueError(f'no such key of {key} in model')
-    #     setattr(self.model,key,value)
-    #     self.save_model()
+        self.state = VideoConversionFSMsController.VideoConversionState(self)
+        
+        # Open the video file
+        self.cap = cv2.VideoCapture(self.model.filename)
+        if not self.cap.isOpened():
+            raise RuntimeError(f"Failed to open video file: {self.model.filename}")
 
+        # self.total_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.model.converted_count)
+        
     def save_model(self):
         # connect db
-        DBStorage().set(model.uuid,model.to_dict())
+        DBStorage().set(self.model.uuid,self.model.to_dict())
         return self
     
     @staticmethod
-    def new_file_conversion(filename,filesize):
+    def new_video_conversion(filename):
         # new request for file conversion, hard operation
-        model = FileConversionModel(uuid.uuid4(),filename,filesize)
-        return FileConversionController(model).save_model()
+        model = VideoConversionModel(uuid.uuid4(),filename)
+        return VideoConversionFSMsController(model).save_model()
     
     @staticmethod
-    def find_file_conversion(uuid):
+    def find_video_conversion(uuid):
         model = DBStorage().get(uuid)
-        if model is None:raise ValueError('no such data of {uuid}')
-        return FileConversionController(model)
+        if model is None:raise ValueError(f'no such data of {uuid}')
+        return VideoConversionFSMsController(VideoConversionModel.from_dict(model))
     
-    def append_raw_file(self,chunk_No,chunk_data):
-        # to complete raw file when get new chunk from user
-        if self.model.total_chunks>1:
-            with open(f'{self.model.filename}.{chunk_No}.bin','wb') as f:
-                f.write(chunk_data)
-        else:
-            with open(f'{self.model.filename}','wb') as f:
-                f.write(chunk_data)
-        self.model.recieved_chunks[chunk_No]=True
-        if self.model.is_recieved() and self.model.total_chunks>1:
-            # merge parts into a file
-            pass
-        self.save_model()
-
-    def convert_raw_file(self):
-        # to convert raw file, and it will be a long process
-        start = self.model.converted_count
-        for f in range(start,self.model.total_count):
-            # do conversion on each frame
-            pass
-            self.model.converted_count=f
-            if f%100==0:#save our process every 100 count
-                self.save_model()
-        self.save_model()
-
-class FileConversionState:
-    class States:
-        idle = 'idle'
-        recieving = 'recieving'
-        recieved = 'recieved'
-        recieve_failure = 'recieve_failure'
-        converting = 'converting'
-        converted = 'converted'
-        convert_failure = 'convert_failure'
-
-    _transitions = {
-        States.idle:            [States.recieving],
-        States.recieving:       [States.recieved, States.recieve_failure],
-        States.recieved:        [States.converting],
-        States.recieve_failure: [States.idle],
-        
-        States.converting:      [States.converted, States.convert_failure],
-        States.convert_failure: [States.recieved],
-    }
-    _states = list(_transitions.keys())
-
-    def __init__(self, controller:FileConversionController):
-        self.controller = controller
-        self.model = self.controller.model
-        self._state = self.model.state
-
-    def set_state(self,state):
-        self._state=state
-        self.model.state=state
-        self.controller.save_model()
-    
-    def handle_errors(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            self:FileConversionState=self
-            valid_transitions = self._transitions[self._state]
-            target_transition = func.__name__.replace('to_','')        
-            if target_transition not in valid_transitions:            
-                raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
-            try:
-                return func(self, *args, **kwargs)
-            except Exception as e:
-                print(f'[{self.__class__.__name__}]: {e}')
-        return wrapper
-
-    @handle_errors
-    def to_recieving(self):
-        #start recieving flows
-        pass
-
-    @handle_errors
-    def to_recieved(self):
-        if self.model.is_recieved():
-            self.set_state(FileConversionState.States.recieved)
-
-    @handle_errors
-    def to_recieve_failure(self):
-        self.set_state(FileConversionState.States.recieve_failure)
-
-    @handle_errors
-    def to_converting(self):
-        self.set_state(FileConversionState.States.converting)
-        #start converting flows
-        pass
-
-    @handle_errors
-    def to_converted(self):
-        if self.model.is_converted():
-            self.set_state(FileConversionState.States.converted)
-
-    @handle_errors
-    def to_convert_failure(self):
-        self.set_state(FileConversionState.States.convert_failure)
-
-    def find_path(self, transitions:dict, start_state, end_state):
-        queue = deque([[start_state]])    
-        visited = set()    
-        while queue:
-            path = queue.popleft()
-            state = path[-1]        
-            if state == end_state:
-                return path
-            if state not in visited:
-                visited.add(state)            
-                next_states = transitions.get(state, [])
-                for next_state in next_states:
-                    new_path = list(path)
-                    new_path.append(next_state)
-                    queue.append(new_path)
-        return []
-    
-    def resume_state(self,target_state, max_attempts=100):
-        print(f'Set target state: {target_state} ( current is {self._state})')
-        def next_action(task:FileConversionState,target_state):
-            path = self.find_path(self._transitions, task._state, target_state)
-            if len(path)<=1: return None
-            return path[1]
-            
-        while self._state != target_state:
-            cls = next_action(self,target_state)
-            if cls is None:raise ValueError('no next acion! unreachable!')
-            if max_attempts<0:raise ValueError(f'over max_attempts!')
-            
-            print(f'Current: {self._state}, try to_{cls}')
-            getattr(self,f'to_{cls}')()
-            max_attempts -= 1
-        print(f'Success to target state: {self._state}')
+    def start_conversion(self):
+        state:VideoConversionFSMsController.VideoConversionState = self.state
+        state.resume_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4)
 
 ```
 
 
 ```python
-
+print('```')
+conversion = VideoConversionFSMsController.new_video_conversion('test.mp4')
+conversion.start_conversion()
+print('```')
 ```
+
+    ```
+    Set target state: complete_mp4 ( current is idle)
+    Current: idle, try to_resize_stage
+    Current: resize_stage, try to_complete_mp4
+    Success to target state: complete_mp4
+    ```
+    
 
 
 
@@ -5641,8 +5649,354 @@ class FileConversionState:
 ### Additional Notes
 ...
 
-## Chapter 9: Resumability in Distributed Systems
-- (Existing content)
+---
+
+## Chapter 9: Resumability in Task Systems ( Distributed )
+
+### Introduction
+...
+### Section 0: Preparation
+To design a task states
+
+#### Updated States
+1. **Created**:  
+   - The initial state of a task after it is created but not yet acted upon.
+2. **Assigned**:  
+   - The task is assigned to a user, team, or system for action.  
+3. **In Progress**:  
+   - Work on the task has started.
+4. **Paused**:  
+   - The task is temporarily on hold but may resume later.
+5. **Error**:
+   - An error occurred (e.g., camera overheating). In this state, the error is analyzed to decide the next action.
+6. **Completed**:  
+   - The task has been successfully finished.
+7. **Canceled**:  
+   - The task has been terminated without completion.
+8. **Failed**:  
+   - The task could not be completed due to errors, issues, or other reasons.
+9. **Closed**:  
+   - The task is finalized and no further changes can be made.
+
+
+#### Transitions
+1. **Created → Assigned**:
+   - The task to start the task is assigned to the control system.
+
+2. **Assigned → In Progress**:
+   - Attempting to start the task.
+
+3. **In Progress → Error**:
+   - The task encounters an error (e.g., camera overheating).
+
+4. **Error → Paused**:
+   - If the error is recoverable (e.g., camera overheating), the task transitions to `Paused` for a retry.
+
+5. **Error → Failed**:
+   - If the error is critical (e.g., hardware failure), the task transitions to `Failed`.
+
+6. **Paused → Assigned**:
+   - After a recovery period, the task retries.
+
+7. **In Progress → Completed**:
+   - The task starts successfully, and the task completes.
+
+8. **Any State → Canceled**:
+   - The task is manually or automatically canceled, halting retries.
+
+
+#### FSM Diagram
+```plaintext
+[Created] --> [Assigned] --> [In Progress] --> [Completed]
+                                |
+                                v
+                             [Error]
+                              /   \
+                 (Recoverable)   (Critical)
+                    |               |
+                    v               v
+               [Paused]         [Failed]
+                    |
+          (Recovery Timer)
+                    |
+                    v
+                [Assigned]
+```
+
+
+```python
+from functools import wraps
+from typing import Callable
+from collections import deque
+import random
+import time
+
+class TaskStateMachine:
+    class States:
+        created = 'created'
+        assigned = 'assigned'
+        in_progress = 'in_progress'
+        error = 'error'
+        paused = 'paused'
+        failed = 'failed'
+        completed = 'completed'
+        canceled = 'canceled'
+
+    _transitions = {
+        States.created:      [States.assigned],
+        States.assigned:     [States.in_progress, States.canceled],
+        States.in_progress:  [States.error, States.completed, States.canceled],
+        States.error:        [States.paused, States.failed, States.canceled],
+        States.paused:       [States.assigned, States.canceled],
+        States.failed:       [],  # End of task life
+        States.completed:    [],  # End of task life
+        States.canceled:     [],  # End of task life
+    }
+
+    _states = list(_transitions.keys())
+
+    def __init__(self, state):
+        if state not in self._states:
+            raise ValueError(f"Invalid initial state: {state}")
+        self._state = state
+
+    def set_state(self,state):
+        self._state=state
+        
+    def task_start(self):
+        # Simulate task start logic
+        return random.choice([True,True,True, False])  # Random success/failure for demonstration
+
+    def simulate_error(self):
+        # Simulate error detection
+        return random.choice(["overheat", "hardware_failure",None])  # Random error type
+
+    def wait_for_cool_down(self):
+        print("wait for cool down ...")
+        time.sleep(2)  # Simulate cooling down period
+
+    def handle_errors(func:Callable):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            valid_transitions = self._transitions[self._state]
+            target_transition = func.__name__.replace('to_','')
+            if target_transition not in valid_transitions:            
+                raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f'[{self.__class__.__name__}]: {e}')
+        return wrapper
+
+    def find_path(self, transitions:dict, start_state, end_state):
+        queue = deque([[start_state]])    
+        visited = set()    
+        while queue:
+            path = queue.popleft()
+            state = path[-1]        
+            if state == end_state:
+                return path
+            if state not in visited:
+                visited.add(state)            
+                next_states = transitions.get(state, [])
+                for next_state in next_states:
+                    new_path = list(path)
+                    new_path.append(next_state)
+                    queue.append(new_path)
+        return []
+    
+    def resume_state(self,target_state, max_attempts=10):
+        print(f'Set target state: {target_state} ( current is {self._state})')
+        def next_action(task,target_state):
+            path = self.find_path(self._transitions, task._state, target_state)
+            if len(path)<=1: return None
+            return path[1]
+            
+        while self._state != target_state:
+            cls = next_action(self,target_state)
+            if cls is None:raise ValueError('no next acion! unreachable!')
+            if max_attempts<0:raise ValueError(f'over max_attempts!')
+            
+            print(f'Current: {self._state}, try to_{cls}')
+            getattr(self,f'to_{cls}')()
+            max_attempts -= 1
+        print(f'Success to target state: {self._state}')
+
+    # Transition methods
+    @handle_errors
+    def to_assigned(self):
+        self.set_state(self.States.assigned)
+
+    @handle_errors
+    def to_in_progress(self):
+        if self.task_start():
+            self.set_state(self.States.in_progress)
+        else:
+            print('Can not start and remain state of assigned')
+            return
+                
+        error = self.simulate_error()
+        if error:
+            self.to_error(error)
+
+    @handle_errors
+    def to_error(self,error_type):
+        self.set_state(self.States.error)
+
+        print(f"Error detected: {error_type}")
+        if error_type == "hardware_failure":
+            print("hardware critical failure!")
+            self.to_failed()
+
+    @handle_errors
+    def to_paused(self):
+        self.set_state(self.States.paused)
+        self.wait_for_cool_down()
+
+    @handle_errors
+    def to_failed(self):
+        self.set_state(self.States.failed)
+
+    @handle_errors
+    def to_completed(self):
+        error_type = self.simulate_error()
+        if error_type:
+            self.to_error(error_type)
+        else:
+            self.set_state(self.States.completed)
+
+    @handle_errors
+    def to_canceled(self):
+        self.set_state(self.States.canceled)
+
+# Test cases for the TaskStateMachine
+def test_task_state_machine():
+    # Initialize the FSM in the 'created' state
+    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
+
+    print("\n########### Test Case 1: Transition from 'created' to 'completed'")
+    try:
+        fsm.resume_state(TaskStateMachine.States.completed)
+    except Exception as e:
+        print(f"Test failed: {e}")
+
+    print("\n########### Test Case 2: Transition from 'created' to 'failed' when task_start")
+    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
+    try:
+        # Force task_start to simulate failure
+        def always_fail():
+            return False
+        fsm.task_start = always_fail  # Override method
+        fsm.resume_state(TaskStateMachine.States.failed)
+    except Exception as e:
+        print(f"Test failed: {e}")
+
+    print("\n########### Test Case 3: Transition from 'created' to 'paused' (recoverable error)")
+    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
+    try:
+        # Force simulate_error to simulate overheating
+        def simulate_overheat():
+            return "overheat"
+        fsm.simulate_error = simulate_overheat  # Override method
+        fsm.resume_state(TaskStateMachine.States.paused)
+    except Exception as e:
+        print(f"Test failed: {e}")
+
+    print("\n########### Test Case 4: Transition from 'created' to 'canceled'")
+    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
+    try:
+        fsm.resume_state(TaskStateMachine.States.canceled)
+    except Exception as e:
+        print(f"Test failed: {e}")
+
+# Run the tests
+test_task_state_machine()
+```
+
+    
+    ########### Test Case 1: Transition from 'created' to 'completed'
+    Set target state: completed ( current is created)
+    Current: created, try to_assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Error detected: hardware_failure
+    hardware critical failure!
+    Test failed: no next acion! unreachable!
+    
+    ########### Test Case 2: Transition from 'created' to 'failed' when task_start
+    Set target state: failed ( current is created)
+    Current: created, try to_assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Test failed: over max_attempts!
+    
+    ########### Test Case 3: Transition from 'created' to 'paused' (recoverable error)
+    Set target state: paused ( current is created)
+    Current: created, try to_assigned
+    Current: assigned, try to_in_progress
+    Can not start and remain state of assigned
+    Current: assigned, try to_in_progress
+    Error detected: overheat
+    Current: error, try to_paused
+    wait for cool down ...
+    Success to target state: paused
+    
+    ########### Test Case 4: Transition from 'created' to 'canceled'
+    Set target state: canceled ( current is created)
+    Current: created, try to_assigned
+    Current: assigned, try to_canceled
+    Success to target state: canceled
+    
+
+
+#### Key Enhancements
+1. **Error Evaluation**:
+   - The `Error` state evaluates the severity of the issue and routes the task accordingly.
+   - Example criteria:
+     - Overheating: Recoverable, transition to `Paused`.
+     - Hardware failure: Critical, transition to `Failed`.
+
+2. **Retry Handling**:
+   - `Paused → Assigned` loop ensures retries after recoverable errors.
+   - Include a delay in the `Paused` state for recovery.
+
+3. **Task Termination**:
+   - Transition to `Failed` for unrecoverable errors, stopping the task.
+
+4. **Manual Cancellation**:
+   - A `Canceled` transition is available for external termination of the task.
+
+This enhanced FSM design adds robustness by introducing error analysis and dynamic decision-making.
+### Conclusion
+...
+
+### Additional Notes
+...
+
+---
+
+
 
 ## Chapter 10: Architectural Considerations for Resumability
 - (Newly added chapter)

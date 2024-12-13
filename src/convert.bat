@@ -1,0 +1,1 @@
+jupyter nbconvert --to markdown ResumableProgramming.ipynb --output-dir ../docs
