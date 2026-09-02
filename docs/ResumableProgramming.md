@@ -2792,7 +2792,9 @@ print('```')
     ```
     
 
-This example involves very simple sequential tasks, meaning its states and transitions are minimal. However, in many cases, our system has many more states and transitions, making it difficult to do **Resumability** in a single function. As the following example shows, we will need a **solver**.
+This example involves very simple sequential tasks, meaning its states and transitions are minimal. However, in many cases, our system has many more states and transitions, making it difficult to do **Resumability** in a single function.
+
+As the following example shows, we will need a **solver** to auto **Resume**.
 
 
 ```python
@@ -3060,6 +3062,7 @@ class_str_map.update({cls:cls.__name__ for cls,trans in transitions.items()})
 class_methodstr_map = {cls.__name__:cls.__name__.replace('State','').lower() for cls,trans in transitions.items()}
 
 transitions_str = {class_str_map[cls]:[class_str_map[t] for t in trans] for cls,trans in transitions.items()}
+print('Following is possible transisitions table(dict).')
 print('```json')
 print(json.dumps(transitions_str,indent=2))
 print('```')
@@ -3120,6 +3123,7 @@ def find_path(transitions:dict, start_state, end_state):
 start_state = FailureState
 end_state   = CommunicationState
 path        = find_path(transitions, start_state, end_state)
+print('With a solver we will easy to find path from a state to certain goal.')
 print('```')
 print(f"Path from {class_str_map[start_state]} to {class_str_map[end_state]} : "+' -> '.join([class_str_map[p] for p in path]))
 print('```')
@@ -3543,16 +3547,19 @@ class UserAuthState:
 
 print('```')
 # Example Usage
+print('Test 1 :')
 controller = UserAuthFSMsController(
                 User(username="admin", password="1234"),
                 View()).login()  # Should log in successfully
 controller.logout()
 
+print('Test 2 :')
 controller = UserAuthFSMsController(
                 User(username="admin", password="wrongpassword"),
                 View()).login()   # Should show login failed
-controller.logout()
+controller.logout() # Should warning that cannot logout without login at first.
 
+print('Test 3 :')
 controller = UserAuthFSMsController(
                 User(username="anna", password="5678"),
                 View()).login()  # Should show login failed
@@ -3611,6 +3618,7 @@ Let's consider the following service: searching for something and communicating 
 
 
 ```python
+# this is a server code for starting independent.
 import socket
 import json
 import random
@@ -5643,6 +5651,9 @@ print('```')
     ```
     
 
+### Section 3: AI object detetion service (Yolo)
+...
+
 
 
 ### Conclusion
@@ -5656,11 +5667,18 @@ print('```')
 
 ## Chapter 8: Testing Resumable Systems
 
+
 ### Introduction
 ...
 
+### Section 0: Preparation
+...
+
+
 ### Conclusion
 ...
+
+
 
 ### Additional Notes
 ...
@@ -5970,17 +5988,1441 @@ print('```')
     
 
 ### Conclusion
-...
+
+In this chapter, we moved from *concepts* to *real systems*, showing how resumable programming looks in practice when combined with storage, state machines, and MVC-style structure.
+
+Across the two case studies:
+
+1. **Resumable Large File Uploading Service (AWS Lambda + S3 + FastAPI)**
+
+   * We used a **finite state machine** (`S3LargeUploadingState`) to model the lifecycle of a multipart upload:
+     `idle → receiving → received → merged` (with `*_failure` states for error handling).
+   * The **model** (`S3LargeUploadingModel`) holds all resumable state: file name, hash, upload_id, chunk_size, total_chunks, and uploaded parts.
+   * A **controller with FSM logic** (`S3LargeUploadingFSMsController`) encapsulates:
+
+     * Hard operations: calling S3 APIs, appending chunks, merging parts.
+     * Soft operations: updating in-memory state and persisting it via `DBStorage`.
+   * Persistent storage (MongoDB or Shelve) allows:
+
+     * AWS Lambda (or any short-lived process) to stop at any time.
+     * Another process / next call to *resume* from the last consistent state.
+   * On the client side (`index.html`), the browser:
+
+     * Splits the file into chunks.
+     * Computes a hash to uniquely identify the upload.
+     * Calls `/start_upload/` and `/upload_chunk/` in a loop, trusting the backend’s FSM to figure out the *next action*.
+
+2. **Resumable Video File Conversion Service (Thumbnail Generator)**
+
+   * We modelled another FSM (`VideoConversionState`) with states:
+     `idle → resize_stage → complete_mp4` (with `error` for failures).
+   * The **model** (`VideoConversionModel`) records:
+
+     * A UUID for the task, original filename, total frame count.
+     * Thumbnail size, fps sampling ratio.
+     * Progress (`converted_count`), intermediate files (`*.bin`), final output path.
+   * The **controller + state** (`VideoConversionFSMsController` / `VideoConversionState`) manage:
+
+     * Resizing frames and appending them to a temporary binary file.
+     * Converting the binary frame dump into an MP4 thumbnail.
+     * Persisting progress to storage so that a crash or error only loses at most a small step.
+   * The `resume_state(target_state, simulate_error=...)` method shows the *core idea* of resumability:
+
+     * Given a target state (e.g., `complete_mp4`), repeatedly determine the next legal action (`find_path`) and run it.
+     * If an error occurs, store the error state, then let a later run continue from there.
+
+Across both examples, the same pattern appears:
+
+* **State is explicit and externalized**
+  Nothing important lives only in RAM. All progress (chunks uploaded, frames processed, current FSM state) is stored in a database or filesystem.
+
+* **FSMs define legal progress**
+  Transitions are whitelisted via `_transitions` and validated via decorators like `validate_transition` / `handle_errors`. This prevents illegal jumps and makes error handling explicit.
+
+* **Controllers own “hard operations”**
+  Anything that can fail or cause durable side effects (S3 writes, file writes, DB updates) lives in the controller, not in the model.
+  The model stays as a *data record*, not a place full of side effects.
+
+* **Resumability = “drive toward a target state”**
+  Both `next_action(...)` (upload service) and `resume_state(...)` (video converter) implement the same philosophy:
+
+  > From the current state, find a valid path toward the goal, take one step, persist, repeat.
+
+This chapter demonstrates that **resumable programming is not magic**—it’s a disciplined combination of:
+
+* Clear state design (FSMs),
+* Clean separation of concerns (MVC-like structure),
+* And reliable persistence (SQL / NoSQL / key-value storage).
+
+Once you adopt this mindset, many long-running or failure-prone tasks—uploads, conversions, workflows, robot tasks, etc.—can be redesigned to be safely pausable and resumable.
 
 ### Additional Notes
-...
+
+* **Storage Choice Matters, but the Pattern Is Reusable**
+  We used `MongoDBStorage` and `ShelveStorage`, but the pattern works the same with:
+
+  * Firestore, DynamoDB, Redis, PostgreSQL, etc.
+    As long as you can:
+
+  1. Save a model dict,
+  2. Look it up by a stable key (UUID, file-hash, etc.),
+  3. Update it atomically enough for your use case.
+
+* **Idempotency & Safety**
+  When making transitions resumable:
+
+  * Design each step so it can be retried without breaking data:
+
+    * Uploading a chunk at a known index,
+    * Writing a frame only once per `converted_count`,
+    * Avoiding “double-merge” or “double-complete”.
+  * Prefer “append” or “set by index/state” semantics instead of “blind overwrite”.
+
+* **Cleaning Up**
+  Resumable systems tend to accumulate:
+
+  * Old records (unfinished uploads, failed conversions),
+  * Temporary files (`*.bin`, partial multipart uploads),
+  * Zombie states stuck in failure.
+    Consider:
+  * TTL (time-to-live) cleanup jobs,
+  * Admin tools to inspect and purge stale tasks,
+  * Automatic retries with a maximum attempt count.
+
+* **Observability**
+  Resumable tasks are much easier to reason about when you have:
+
+  * Logs that include the current state and target state,
+  * Metrics (e.g., number of tasks in `error`, average steps to reach `merged`),
+  * Simple admin views to show per-task FSM state.
+
+* **Concurrency Considerations**
+  If multiple workers or processes may touch the same task:
+
+  * Add some form of locking (optimistic versioning, “claimed_by” fields, or distributed locks).
+  * Avoid two workers driving the same FSM at the same time unless you design for it explicitly.
+
+* **Security & Multi-Tenancy**
+  For production systems:
+
+  * Tie each resumable task (upload, conversion, etc.) to a user or tenant ID.
+  * Ensure only the owner can resume, query, or delete that task.
+  * Encrypt sensitive data where appropriate (file names, hashes, user IDs).
+
+* **Suggested Exercises for Readers**
+  To deepen your understanding, try:
+
+  1. **Add a “cancel” state**
+     Extend the S3 upload FSM with a `canceled` state and implement:
+
+     * S3 multipart abort,
+     * DB cleanup,
+     * Frontend “Cancel” button.
+
+  2. **Introduce Backoff & Retry Policies**
+     In both services, add a retry counter and exponential backoff for some transitions (like `_append_chunk` or `to_resize_stage`).
+
+  3. **Port to Another Backend**
+     Replace `ShelveStorage`/`MongoDBStorage` with:
+
+     * A Redis hash,
+     * Or a simple PostgreSQL table.
+       Keep the model/controller code mostly unchanged to feel the benefit of abstraction.
+
+  4. **Add a Monitoring Endpoint**
+     For the upload or video conversion service, create an endpoint like:
+
+     * `GET /status/<task_id>` returning current FSM state and progress percentage.
+
+By experimenting with these extensions, you’ll not only understand the examples in this chapter more deeply, but also be ready to design your own resumable systems—built on the same core ideas of **explicit state, controlled transitions, and persistent progress**.
 
 ---
 
+## Chapter 10: Architectural Considerations for Resumability — Proposal
+
+### Introduction
+
+* Position this chapter as the **bridge between code-level patterns** (FSM, MVC, SQL vs KV, etc.) and **system-level architecture**.
+* Emphasize: *“Resumability is not just a function feature; it’s a system property.”*
+
+### Section 1: When Do We Save Progress?
+
+> **When should we persist progress so that a task can safely resume?**
+
+Saving too often wastes I/O and slows the system. Saving too rarely means a crash forces you to redo a lot of work. Resumability is basically the art of choosing **good checkpoints**.
+
+In this section, we’ll look at common strategies and trade-offs.
 
 
-## Chapter 10: Architectural Considerations for Resumability
-- (Newly added chapter)
+#### 1.1 Coarse-Grained vs Fine-Grained Checkpoints
+
+For any resumable task, you can decide to checkpoint at different “resolutions”:
+
+* **Coarse-Grained Checkpoints**
+  You only save state at *high-level steps*.
+
+  * Examples:
+
+    * Checkout flow: `"step = 'payment'"`, `"step = 'review'"`, `"step = 'complete'"`.
+    * User registration: `"step = 'email_verified'"`.
+  * If you crash mid-step, you redo that whole step.
+  * **Good when**:
+
+    * Each step is relatively cheap.
+    * The user can tolerate redoing the step.
+
+* **Fine-Grained Checkpoints**
+  You save progress frequently, e.g. per chunk, per frame, per record.
+
+  * Examples:
+
+    * S3 upload: `"parts_uploaded = 37 of 100"`.
+    * Video conversion: `"converted_count = 1200 of 5423 frames"`.
+  * If you crash, you lose at most a small piece of work.
+  * **Good when**:
+
+    * Each unit of work is expensive.
+    * Task runs for minutes or hours.
+    * Retrying a big chunk is painful (or costly).
+
+A practical way to decide:
+
+> **Ask: “How much work is acceptable to lose after a crash?”**
+> That answer defines your checkpoint granularity.
+
+
+#### 1.2 Common Triggers for Saving Progress
+
+Architecturally, you rarely “just save whenever”. You usually anchor checkpoints to **specific events**:
+
+1. **On State Transition (FSM-Level Checkpoint)**
+
+   * Every time your FSM state changes, you persist:
+
+     * `current_state`,
+     * key progress fields,
+     * timestamps / last error.
+   * Example:
+
+     * `idle → receiving`
+       Save: upload metadata, initialized parts list.
+     * `receiving → received`
+       Save: final parts array (`[PartNumber, ETag, ...]`), ready to merge.
+   * **Pros**: Simple, predictable, aligns with your conceptual model.
+   * **Cons**: If a state encapsulates a lot of work internally, you may still lose progress inside that state.
+
+2. **Every N Units of Work (Loop-Level Checkpoint)**
+
+   * In long loops, save after processing N items:
+
+     * N frames, N records, N chunks.
+   * Example (video conversion):
+     Save every 50 frames:
+
+     ```python
+     for frame_idx in range(model.converted_count, model.total_count):
+         # process frame...
+         model.converted_count = frame_idx + 1
+         if frame_idx % 50 == 0:
+             controller.save_model()
+     ```
+   * **Pros**: Tunable trade-off between overhead and possible rework.
+   * **Cons**: Requires careful choice of N; too small = heavy I/O, too large = painful rework.
+
+3. **On External Boundaries (Time / Size / API Limits)**
+
+   * Save when:
+
+     * A **time budget** is nearly exhausted (e.g. AWS Lambda’s ~15 minutes).
+     * A **size threshold** is reached (e.g. local file size, memory usage).
+     * An **API limit** is close (e.g. N API calls per run).
+   * Example:
+
+     * In a Lambda, stop work if you are close to timeout:
+
+       * Write current progress,
+       * Return control, let the next invocation resume.
+
+4. **On “Risky” Operations**
+
+   * Before:
+
+     * Deleting the only copy of something,
+     * Merging partial uploads,
+     * Switching to a new state that is hard to roll back,
+   * You save a checkpoint you can roll back to if things go wrong.
+
+
+#### 1.3 Balancing Overhead vs Safety
+
+Saving progress has a cost:
+
+* Extra DB writes,
+* Extra filesystem writes,
+* More contention on shared resources.
+
+But not saving enough has a different cost:
+
+* CPU/GPU time wasted recomputing work,
+* Money (cloud compute),
+* User frustration (having to restart).
+
+A simple mental model:
+
+* **Checkpoint Cost**: `C_save` (time + money)
+* **Work Lost on Crash**: `C_redo` (average cost to redo between checkpoints)
+* **Crash Likelihood**: `p_crash` in that window
+
+Expected cost per window ≈
+`C_save + p_crash * C_redo`
+
+You don’t need precise numbers, but this tells you:
+
+* If failures are common or expensive → more frequent checkpoints.
+* If failures are rare and work is cheap → fewer checkpoints.
+
+A practical engineering heuristic:
+
+* For **CPU-heavy** or **I/O-heavy** long tasks:
+  Checkpoint per **1–5 seconds** of work, or per **small batch**.
+* For **user-driven low-cost steps** (forms, short interactions):
+  Checkpoint per **step** or per **screen**.
+
+
+#### 1.4 Example: Tuning a Resumable Loop
+
+Consider a simplified pseudo-loop for a resumable job:
+
+```python
+class JobModel:
+    def __init__(self, job_id, offset=0, total=0):
+        self.job_id = job_id
+        self.offset = offset  # how many items processed
+        self.total = total
+
+    def to_dict(self): return self.__dict__
+
+class JobController:
+    CHECKPOINT_EVERY = 100  # tune this
+
+    def __init__(self, model, storage):
+        self.model = model
+        self.storage = storage
+
+    def save(self):
+        self.storage.set(self.model.job_id, self.model.to_dict())
+
+    def run(self, items):
+        for idx in range(self.model.offset, len(items)):
+            item = items[idx]
+            self.process(item)
+            
+            self.model.offset = idx + 1
+
+            if self.model.offset % self.CHECKPOINT_EVERY == 0:
+                self.save()  # checkpoint
+
+        # final checkpoint
+        self.save()
+
+    def process(self, item):
+        # heavy work here
+        pass
+```
+
+Architectural tuning knobs:
+
+* **`CHECKPOINT_EVERY = 1`**
+
+  * Very safe, minimal lost work.
+  * DB-heavy, may throttle throughput.
+
+* **`CHECKPOINT_EVERY = 1000`**
+
+  * Light on DB, but a crash means reprocessing up to 1000 items.
+
+In a real system, you adjust `CHECKPOINT_EVERY` based on:
+
+* Average item processing cost,
+* DB capacity,
+* Observed crash frequency / node churn,
+* SLAs (how much rework is acceptable).
+
+
+#### 1.5 Design Heuristics: When to Save
+
+When you design a resumable workflow, it helps to explicitly answer:
+
+1. **What is the “unit of progress”?**
+
+   * A step, a chunk, a frame, a record, an API call?
+2. **What is the worst-case rework if we crash between checkpoints?**
+
+   * Is that acceptable for:
+
+     * CPU time?
+     * Money?
+     * User patience?
+3. **Where is the natural “safe” boundary?**
+
+   * At FSM state transitions?
+   * At the end of a loop batch?
+   * After writing a stable intermediate file?
+4. **What does rollback look like if a checkpoint is “bad”?**
+
+   * Can we safely rerun from the last checkpoint?
+   * Do we need compensating actions (e.g., delete partial uploads, discard broken temp files)?
+
+If you can answer these questions for each major process, you are no longer “just retrying and hoping”. You are *choosing* when to save progress to balance performance, cost, and reliability.
+
+### Section 2: Where Does State Live?
+
+Resumability always starts with one core question:
+
+> **If the process dies *right now*, where does the truth live?**
+
+In previous chapters, we stored state in different places:
+
+* SQL / key-value databases (Chapter 2),
+* Models controlled by FSMs (Chapter 6),
+* MongoDB / Shelve-based storage plus S3, local files, etc. (Chapter 7).
+
+In this section, we step back and classify the main **locations of state** and their implications for resumability.
+
+#### 2.1 In-Memory State (Process Memory)
+
+This is the fastest, most convenient place for state — local variables, objects, caches.
+
+* **Pros**
+
+  * Extremely fast reads and writes.
+  * Simple to manipulate with normal language features (objects, lists, dicts).
+* **Cons**
+
+  * Disappears on crash, restart, or redeploy.
+  * Hard to share across processes / machines.
+* **Consequence for Resumability**
+
+  * Any critical state that *only* exists in memory is **not resumable**.
+  * In-memory state is fine as a *working copy*, but not as the **system of record**.
+
+In a resumable design, think of in-memory state as “scratch space” between durable checkpoints.
+
+#### 2.2 Durable Databases (SQL and NoSQL)
+
+Databases are the most common place to keep resumable state:
+
+* **Relational (SQL)**: tables, rows, transactions.
+* **Key-Value / Document (NoSQL)**: flexible schemas, high scalability.
+
+Typical patterns:
+
+* A **task table / collection**:
+
+  * `id`, `current_state`, `progress`, `last_error`, `updated_at`.
+
+* A **model document** per unit of work:
+
+  * As in `S3LargeUploadingModel` or `VideoConversionModel`.
+
+* **Pros**
+
+  * Durable, crash-safe (when configured properly).
+  * Good query capabilities (e.g., “all tasks in error state”).
+  * Easy to integrate with monitoring and admin UIs.
+
+* **Cons**
+
+  * Writing too often can become a bottleneck.
+  * Schema and migration management (for SQL).
+
+* **Consequence for Resumability**
+
+  * The database is usually the **canonical place** to resume from.
+  * Every important transition in your FSM should be reflected here:
+
+    * New row/document created at start,
+    * Progress/offset updated,
+    * Final state marked (`completed`, `failed`, `canceled`).
+
+A good rule of thumb:
+
+> If you need to answer “where did this task stop?” tomorrow, it belongs in the database.
+
+#### 2.3 Message Queues and Event Logs
+
+Some systems rely heavily on:
+
+* Message queues (e.g., RabbitMQ, SQS, Kafka topics),
+* Event logs / streams.
+
+Here, resumability can be based on:
+
+* **Offsets / positions** in a topic,
+
+* “At-least-once” handlers that can be **replayed**.
+
+* **Pros**
+
+  * Built-in buffering, retry, and decoupling between producer/consumer.
+  * Natural way to model long-running workflows (“one message per step”).
+
+* **Cons**
+
+  * The queue itself usually does **not** know semantic progress (only that messages were delivered).
+  * You still need an external “task state” somewhere if you care about higher-level workflow state.
+
+* **Consequence for Resumability**
+
+  * Queues help you *resume processing work*, but you still need:
+
+    * Either an offset,
+    * Or a task record, to know *what* has been done and *what* remains.
+
+For complex workflows, queues are best combined with **FSM + DB**, not used as the only state store.
+
+#### 2.4 Files, Object Storage, and External Services
+
+Examples already use:
+
+* **S3** multipart uploads,
+* Local files (`*.bin` for frames, final thumbnails).
+
+These are also part of system state:
+
+* Uploaded parts in S3,
+
+* Temporary binary files,
+
+* Final output files.
+
+* **Pros**
+
+  * Suitable for large binary data (videos, images, archives).
+  * Often cheaper and more scalable than storing blobs in a database.
+
+* **Cons**
+
+  * Harder to query (“Which uploads are half-done?”).
+  * Operations are usually not transactional with your database.
+
+* **Consequence for Resumability**
+
+  * Treat file/object storage as **payload storage**, not the main source of *workflow state*.
+  * Use the DB/model to record:
+
+    * Which parts have been uploaded,
+    * Which intermediate files exist,
+    * Where the final output lives.
+
+S3 upload example does this nicely: S3 holds chunks; Mongo/Shelve holds *which* chunks are done.
+
+#### 2.5 Client-Side State (Browser, Mobile, Desktop)
+
+Sometimes the **client itself** (browser, mobile app) holds part of the resumable state:
+
+* Selected file, last played position, in-progress form, local drafts.
+
+* Stored via:
+
+  * `localStorage`, `IndexedDB`,
+  * Mobile app local DB,
+  * Desktop config / cache files.
+
+* **Pros**
+
+  * Reduces load on the server.
+  * Can provide offline progress.
+
+* **Cons**
+
+  * Not reliable for critical tasks (user can clear storage, change devices, etc.).
+  * Harder to coordinate across devices and sessions.
+
+* **Consequence for Resumability**
+
+  * Client-side state is excellent for **user convenience** (drafts, last position),
+  * But **critical business workflows** should still be resumable based on server-side durable state.
+
+#### 2.6 Design Guideline: System of Record vs. Cache
+
+To keep your architecture clear, distinguish:
+
+* **System of Record (SoR)**:
+
+  * The one place that defines the “true” state of a resumable task.
+  * Usually a database row/document for the task.
+* **Caches / Derived State**:
+
+  * Everything else that can be recomputed or repaired from the SoR:
+
+    * In-memory structures,
+    * Temporary files,
+    * Queues containing “work items” derived from the task state.
+
+A quick checklist for each piece of state:
+
+1. **If it’s lost, can we recompute it from something else?**
+
+   * Yes → cache / derived state.
+   * No → put it in your SoR.
+
+2. **If the process crashes halfway, what must we read to decide the next step?**
+
+   * That must live in durable, queryable storage (DB, etc.).
+
+By answering *“Where does state live?”* carefully for each subsystem, you create a solid foundation for all the other architectural decisions in this chapter: when to checkpoint, how to retry, how to scale, and how to operate the system.
+
+
+### Section 3: Who Orchestrates Resumability?
+
+Once you know **where** state lives and **when** to save progress, the next architectural question is:
+
+> **Who is actually responsible for driving the workflow forward and resuming it after interruptions?**
+
+In other words: *who* looks at the current state, decides the next step, and executes it?
+
+Different architectures answer this question differently. In resumable systems, being explicit about “who orchestrates” is critical for clarity, debuggability, and failure handling.
+
+#### 3.1 Controller-Driven Orchestration (Local MVC + FSM)
+
+In many of the examples in this book, the **Controller + FSM** is the main orchestrator:
+
+* The **Controller**:
+
+  * Knows the *current* state (from the Model / DB).
+  * Chooses the next transition (`to_recieving`, `to_merged`, `to_resize_stage`, `to_complete_mp4`, etc.).
+  * Performs the **hard operations** (I/O, S3 calls, video encoding).
+* The **FSM**:
+
+  * Restricts what transitions are legal.
+  * Encodes the process logic as a transition graph.
+  * Provides helpers like `find_path(...)` or `resume_state(...)` to move toward a target state.
+
+**Characteristics:**
+
+* Orchestration is **local** to the service or process.
+* Easy to reason about in code:
+
+  * “Given state X and target Y, call the controller; it will figure out the next step.”
+* Great for:
+
+  * Single-service flows,
+  * Background workers,
+  * Simple APIs that “do the next step” on each call (like `/start_upload/` and `/upload_chunk/`).
+
+**Trade-offs:**
+
+* If logic spans multiple services, each service needs its own FSM, or you end up with one “God-controller” service.
+* For very large workflows, you may want a more visible, centralized orchestration layer.
+
+#### 3.2 Client-Driven Orchestration (Browser / Mobile / External Caller)
+
+Sometimes the **client** plays an active orchestration role:
+
+* The browser or mobile app:
+
+  * Knows it must:
+
+    1. `/start_upload/`
+    2. Loop `/upload_chunk/` until completion
+    3. Poll for final status
+  * Decides when to pause, resume, or cancel based on user actions.
+* A command-line tool or external script:
+
+  * Repeatedly calls your API,
+  * Inspects the current state,
+  * Decides the next call.
+
+In this style, the server is more like a **stateful engine** with simple APIs:
+
+* “Do one step and tell me the new state.”
+* “Give me the current state of task X.”
+
+The **client orchestrates**, the **server enforces** correctness and persistence.
+
+**Pros:**
+
+* Very flexible: different clients can orchestrate the same backend in different ways.
+* Great for interactive UX (pause/resume buttons, progress bars).
+
+**Cons:**
+
+* If client logic is wrong, you get strange usage patterns or stuck flows.
+* If multiple clients can touch the same task, you’ll need extra safeguards (locking, ownership checks).
+
+#### 3.3 Central Orchestrator Services (Workflow Engines)
+
+In more complex systems, especially microservice architectures, you might introduce a dedicated **orchestrator**:
+
+* Workflow engines like:
+
+  * “Job runners”, “pipeline engines”, or external tools (e.g., Airflow-like, Step Functions-like concepts).
+* The orchestrator:
+
+  * Stores the **global workflow definition** (steps, branches, timeouts).
+  * Keeps track of **per-task state**.
+  * Calls into individual services to perform steps (“send email”, “charge card”, “generate thumbnail”).
+  * Decides what to do on failure (retry, compensation, mark as failed).
+
+Here, *who orchestrates* is:
+
+* A **separate service** whose only job is to manage long-running workflows.
+
+**Pros:**
+
+* Good visibility: a single place to inspect the progress of all workflows.
+* Easier cross-service coordination (Sagas, compensating actions).
+* Each individual service can stay simpler: “do step X when asked” and report success/failure.
+
+**Cons:**
+
+* Another component to design, maintain, secure, and scale.
+* Tight coupling between orchestrator and services if not designed carefully (e.g., hard-coded step names or payload formats).
+
+#### 3.4 Autonomous Services (Choreography Instead of Orchestration)
+
+The opposite of a central orchestrator is a **choreographed** system:
+
+* There is **no single “boss”**.
+* Each service:
+
+  * Listens to events,
+  * Updates its own state,
+  * Emits new events when it finishes something.
+* The whole workflow emerges from:
+
+  * “When event A happens and my state is S, I emit B,”
+  * “When I see B and my state is T, I emit C,” etc.
+
+Resumability here depends heavily on:
+
+* **Per-service FSMs** and their persisted state,
+* **Event logs** and idempotent event handlers.
+
+**Pros:**
+
+* Very decoupled, services know as little as possible about each other.
+* Easy to add new reactions by adding new consumers.
+
+**Cons:**
+
+* It’s harder to answer “What is the current global state of workflow #123?” unless you build special aggregators.
+* Debugging and reasoning about end-to-end behavior can be complex.
+
+In this architecture, “who orchestrates?” is answered with:
+
+> “No one; the system as a whole choreographs itself via events.”
+
+#### 3.5 Design Guideline: Make “Who Drives the Next Step?” Explicit
+
+Regardless of style, a resilient resumable architecture should be able to answer clearly:
+
+* **Who** decides what the next step is?
+* **Where** is that decision encoded? (Controller code? Workflow engine? Client?)
+* **How** is that component restarted or scaled?
+* **What happens** if that orchestrator crashes in the middle of a decision?
+
+A simple rule of thumb:
+
+1. Pick **one primary orchestrator** per workflow:
+
+   * Controller FSM, client app, workflow engine, or event choreography.
+2. Make orchestration behavior **visible in code**:
+
+   * Explicit FSM transitions,
+   * Clear API contracts,
+   * Centralized workflow definition where appropriate.
+3. Ensure the orchestrator itself is **restartable and stateless**:
+
+   * All real state must live in durable storage (Chapter 10, Section 1),
+   * The orchestrator only *reads state, decides, and writes back*.
+
+Once you know **who orchestrates resumability**, you can reason about how failures are handled, how to test complex flows, and where to add new behaviors without turning the system into a ball of mud.
+
+
+### Section 4: What Patterns Keep Retries Safe?
+
+Once you start making things resumable, you almost always end up adding **retries**:
+
+* The network is flaky → retry the HTTP call.
+* S3 upload fails mid-chunk → retry the upload.
+* Video conversion crashes → re-run the step.
+
+But naive retries can be dangerous:
+
+* Double-charging a customer,
+* Uploading the same chunk twice and corrupting the merge,
+* Writing duplicate rows or emitting duplicate events.
+
+So the architectural question becomes:
+
+> **What patterns allow us to retry safely without breaking correctness?**
+
+This section introduces a small toolbox of patterns you can apply on top of your MVC + FSM designs to make “retry until success” compatible with correctness and resumability.
+
+
+#### 4.1 Idempotent Operations
+
+**Idempotent** means:
+
+> Running the same operation once or multiple times produces the **same final state**.
+
+For example:
+
+* “Set `task.state = 'completed'`” is idempotent.
+* “Insert new row into `payments` table” is *not* idempotent if you call it twice.
+
+In resumable systems, you often design your “steps” (FSM transitions) to be idempotent:
+
+* In the S3 upload example:
+
+  * Instead of “append some unknown chunk”, you do:
+
+    * “Upload **part number N** for file `file_id`”
+    * State is tracked per `(file_id, part_number)`.
+* In the video conversion example:
+
+  * Instead of “process some frames again and again”:
+
+    * You track `converted_count`.
+    * Each call processes *from* `converted_count` onward.
+
+**Typical idempotency techniques:**
+
+1. **Use natural or composite keys**
+   Example: `(file_name, file_size, file_hash)` as a unique ID for the upload task.
+   Calling “create upload” twice with the same triple returns the same record, not two.
+
+2. **Upsert instead of insert**
+
+   * “Insert, or update if already exists.”
+   * In SQL: `INSERT ... ON CONFLICT (...) DO UPDATE ...`
+   * In NoSQL: `update_one(..., upsert=True)`
+
+3. **Set vs increment**
+
+   * Prefer operations like:
+
+     * `state = 'merged'`
+     * `progress = max(progress, new_progress)`
+   * Avoid blind increments when the same operation might run multiple times.
+
+Architecture guideline:
+
+> Design each FSM transition as a well-defined, *named* idempotent operation if possible.
+
+
+#### 4.2 Idempotency Keys for External Requests
+
+When external clients (browsers, mobile apps, other services) call your API, they might:
+
+* Retry the same request due to network failure,
+* Click the same button twice,
+* Replay requests after a timeout.
+
+To maintain resumability and correctness, you can introduce **idempotency keys**:
+
+* Client generates a unique key per logical operation:
+
+  * `X-Idempotency-Key: <uuid>`
+  * Or a structured key like `upload:<user_id>:<file_hash>`.
+* Server stores:
+
+  * The key,
+  * The resulting state / response.
+
+On receiving the same idempotency key again:
+
+* If the operation was already completed → return the **same result**.
+* If it’s still running → return a “still processing” status or current state.
+
+This pattern is especially important for:
+
+* Payment APIs,
+* “Create resource” endpoints,
+* Any operation where double execution is unacceptable.
+
+
+#### 4.3 Outbox and Inbox Patterns (for Events and Messages)
+
+In distributed systems, resumability and retries often involve queues and events:
+
+* You write to the DB,
+* You send an event or a message to a queue,
+* Either one can fail independently.
+
+To avoid losing or duplicating events when you retry, you can use:
+
+##### Outbox Pattern (Sender Side)
+
+* When you update your main model (e.g. upload state, conversion state), you **also** write an “event” into an **outbox table/collection** in the same transaction:
+
+  * Example: `upload_completed` event with `task_id`.
+* A background worker:
+
+  * Polls the outbox,
+  * Sends events to Kafka/SQS/Webhooks,
+  * Marks them as “sent”.
+
+**Benefit:**
+If your service crashes:
+
+* The DB update and the outbox insert succeed or fail together.
+* On restart, unsent events are still in the outbox, and you can safely resend.
+
+##### Inbox / Processed-Event Log (Receiver Side)
+
+* When a service consumes events, it keeps an **inbox table** or a list of processed event IDs.
+* Before handling an event:
+
+  * Check if you’ve already processed `event_id`.
+  * If yes → skip (the event is a duplicate).
+  * If no → process and record `event_id` as processed.
+
+**Benefit:**
+You can safely do **at-least-once delivery** but still process each event **exactly once** from a business-logic perspective.
+
+
+#### 4.4 Sagas and Compensating Actions
+
+Sometimes an operation spans multiple components:
+
+* Reserve inventory,
+* Charge payment,
+* Generate invoice,
+* Send confirmation email.
+
+If step 3 fails after step 1 and 2 succeeded, how do you “resume” without leaving a mess?
+
+This is where **Saga** and **compensating actions** help:
+
+* A Saga is a long-running workflow split into multiple steps.
+* Each step has:
+
+  * A **forward action** (do something),
+  * A **compensating action** (undo or logically reverse it).
+
+Example:
+
+* Forward:
+
+  * `reserve_item(item_id)`
+  * `charge_card(amount)`
+* Compensating:
+
+  * `release_item(item_id)`
+  * `refund_card(amount)`
+
+In a resumable architecture:
+
+* If a Saga fails at step N:
+
+  * You can resume by:
+
+    * Either retrying step N (if safe),
+    * Or triggering compensations for steps 1..N-1.
+* The Saga’s state (including which steps are done, which compensations are pending) is persisted and resumable.
+
+This pattern is especially useful in microservice architectures where:
+
+* No single DB transaction spans all services,
+* You still need a consistent *business* result after failures and retries.
+
+
+#### 4.5 Timeouts, Backoff, and Circuit Breakers
+
+Safe retries are not just about data correctness; they’re also about **protecting your system**.
+
+Common patterns:
+
+1. **Timeouts**
+
+   * Don’t let a call hang forever; bound the time.
+   * If a call times out, you may:
+
+     * Retry,
+     * Mark the state as “error” and wait for a manual or automatic resume.
+
+2. **Exponential Backoff**
+
+   * On repeated failures, wait longer between retries:
+
+     * 1s, 2s, 4s, 8s, …
+   * Reduces pressure on a struggling dependency.
+
+3. **Circuit Breaker**
+
+   * If a dependency keeps failing:
+
+     * “Open” the circuit (stop calling it for a while).
+     * Return fast errors or alternate behavior.
+   * After a cooldown, try again and “close” if it recovers.
+
+In terms of resumability:
+
+* These patterns prevent your FSM from hammering failing resources.
+* Your persisted state should capture:
+
+  * Failure reason,
+  * Next allowed retry time,
+  * Number of attempts so far.
+
+
+#### 4.6 Design Checklist: Is This Step Retry-Safe?
+
+For each FSM transition or architectural step in your resumable system, ask:
+
+1. **If this step is executed twice, what happens?**
+
+   * Is it idempotent?
+   * If not, can we make it idempotent with:
+
+     * A natural key / idempotency key,
+     * Upsert semantics,
+     * A more explicit state representation?
+
+2. **If the process crashes halfway through this step, what will we see in the persisted state?**
+
+   * Can we detect partial changes?
+   * Will we retry safely, or risk double effects?
+
+3. **If messages/events are duplicated, can we detect and ignore duplicates?**
+
+   * Outbox pattern used?
+   * Inbox / processed log present?
+
+4. **If external APIs fail or are slow, do we have:**
+
+   * Timeouts and backoff,
+   * Limits on the number of retries,
+   * A way to surface “stuck in error” states to operators?
+
+5. **Is the semantics of “success” clear?**
+
+   * Do we have a well-defined terminal state (`merged`, `complete_mp4`, `failed`, `canceled`)?
+   * Once we reach it, retries should be a no-op.
+
+If you can answer these questions clearly for each major step, your architecture is not only resumable — it is also **retry-safe**, which is a fundamental requirement for real-world reliability.
+
+
+### Section 5: Why Resumability Changes Your Design Priorities
+
+Up to this point, we’ve asked **where** state lives, **when** to save progress, **who** orchestrates the flow, and **what** patterns keep retries safe. This section takes a step back and asks:
+
+> **Why does caring about resumability fundamentally change the way we design systems?**
+
+Resumability is not just a “nice-to-have reliability feature”. Once you take it seriously, it starts to reorder your priorities: how you model data, how you split services, how you treat failures, and even how you think about “done”.
+
+#### 5.1 Why “Just Retry” Is Not Enough
+
+Many systems start with a very simple reliability strategy:
+
+> “If it fails, we’ll just retry.”
+
+This works for:
+
+* **Read-only** operations,
+* Non-critical, idempotent actions,
+* Small scripts and internal tools.
+
+But as soon as you have:
+
+* Payments, file uploads, long-running conversions,
+* Multi-step flows (registration, onboarding, content pipelines),
+* Expensive work (GPU jobs, video processing, ML training),
+
+“Just retry” becomes dangerous:
+
+* Retrying can **duplicate side effects** (double charge, double notification).
+* Simple retries ignore **progress** (you always start from zero).
+* They don’t answer: *“Where exactly did we stop?”*
+
+Resumability forces you to move from:
+
+* “Try again and hope it works this time”
+  **to**
+* “Pick up precisely from the last known consistent point.”
+
+That shift requires architectural support: explicit FSMs, persisted models, idempotency, and careful state location.
+
+#### 5.2 Why You Must Make State Explicit
+
+In a non-resumable system, a lot of state is **implicit**:
+
+* Hidden in local variables,
+* Spread across in-memory objects,
+* Implied by logs or queue contents.
+
+This is often “good enough” until:
+
+* The process crashes,
+* You need to move workloads between machines,
+* You have to explain to someone **what the system is doing right now**.
+
+Resumability pushes you to:
+
+* Put the **current state** of workflows in a **single, explicit form**:
+
+  * A row or document describing the task,
+  * A clear `state` field reflecting the FSM,
+  * Additional fields like `progress`, `last_step`, `last_error`.
+
+Why?
+
+* Because **only explicit state can be safely recovered**.
+* Because explicit state becomes a **contract** between:
+
+  * Orchestrator and worker,
+  * Frontend and backend,
+  * Human operator and system.
+
+It’s the difference between “somewhere in the code we know this” and “you can query the database and see exactly where we are”.
+
+#### 5.3 Why User Experience Depends on Resumability
+
+From the user’s perspective, resumability often looks like:
+
+* “I can pause the upload and resume it later.”
+* “If the browser crashes, my form / draft is still there.”
+* “When I refresh the page, the video conversion shows progress, not zero.”
+
+Modern users implicitly expect:
+
+* **Continuity**: the system remembers them and their work.
+* **Forgiveness**: network glitches and reloads are not fatal.
+* **Transparency**: they can see what’s happening and what’s left.
+
+Architecturally, this means:
+
+* You treat workflows as **long-lived tasks**, not one-shot API calls.
+* You persist both:
+
+  * The *machine-visible* state (FSM),
+  * And the *user-visible* status (percentage, step name, ETA-ish info).
+* You design APIs and frontends in terms of:
+
+  * “Create task → poll/subscribe → resume/cancel”,
+    instead of “do everything immediately in one request”.
+
+Resumability is therefore not just about backend safety; it is a direct driver of **better UX**.
+
+#### 5.4 Why Operations and Compliance Care About Resumability
+
+Resumable systems are also easier to **operate** and **audit**:
+
+* Operators can:
+
+  * See which tasks are stuck (`error` state),
+  * Retry, cancel, or move them manually,
+  * Inspect the history of transitions.
+* Compliance and auditing are easier:
+
+  * You can show **what happened when**, especially if you log state transitions.
+  * You can demonstrate that:
+
+    * No task was “lost” in the middle,
+    * Failures were handled in controlled ways,
+    * Certain steps (e.g., approvals, checks) were actually executed.
+
+From an architectural perspective, this is why you:
+
+* Treat **state transitions as first-class events** (sometimes even storing them as a history),
+* Design FSMs and models so they can be inspected externally,
+* Make it possible to **replay**, **compensate**, or **explain** the behavior of the system.
+
+Resumability and observability naturally reinforce each other.
+
+#### 5.5 Why Not Everything Should Be Fully Resumable
+
+There is also an important negative lesson:
+
+> You *could* make everything perfectly resumable — but you **shouldn’t**.
+
+Full, fine-grained resumability has costs:
+
+* More state to design, store, and migrate.
+* More complex FSMs and controllers.
+* More edge cases around partial progress.
+* More clean-up tasks for old / abandoned state.
+
+Some operations are cheap enough that restarting them from scratch is acceptable. For example:
+
+* Quick, idempotent cache refresh jobs,
+* Very small tasks that complete in milliseconds,
+* Internal analytics jobs where partial loss is acceptable.
+
+Architecturally, this leads to a pragmatic principle:
+
+* **Make resumable what is:**
+
+  * Expensive (time, money, CPU/GPU),
+  * User-facing and long-running,
+  * Critical to correctness (e.g., payments, external side effects).
+
+* **Allow restart from scratch where:**
+
+  * Work is cheap and quick,
+  * Or the result is non-critical / best-effort.
+
+Resumability is a **design choice**, not a dogma.
+The “Why” here is about *prioritizing* where to invest complexity.
+
+#### 5.6 Why Resumable Thinking Scales with System Complexity
+
+As systems grow:
+
+* More services,
+* More steps,
+* More failure modes,
+
+Ad-hoc error handling and ad-hoc “retry here and there” logic becomes unmanageable.
+
+By contrast, **resumable thinking** scales because it gives you:
+
+* A uniform way to think about workflows:
+
+  * FSM for states,
+  * Durable SoR for task models,
+  * Clear orchestrator roles,
+  * Safe retry patterns.
+* A common vocabulary for the team:
+
+  * “What state is this task in?”
+  * “Which transition failed?”
+  * “Where is the checkpoint?”
+
+This uniformity is exactly why mature systems (cloud platforms, payment gateways, large SaaS products) invest so heavily in resumability-oriented architectures.
+
+In short, **why** you design for resumability is not just “to handle failures better”; it’s because:
+
+* It improves **correctness**,
+* It improves **user experience**,
+* It improves **operability and auditability**,
+* And it provides a **scalable mental model** for complex systems.
+
+The rest of this chapter’s sections (and this book) are about giving you the concrete tools so that, once you decide *why* you care about resumability, you already know **how** to build it in.
+
+
+### Section 5: How to Review an Architecture for Resumability (Checklist)
+
+By this point, we have discussed:
+
+* **Where** state lives,
+* **When** to save progress,
+* **Who** orchestrates the flow,
+* **What** patterns keep retries safe,
+* (And later: **Why** this all changes your priorities).
+
+This section is about something very practical:
+
+> **How can you systematically review (or design) a system to ensure it is truly resumable?**
+
+To make this actionable, we provide a **checklist** you can apply to:
+
+* A single feature (e.g., large file upload),
+* A background job (e.g., video thumbnail conversion),
+* Or a full cross-service workflow.
+
+You don’t have to achieve “perfect” resumability everywhere, but you should be able to answer these questions consciously.
+
+---
+
+#### 5.1 How to Use This Checklist
+
+1. Pick a **specific workflow or feature** (e.g., “S3 multipart upload”, “video conversion job”).
+2. Identify its **start** and **end** states (what does “not started” and “done” mean?).
+3. Go through each checklist group below:
+
+   * If you can clearly answer “yes” → great.
+   * If “no” or “not sure” → that’s a design gap to address.
+
+You can treat this section as a **design review ritual**: run it for each major resumable feature before shipping.
+
+---
+
+#### 5.2 Checklist – Modeling & State
+
+**[ ] 1. Do you have a single, explicit System of Record (SoR) for this workflow?**
+
+* Example: a `S3LargeUploadingModel`, `VideoConversionModel`, or a `task` table row.
+* This SoR should answer:
+
+  * What is the task?
+  * What is its current state?
+
+**[ ] 2. Is the current state represented by a clear field (or FSM state) in the model?**
+
+* e.g., `FSMs_state = 'idle' | 'recieving' | 'recieved' | 'merged'` or `state = 'resize_stage' | 'error' | 'complete_mp4'`.
+
+**[ ] 3. Is all critical progress stored durably, not only in memory?**
+
+* For uploads: which chunks are done (`parts` list).
+* For conversion: how many frames are processed (`converted_count`).
+* If the process dies, can you recompute everything from this stored state?
+
+**[ ] 4. Is it clear what counts as a terminal state?**
+
+* e.g., `merged`, `complete_mp4`, `failed`, `canceled`.
+* Once the task is in a terminal state, further actions should be no-ops or clearly rejected.
+
+---
+
+#### 5.3 Checklist – Transitions, FSM, and Orchestration
+
+**[ ] 5. Do you have an explicit set of allowed transitions (an FSM)?**
+
+* e.g., `_transitions = { 'idle': ['recieving'], 'recieving': ['recieved', 'recieve_failure', 'idle'], ... }`.
+* Illegal transitions should be blocked (e.g., via `validate_transition` / `handle_errors` decorators).
+
+**[ ] 6. Is it clear *who* drives the next step?**
+
+* Controller (`RequestFSMsController`, `S3LargeUploadingFSMsController`, `VideoConversionFSMsController`)?
+* Client (browser / CLI)?
+* Central workflow engine?
+* Event choreography?
+* You should be able to point to **one main orchestrator** per workflow.
+
+**[ ] 7. Can the orchestrator be restarted without losing context?**
+
+* All needed information must be in the SoR, not hidden in temporary variables.
+* After restart, it should be able to read state and continue.
+
+**[ ] 8. Do you have a way to “drive” the system toward a target state?**
+
+* e.g., `find_path(...)` + `next_action(...)`, or `resume_state(target_state=...)`.
+* This is the core of declarative resumability:
+
+  * “Given current state and target, how do we step-by-step move there?”
+
+---
+
+#### 5.4 Checklist – Persistence, Idempotency, and Retries
+
+**[ ] 9. Is each major step safe to retry?**
+
+* If the same transition runs twice (by bug or retry), does the final result remain correct?
+* If not, can you:
+
+  * Use idempotency keys / unique constraints?
+  * Change the operation from “do something” to “set state to X”?
+
+**[ ] 10. Are hard operations (I/O, external APIs, DB writes) in controllers, not models?**
+
+* Models should primarily hold data.
+* Controllers / FSMs should own:
+
+  * S3 calls,
+  * File writes,
+  * DB writes, etc.
+
+**[ ] 11. Is checkpoint granularity intentional?**
+
+* Do you know how much work might be redone after a crash?
+
+  * For uploads: maybe 1 chunk.
+  * For video: maybe a few frames.
+* Is this amount acceptable in terms of time and cost?
+
+**[ ] 12. Are errors captured as part of state?**
+
+* e.g., a state like `recieve_failure`, `error`, or fields like `last_error`.
+* After failure, the system can:
+
+  * Retry,
+  * Or present a clear status for human intervention.
+
+---
+
+#### 5.5 Checklist – Observability & Operations
+
+**[ ] 13. Can operators see the current state and progress of a task?**
+
+* e.g., via:
+
+  * A DB query (admin console),
+  * A `/status/<id>` API,
+  * Logs that include `task_id` and `state`.
+
+**[ ] 14. Can operators safely retry, cancel, or purge a task?**
+
+* Is there a defined way to:
+
+  * Move a task from `error` → `idle` (retry),
+  * Mark it `canceled`,
+  * Delete records and temporary files after completion?
+
+**[ ] 15. Are logs and metrics connected to states?**
+
+* Logs should mention:
+
+  * Task ID,
+  * Old state → new state,
+  * Reason for transition.
+* Metrics:
+
+  * Count tasks in each state,
+  * Time spent in each state,
+  * Number of errors / retries.
+
+---
+
+#### 5.6 Checklist – Security, Cleanup, and Lifecycle
+
+**[ ] 16. Is access to resumable state properly authorized?**
+
+* Can one user/tenant only see and resume **their own** tasks?
+* Are sensitive fields (file names, hashes, user info) protected?
+
+**[ ] 17. Do you have a cleanup strategy?**
+
+* What happens to:
+
+  * Old upload records,
+  * Old temporary files (`*.bin`),
+  * Old conversion tasks,
+  * Zombie tasks stuck in `error`?
+* Is there:
+
+  * Time-to-live (TTL) logic,
+  * A background job,
+  * Or manual tools?
+
+**[ ] 18. Is the lifecycle clearly defined?**
+
+* From `created` → `in progress` → `terminal state` → `archived/deleted`.
+* Each step of the lifecycle should be:
+
+  * Represented in your state model,
+  * And supported by your code.
+
+---
+
+#### 5.7 How to Decide “Good Enough”
+
+You do **not** need to check every box for every feature. Instead:
+
+* For **critical, long-running, and expensive** workflows:
+
+  * Aim to satisfy as many checklist items as possible.
+* For **cheap, short, or low-risk** workflows:
+
+  * You might accept:
+
+    * Less detailed state,
+    * Coarser checkpoints,
+    * Simple “retry from scratch”.
+
+The important part is:
+You **consciously decide** where resumability matters, and you have a **systematic way** to check that your architecture actually supports it.
+
+This checklist should give you a concrete “How”:
+
+* How to review a design,
+* How to refine an existing system,
+* How to ensure that your use of MVC, FSMs, and storage backends really results in a resilient, resumable architecture—not just in theory, but in running, maintainable code.
+
+
 
 ## Chapter 11: State Management Techniques
 - (Newly added chapter)
