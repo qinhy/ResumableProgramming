@@ -1,3 +1,7 @@
+---
+slug: /
+---
+
 # Resumable Programming
 #### Authors : Huangyi Qin, ChatGPT
 
@@ -10161,4 +10165,3 @@ We hope this book has provided not only practical techniques for saving state an
 Keep experimenting, testing, and refining your designs. Every carefully chosen checkpoint and every recovery path you verify is a step toward software that is more dependable, maintainable, and useful to the people who rely on it.
 
 **Thank you, and happy coding!**
-
