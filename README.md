@@ -1,6 +1,6 @@
 # Website
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+This book now serving at https://qinhy.github.io/ResumableProgramming/
 
 ### Installation
 
