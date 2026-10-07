@@ -34,7 +34,7 @@ Python's syntax is designed to be intuitive and easy to read. This section will 
 
 
 
-```python
+```
 'Python syntax is clean and easy to understand, emphasizing readability. '
 'Python uses indentation to define code blocks instead of curly braces or keywords.'
 print('```')
@@ -67,10 +67,10 @@ print('```')
     50
     2.0
     ```
-    
 
 
-```python
+
+```
 'Control structures in Python allow you to control the flow of program.' 
 'Python supports common control structures like `if` statements, `for` loops, and `while` loops.'
 
@@ -114,10 +114,10 @@ print('```')
     Count is: 3
     Count is: 4
     ```
-    
 
 
-```python
+
+```
 'Functions in Python are defined using the `def` keyword.'
 'They are reusable blocks of code that perform a specific task.'
 'Python functions can take arguments and return values.'
@@ -143,10 +143,10 @@ print('```')
     Hello, Alice!
     15
     ```
-    
 
 
-```python
+
+```
 'Python modules are .py files that can be imported into other Python programs.'
 'This allows you to organize your code into reusable components.'
 
@@ -185,7 +185,7 @@ These advanced Python features—generators, decorators, and context managers—
 Generators are a type of iterable, like lists or tuples. Unlike lists, however, generators do not store all their values in memory; they generate each value on the fly and are hence more memory-efficient for large data sets. Generators are defined using functions and the `yield` keyword.
 
 
-```python
+```
 def fibonacci_sequence(n):
     """Generate Fibonacci sequence up to n terms."""
     a, b = 0, 1
@@ -211,14 +211,14 @@ print('```')
     21
     34
     ```
-    
+
 
 
 - **Decorators**: Decorators are a powerful and expressive tool in Python that allow you to modify or enhance functions or methods without changing their actual code. Decorators are widely used in Python for logging, enforcing access control, instrumentation, caching, and more.
 
 
 
-```python
+```
 
 def debug(func):
     """A simple decorator that prints the arguments and return value of a function."""
@@ -243,13 +243,13 @@ print('```')
     Calling multiply with arguments (5, 3) and keyword arguments {}
     multiply returned 15
     ```
-    
+
 
 
 - **Context Managers**: Context managers are used for resource management in Python, such as managing files, network connections, and locks. The most common way to define a context manager is with the `with` statement, which ensures that resources are properly acquired and released. You can create your own context managers using the `contextlib` module or by defining a class with `__enter__` and `__exit__` methods.
 
 
-```python
+```
 from contextlib import contextmanager
 
 @contextmanager
@@ -275,7 +275,7 @@ Classes are one of the fundamental building blocks of object-oriented programmin
 - **What is a Class?**: A clas is a blueprint for creating objects. It defines a set of attributes and methods that the created objects (also called instances) can use. Attributes represent the state of an object, while methods define its behavior. In Python, a class is defined using the `class` keyword, followed by the class name and a colon.
 
 
-```python
+```
 class MyClass:
     # Attributes and methods go here
     pass
@@ -289,7 +289,7 @@ Attributes in a Python class are defined within the `__init__` method, which is 
 
 
 
-```python
+```
 class Dog:
     def __init__(self, name, breed):
         self.name = name
@@ -306,13 +306,13 @@ print('```')
     ```
     Buddy says Woof!
     ```
-    
+
 
 - **Class vs. Instance Attributes** :
 Class attributes are shared among all instances of a class, while instance attributes are unique to each instance. Class attributes are defined directly within the class body and are not inside any methods.
 
 
-```python
+```
 # Here, `species` is a class attribute, and `name` is an instance attribute.
 class Cat:
     species = "Felis catus"  # Class attribute
@@ -330,14 +330,14 @@ print('```')
     ```
     Felis catus
     ```
-    
+
 
 - **Encapsulation and Data Hiding** :
 Encapsulation is the concept of bundling data and methods that operate on the data within one unit, a class. Python uses a naming convention to make attributes and methods private (not intended to be accessed from outside the class). Prefixing an attribute name with an underscore (`_`) suggests that it is intended for internal use.
 
 
 
-```python
+```
 class BankAccount:
     def __init__(self, balance):
         self._balance = balance  # Private attribute
@@ -357,7 +357,7 @@ Inheritance is a powerful feature of OOP that allows a class to inherit attribut
 Polymorphism allows methods to have different implementations depending on the object that calls them. In the example above, both `Dog` and `Cat` implement the `speak()` method differently. Polymorphism enables the same interface to be used for different underlying forms (data types).
 
 
-```python
+```
 class Animal:
     def __init__(self, name):
         self.name = name
@@ -385,14 +385,14 @@ print('```')
     Buddy says Woof!
     Whiskers says Meow!
     ```
-    
+
 
 -  **Using `super()`** :
 The `super()` function allows you to call methods from a parent class from within a child class. This is especially useful in constructors when you want to initialize the base class.
 
 
 
-```python
+```
 class Bird(Animal):
     def __init__(self, name, can_fly=True):
         super().__init__(name)
@@ -404,7 +404,7 @@ Python classes have special methods, also known as "dunder" methods (double unde
 
 
 
-```python
+```
 
 class Point:
     def __init__(self, x, y):
@@ -426,7 +426,7 @@ print('```')
     ```
     Point(x=1,y=1)
     ```
-    
+
 
 Understanding Python classes is crucial for writing efficient and maintainable code. Classes provide a way to encapsulate data and behavior, implement inheritance for code reuse, and enable polymorphism for flexible design. Mastering classes and OOP in Python will give you a solid foundation for developing robust software solutions.
 
@@ -461,7 +461,7 @@ In today’s technological landscape, applications are increasingly expected to 
 let's think a simple example without resumability.
 
 
-```python
+```
 print('```')
 def fibonacci(n):
     if n <= 1 : return n
@@ -479,7 +479,7 @@ print('```')
     
     Fibonacci results: ... [(32, 2178309), (33, 3524578), (34, 5702887), (35, 9227465), (36, 14930352)]
     ```
-    
+
 
 
 Here are some key reasons why resumability is essential from the example:
@@ -496,7 +496,7 @@ Here are some key reasons why resumability is essential from the example:
 Here's how we can implement a resumable Fibonacci function in Python, using **memoization** with persistent storage:
 
 
-```python
+```
 import shelve  # Used for simple key-value pair storage
 def fibonacci(n, db_path='fibonacci_cache.db'):
    if n <= 1 : return n
@@ -520,7 +520,7 @@ print('```')
     
     Fibonacci results: ... [(32, 2178309), (33, 3524578), (34, 5702887), (35, 9227465), (36, 14930352)]
     ```
-    
+
 
 
 - **Key Features of This Resumable Implementation**:
@@ -535,7 +535,7 @@ This approach illustrates a basic method to make the Fibonacci function resumabl
 To simplify "Resumability" in the first step for easier understanding, as in the above example, we can consider the following design pattern.
 
 
-```python
+```
 def processA(args):
     # Perform the processing for A
     result = f'Result of A processing args: {args}'
@@ -562,7 +562,7 @@ def processC(args):
 Now, let us move on to the second step of imagining a high-level abstraction. As we know from videos or some books, a robot or machine(or a controller) is designed to repeat certain actions or follow specific commands. In our example, this "reproducibility" can also be assumed to function like a machine(or a controller), similar to a ["finite-state machine"](https://en.wikipedia.org/wiki/Finite-state_machine).
 
 
-```python
+```
 "A high-level Machine object abstraction"
 class Machine:
     def __init__():
@@ -587,7 +587,7 @@ class Machine:
 ```
 
 
-```python
+```
 "A Machine object actual moving implementation"
 import math
 import random
@@ -704,14 +704,14 @@ print('```')
     Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
     ```
-    
+
 
 - **Machine(Controller)**: This example demonstrates that a machine (or an object of MachineA or a controller) with certain parameters (or initialization arguments) can perform actions (or processes or tasks) and then reach a state (or result). The "Resumable Implementation" allows us to make this machine resumable at any checkpoint, even if it crashes suddenly( we will enable random_crash function later).
 
 - **State**: In this example of a machine state, the orientation and position are considered. To ensure this machine has resumability, we have two ways to implement it. The first way is to record the orientation and position of the machine state after performing each action( or process). The second way is to record the action name and its arguments as a "state" after performing each action.
 
 
-```python
+```
 import math
 import random
 class MachineA:
@@ -793,14 +793,14 @@ print('```')
     Machine has been reset to the 0,(0,0) state.
     (0, [0, 0])
     ```
-    
+
 
 The machine in the code shows unstable movements, making it very hard to reach the goal axis of (-5, 10). In production systems, obviously, users will hate losing their previous work and ending up in an unexpected state, which is not the goal.
 
 let us make a simple "Resumable Implementation" as following:
 
 
-```python
+```
 "The first way is to record the orientation and position of the machine state after performing each action( or process)."
 
 import shelve  # Used for simple key-value pair storage
@@ -854,7 +854,7 @@ with shelve.open('machine_cache.db') as db:
     Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
     ```
-    
+
 
 - **First Way: Recording Machine State After Each Action**: This approach saves the entire state of the machine after each action using a key-value store. When an action results in a crash, the machine's state is restored from the last successful operation, and the action is retried.
     - Strengths:
@@ -868,7 +868,7 @@ with shelve.open('machine_cache.db') as db:
       - **Scalability Issues**: As the complexity of the machine's state grows, the time and resources required to serialize, save, and reload the state can increase, potentially making this method less scalable.
 
 
-```python
+```
 "The second way is to record the action name and its arguments as a 'state' after performing each action."
 
 import shelve  # Used for simple key-value pair storage
@@ -930,7 +930,7 @@ with shelve.open('machine_cache.db') as db:
     Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
     ```
-    
+
 
 - **Second Way: Recording Actions and Arguments as State**: In this method, we record each action and its parameters. Upon a crash, the machine is reinitialized, and all recorded actions are replayed to restore the last known good state before attempting to continue from the point of failure.
 
@@ -1079,7 +1079,7 @@ A table in an SQL database stores data in rows and columns, similar to a spreads
     Here’s how to manage transactions in Python with `sqlite3`:
 
 
-```python
+```
 import sqlite3
 from sqlite3 import Error
 
@@ -1161,7 +1161,7 @@ if __name__ == '__main__':
     Additional data inserted after rollback.
     Transaction committed.
     ```
-    
+
 
   - **Explanation of the Code**:
     - **Connection Establishment**: The `create_connection` function establishes a connection to the SQLite database.
@@ -1173,7 +1173,7 @@ if __name__ == '__main__':
 - **Practical Example (for MachineA)**: Using SQL Transactions for Resumability: In this example, we'll use an SQLite database to manage the state of a hypothetical `MachineA`. The database will store the machine's state, and we'll use SQL transactions to ensure all state changes are consistent and recoverable. Here’s how you can implement it:
 
 
-```python
+```
 ############# same as before
 
 import math
@@ -1344,7 +1344,7 @@ if __name__ == '__main__':
     Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
     ```
-    
+
 
   - Key Aspects of This Example:
 
@@ -1487,7 +1487,7 @@ if __name__ == '__main__':
 Here's the assembled Python code block for managing a MongoDB-based implementation of the `Users` table.
 
 
-```python
+```
 from pymongo import MongoClient, errors
 
 # Establishing MongoDB connection
@@ -1531,13 +1531,13 @@ print('```')
     ```
     User already exists.
     ```
-    
+
 
 - **Practical Example (for MachineA)**: (Using MongoDB for Resumability) In this MongoDB-based example, we'll manage the state of a hypothetical MachineA. Instead of using SQL transactions, we'll leverage MongoDB's document model to store the machine's state, employing operations that ensure data consistency and can be resumed if interrupted.
 Here's how we can implement it:
 
 
-```python
+```
 ############# same as before
 
 import math
@@ -1707,7 +1707,7 @@ if __name__ == '__main__':
     Machine state saved: Orientation 0, Position [-4.999999999999999, 10.0]
     (0, [-4.999999999999999, 10.0])
     ```
-    
+
 
 ### Conclusion
 - **Summary**: Evaluate the pros and cons of each database type for resumable applications.
@@ -1817,7 +1817,7 @@ The MVC design pattern is structured around three core components that interact 
 These examples demonstrate how Python can be used to implement each part of the MVC architecture, making it clear how data flows through the application and how state management can be encapsulated within these components for building resumable web applications.
 
 
-```python
+```
 import sqlite3
     
 class BookModel:
@@ -1939,7 +1939,7 @@ print('```')
     Book ID: 1, Title: 1984, Author: George Orwell - Updated
     Book ID: 2, Title: Brave New World, Author: Aldous Huxley
     ```
-    
+
 
 ### Section 2: MVC in Resumability
 
@@ -1969,7 +1969,7 @@ Here's how we can design the MVC components for `MachineA`:
 
 
 
-```python
+```
 import shelve
 import math
 import random
@@ -2162,7 +2162,7 @@ if __name__ == '__main__':
     Reversed 5 distance. New position: [-4.999999999999999, 10.0]
     Machine ID: 3, Orientation: 0, Position: [-4.999999999999999, 10.0]
     ```
-    
+
 
 - **Explanation** :
     - **MachineAModel** is a simple Python class representing the machine.
@@ -2175,7 +2175,7 @@ Incorporating resumability into the MVC architecture enhances the robustness and
 (PS: The following code is the action recording version, which is also very important when the target model is hard to initialize with arguments.)
 
 
-```python
+```
 'Action Recording version'
 
 import shelve
@@ -2359,7 +2359,7 @@ if __name__ == '__main__':
     Machine crashed, auto reset
     Machine ID: 20, Orientation: 0, Position: [-4.999999999999999, 10.0]
     ```
-    
+
 
 ### Conclusion
 The application of the MVC design pattern in your script allows for well-organized code with clear separation of concerns:
@@ -2431,7 +2431,7 @@ To illustrate how a state machine works, let's consider a simple example of a tr
 Here's a simple implementation of **finite** state machine using Python:
 
 
-```python
+```
 class TrafficLight:
     def __init__(self):
         # Start with the green light state
@@ -2510,7 +2510,7 @@ print('```')
     Transition to Red light.
     Red light is on. Stop.
     ```
-    
+
 
 - Explanation of the Traffic Light **Finite** State Machine Implementation
 
@@ -2558,7 +2558,7 @@ Finite State Machines (FSMs) are a powerful tool for managing the complexities o
     - **Resumability**: The state of each task is saved persistently in a database. If the workflow system stops or is interrupted, it can resume by reloading the state from the database and continuing from the last recorded state, ensuring no steps are skipped or repeated.
 
 
-```python
+```
 import random
 class Task:
     def __init__(self):
@@ -2790,14 +2790,14 @@ print('```')
     Task moved to Execution.
     Task moved to Completion.
     ```
-    
+
 
 This example involves very simple sequential tasks, meaning its states and transitions are minimal. However, in many cases, our system has many more states and transitions, making it difficult to do **Resumability** in a single function.
 
 As the following example shows, we will need a **solver** to auto **Resume**.
 
 
-```python
+```
 from collections import deque
 
 # Define the state transitions with the additional states
@@ -2870,7 +2870,7 @@ print('```')
     ```
     Recovery path from loss to talk : loss -> init -> waiting -> connected -> talk
     ```
-    
+
 
 - **Example 2: Network Connection Resumable System:** In a network connection resumable system, managing various states such as `init`, `connected`, `loss`, `close`, `waiting`, `failure`, and `talk` is crucial for maintaining a stable and resilient connection. An FSM can be used to handle these state transitions and ensure that the system can recover from disruptions seamlessly.
 
@@ -2897,7 +2897,7 @@ Here is a Python implementation to find the path from "ConnectionLost" to "Commu
 
 
 
-```python
+```
 import json
 import time
 import random
@@ -2992,7 +2992,7 @@ class CommunicationState(NetworkState):
 ```
 
 
-```python
+```
 # Example usage
 network_task = NetworkTask()
 print(f'State: {network_task.current_state()}')  # State: Initiation
@@ -3046,7 +3046,7 @@ NotImplementedError: Invalid transition from [FailureState] -> [Communication]
 ```
 
 
-```python
+```
 # Extract transitions
 transitions = {
     InitiationState:InitiationState._transitions(),
@@ -3097,10 +3097,10 @@ print('```')
       ]
     }
     ```
-    
 
 
-```python
+
+```
 from collections import deque
 
 def find_path(transitions:dict, start_state, end_state):
@@ -3132,10 +3132,10 @@ print('```')
     ```
     Path from FailureState to CommunicationState : FailureState -> InitiationState -> WaitingState -> ConnectionEstablishedState -> CommunicationState
     ```
-    
 
 
-```python
+
+```
 print('```')
 # Example usage
 network_task = NetworkTask()
@@ -3207,7 +3207,7 @@ print('```')
     Current: ConnectionEstablishedState, try communication
     Success to target state: <class '__main__.CommunicationState'>
     ```
-    
+
 
 This code defines the state transitions and uses a breadth-first search algorithm to find the shortest path from any state to the target `CommunicationState` state. By implementing such FSMs, network systems can automatically recover from disruptions, ensuring continuous and reliable communication.
 
@@ -3246,7 +3246,7 @@ By implementing FSMs, developers can create more robust, error-resistant, and ma
 Let's try `transitions` in Python as following example:
 
 
-```python
+```
 from dataclasses import dataclass
 from transitions import Machine
 import random
@@ -3396,7 +3396,7 @@ print('```')
     Current: ConnectionEstablished, try to_Communication
     Success to target state: Communication
     ```
-    
+
 
 ---
 
@@ -3426,7 +3426,7 @@ In the realm of software design, combining the Model-View-Controller (MVC) archi
 
 
 
-```python
+```
 database = {"admin":"1234",
             "admin:role":"full",
 
@@ -3588,7 +3588,7 @@ print('```')
     ---
     anna is now logged out.
     ```
-    
+
 
 - Design Review and Explanation
 
@@ -3617,7 +3617,7 @@ A basic resumable system can be designed by implementing an FSM in the controlle
 Let's consider the following service: searching for something and communicating via socket.
 
 
-```python
+```
 # this is a server code for starting independent.
 import socket
 import json
@@ -3702,7 +3702,7 @@ def start_server():
   - **Controller with FSM**: The `RequestFSMsController` class manages the finite state machine (FSM) logic, orchestrating state transitions and interacting with both the model and the view. It initializes with the model and view instances and sets the initial state to `RequestState.Initiation`. The controller provides methods to transition between states, such as `to_Initiation`, `to_WaitConnection`, `to_WaitSearching`, `to_ResponseReceived`, `to_Close`, and `to_Failure`. Each state transition updates the current state and uses the view to display the new state, while error handling is managed via decorators to ensure smooth transitions even in the presence of errors.
 
 
-```python
+```
 database = {}
 
 from collections import deque
@@ -3967,7 +3967,7 @@ class RequestState:
 ```
 
 
-```python
+```
 print('```')
 # Example of normal usage (maybe get random error!)
 search_request = RequestFSMsController(RequestModel(request_body='apple'),View())
@@ -4004,7 +4004,7 @@ NotImplementedError: Invalid transition from [Failure] -> [WaitSearching]"
 ```
 
 
-```python
+```
 print('```')
 # Example resumability
 search_request = RequestFSMsController(RequestModel(request_body='apple'),View())
@@ -4029,12 +4029,12 @@ print('```')
     self.model.receive_body = xxxx
     Success to target state: ResponseReceived
     ```
-    
+
 
 Let's implement an interactive controller with the previous server.
 
 
-```python
+```
 class RequestState:
     @dataclass
     class States:
@@ -4148,7 +4148,7 @@ class RequestState:
 ```
 
 
-```python
+```
 print('```')
 'Before running this code, we need to start up the previous server code!'
 # Example resumability with real server
@@ -4170,7 +4170,7 @@ print('```')
     receive_body =  ["apple", "grape"]
     Success to target state: ResponseReceived
     ```
-    
+
 
 Let's take a look at the implementation conclusion.
 First of all, we need to define our model clearly.
@@ -4193,7 +4193,7 @@ We prefer to implement hard operations in the Controller ( with FSMs ) class. Th
 The following complete code provides additional functionality for interacting with the database (MongoDB).
 
 
-```python
+```
 import socket
 import json
 import random
@@ -4493,7 +4493,7 @@ class RequestFSMsController:
 ```
 
 
-```python
+```
 print('```')
 # show database , it will be empty at first time
 # maybe we can try implment class View instead of print method
@@ -4568,7 +4568,7 @@ print('```')
     show failures keys : []
     
     ```
-    
+
 
 ### Section 3: Advance Resumable MVC&FSMs
 
@@ -4669,7 +4669,7 @@ Through a series of case studies, ranging from web applications to distributed s
 In the previous example, we needed **persistent storage** to store states and data models. In this chapter, we will use the following NoSQL storage code.
 
 
-```python
+```
 from pymongo import MongoClient, errors
 
 # The following code is for those who want a ready-to-use production solution.
@@ -4810,7 +4810,7 @@ test_storage()
 ```
 
     All tests passed successfully!
-    
+
 
 Furthermore, you can also try a cloud key-value solution like Firestore or AWS DynamoDB, which will make your solution global and highly resilient.
 
@@ -4833,7 +4833,7 @@ The possible states and transitions are like following python code:
 
 
 
-```python
+```
 class S3LargeUploadingState:
     class States:
         idle = 'idle'
@@ -4858,7 +4858,7 @@ class S3LargeUploadingState:
 Let's consider this service MVC(FSMs)'s Model and Controller.
 
 
-```python
+```
 import os
 from functools import wraps
 
@@ -5091,7 +5091,7 @@ class S3LargeUploadingFSMsController:
 ```
 
 
-```python
+```
 # server by lib of fastapi
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
@@ -5358,7 +5358,7 @@ In this example, the server needs to track the state of a large video file conve
 To avoid restarting the task from the beginning after a crash, we need to manage its state effectively. The possible states and their transitions are illustrated in the following Python code:
 
 
-```python
+```
 class VideoConversionState:
     class States:
         idle = 'idle'
@@ -5379,7 +5379,7 @@ class VideoConversionState:
 Let's consider this service MVC(FSMs)'s Model and basic Controller. And the Controller's states.
 
 
-```python
+```
 "This model needs UUIDs to identify itself and related files."
 "We also need to record the process to ensure the state can be restored."
 
@@ -5396,6 +5396,7 @@ import numpy as np  # Assuming you are using OpenCV to work with videos
 # Chapter 7. Section 0: Preparation
 class DBStorage(ShelveStorage):
     pass
+
 
 class VideoConversionModel:
     
@@ -5451,8 +5452,9 @@ class VideoConversionModel:
         for k,v in data.items():
             if hasattr(model,k):model.__dict__[k]=v
 
+
 class VideoConversionFSMsController:
-    
+
     class VideoConversionState:
         class States:
             idle = 'idle'
@@ -5469,132 +5471,11 @@ class VideoConversionFSMsController:
         }
         _states = list(_transitions.keys())
 
-        def __init__(self, controller:'VideoConversionFSMsController'):
-            self.controller = controller
-            self.model = self.controller.model
-            self._state = self.model.state
-
-        def set_state(self,state):
-            self._state=state
-            self.model.state=state
-            self.controller.save_model()
-        
-        def handle_errors(func:Callable):
-            @wraps(func)
-            def wrapper(self:'VideoConversionFSMsController.VideoConversionState',
-                        *args, **kwargs):
-                valid_transitions = self._transitions[self._state]
-                target_transition = func.__name__.replace('to_','')
-                if target_transition not in valid_transitions:            
-                    raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
-                try:
-                    return func(self, *args, **kwargs)
-                except Exception as e:
-                    print(f'[{self.__class__.__name__}]: {e}')
-            return wrapper
-
-        @handle_errors
-        def to_idle(self):
-            self.set_state(VideoConversionFSMsController.VideoConversionState.States.idle)
-
-        @handle_errors
-        def to_resize_stage(self):
-            self.set_state(VideoConversionFSMsController.VideoConversionState.States.resize_stage)
-            try:
-                while self.model.converted_count < self.model.total_count:
-
-                    # Transition to reading state
-                    ret, frame = self.controller.cap.read()
-                    if not ret:
-                        raise RuntimeError(f"can not read frame.")
-                    
-                    # skip images for small fps
-                    if self.model.converted_count%self.model.thumbnail_fps_ratio==0:
-                        # Transition to resizing state
-                        frame = cv2.resize(frame, (self.model.thumbnail_width, self.model.thumbnail_height))
-                        # Transition to writing state
-                        with open(self.model.thumbnail_bin_path,'ab') as f: f.write(frame.tobytes())
-                    
-                    self.model.converted_count += 1
-                    self.controller.save_model()
-                        
-            except Exception as e:
-                self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
-
-        @handle_errors
-        def to_error(self,e):
-            self.set_state(VideoConversionFSMsController.VideoConversionState.States.error)
-            print(e)
-
-        @handle_errors
-        def to_complete_mp4(self):
-            try:
-                if self.model.converted_count >= self.model.total_count:
-                    # convert bin file into mp4
-                    out = cv2.VideoWriter(
-                        self.model.thumbnail_mp4_path,
-                        cv2.VideoWriter_fourcc(*'mp4v'),  # Codec for mp4 files
-                        self.controller.cap.get(cv2.CAP_PROP_FPS)/self.model.thumbnail_fps_ratio,
-                        # self.model.thumbnail_fps_ratio,
-                        (self.model.thumbnail_width, self.model.thumbnail_height)
-                    )
-                    with open(self.model.thumbnail_bin_path, 'rb') as f: raw_data = f.read()
-                    # Read the frames data
-                    frames = np.frombuffer(raw_data, dtype=np.uint8).reshape(
-                        (-1, self.model.thumbnail_height, self.model.thumbnail_width, 3))
-                    for frame in frames:
-                        out.write(frame)
-                    out.release()
-
-                    os.remove(self.model.thumbnail_bin_path)
-                    self.set_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4)
-                else:
-                    self.to_resize_stage()
-            except Exception as e:
-                self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
-
-        def find_path(self, transitions:dict, start_state, end_state):
-            queue = deque([[start_state]])    
-            visited = set()    
-            while queue:
-                path = queue.popleft()
-                state = path[-1]        
-                if state == end_state:
-                    return path
-                if state not in visited:
-                    visited.add(state)            
-                    next_states = transitions.get(state, [])
-                    for next_state in next_states:
-                        new_path = list(path)
-                        new_path.append(next_state)
-                        queue.append(new_path)
-            return []
-        
-        def resume_state(self,target_state, max_attempts=100,simulate_error=False):
-            print(f'Set target state: {target_state} ( current is {self._state})')
-            def next_action(task:VideoConversionFSMsController.VideoConversionState
-                            ,target_state):
-                path = self.find_path(self._transitions, task._state, target_state)
-                if len(path)<=1: return None
-                return path[1]
-                
-            while self._state != target_state:
-                cls = next_action(self,target_state)
-                if cls is None:raise ValueError('no next acion! unreachable!')
-                if max_attempts<0:raise ValueError(f'over max_attempts!')
-                print(f'Current: {self._state}, try to_{cls}')
-                
-                if simulate_error and random.random()>0.3:
-                    print('simulate some error!')
-                    continue
-                
-                getattr(self,f'to_{cls}')()
-                max_attempts -= 1
-            print(f'Success to target state: {self._state}')
 
     def __init__(self,model:VideoConversionModel) -> None:
         self.model = model
-        self.state = VideoConversionFSMsController.VideoConversionState(self)
+        self.FSMs_STATES = VideoConversionFSMsController.VideoConversionState.States
+        self.set_state(self.FSMs_STATES.idle)
         
         # Open the video file
         self.cap = cv2.VideoCapture(self.model.filename)
@@ -5622,188 +5503,87 @@ class VideoConversionFSMsController:
         return VideoConversionFSMsController(VideoConversionModel.from_dict(model))
     
     def start_conversion(self,simulate_error=False):
-        state:VideoConversionFSMsController.VideoConversionState = self.state
-        state.resume_state(VideoConversionFSMsController.VideoConversionState.States.complete_mp4,simulate_error=simulate_error)
-
-```
-
-
-```python
-print('```')
-conversion = VideoConversionFSMsController.new_video_conversion('test.mp4',width_limit=320,fps_ratio=1/4)
-print(f'start conversion of {conversion.model.uuid}')
-conversion.start_conversion(simulate_error=True)
-print('```')
-```
-
-    ```
-    start conversion of 2ba9d25e-0640-4d32-9eac-cd5f8ba22eb1
-    Set target state: complete_mp4 ( current is idle)
-    Current: idle, try to_resize_stage
-    simulate some error!
-    Current: idle, try to_resize_stage
-    Current: resize_stage, try to_complete_mp4
-    simulate some error!
-    Current: resize_stage, try to_complete_mp4
-    simulate some error!
-    Current: resize_stage, try to_complete_mp4
-    Success to target state: complete_mp4
-    ```
-    
-
-### Section 3: AI object detetion service (Yolo)
-...
-
-
-
-### Conclusion
-...
-
-### Additional Notes
-...
-
----
-
-
-## Chapter 8: Testing Resumable Systems
-
-
-### Introduction
-...
-
-### Section 0: Preparation
-...
-
-
-### Conclusion
-...
-
-
-
-### Additional Notes
-...
-
----
-
-## Chapter 9: Resumability in Task Systems ( Distributed )
-
-### Introduction
-...
-
-### Section 0: Preparation
-To design a task states
-
-- Updated States
-   1. **Created**:  The initial state of a task after it is created but not yet acted upon.
-   2. **Assigned**:  The task is assigned to a user, team, or system for action.  
-   3. **In Progress**:  Work on the task has started. It is sometimes divided into multiple steps or stages.
-   4. **Paused**:  The task is temporarily on hold but may resume later.
-   5. **Error**:An error occurred (e.g., camera overheating). In this state, the error is analyzed to decide the next action.
-   6. **Completed**:  The task has been successfully finished.
-   7. **Canceled**:  The task has been terminated without completion.
-   8. **Failed**:  The task could not be completed due to errors, issues, or other reasons.
-   9. **Closed**:  The task is finalized and no further changes can be made.
-
-
-- Transitions
-   1. **Created → Assigned**: The task to start the task is assigned to the control system.
-
-   2. **Assigned → In Progress**: Attempting to start the task.
-
-   3. **In Progress → Error**: The task encounters an error (e.g., camera overheating).
-
-   4. **Error → Paused**: If the error is recoverable (e.g., camera overheating), the task transitions to `Paused` for a retry.
-
-   5. **Error → Failed**: If the error is critical (e.g., hardware failure), the task transitions to `Failed`.
-
-   6. **Paused → Assigned**: After a recovery period, the task retries.
-
-   7. **In Progress → Completed**: The task starts successfully, and the task completes.
-
-   8. **Any State → Canceled**: The task is manually or automatically canceled, halting retries.
-
-
-```plaintext
-[Created] --> [Assigned] --> [In Progress] --> [Completed]
-                          ^     |
-            |-------------|     v
-            |                [Error]
-            |                 /   \
-            |    (Recoverable)   (Critical)
-            |       |               |
-            |       v               v
-            |  [Paused]         [Failed]
-            |       |
-            |   (Recovery Timer)
-            |       |
-            |       v
-            --- [Assigned]
-```
-
-
-```python
-from functools import wraps
-from typing import Callable
-from collections import deque
-import random
-import time
-
-class TaskStateMachine:
-    class States:
-        created = 'created'
-        assigned = 'assigned'
-        in_progress = 'in_progress'
-        error = 'error'
-        paused = 'paused'
-        failed = 'failed'
-        completed = 'completed'
-        canceled = 'canceled'
-
-    _transitions = {
-        States.created:      [States.assigned],
-        States.assigned:     [States.in_progress, States.canceled],
-        States.in_progress:  [States.error, States.completed, States.canceled],
-        States.error:        [States.paused, States.failed, States.canceled],
-        States.paused:       [States.assigned, States.canceled],
-        States.failed:       [],  # End of task life
-        States.completed:    [],  # End of task life
-        States.canceled:     [],  # End of task life
-    }
-
-    _states = list(_transitions.keys())
-
-    def __init__(self, state):
-        if state not in self._states:
-            raise ValueError(f"Invalid initial state: {state}")
-        self._state = state
+        # auto shift to complete_mp4 state by "resume"
+        self.resume_state(self.FSMs_STATES.complete_mp4,simulate_error=simulate_error)
 
     def set_state(self,state):
-        self._state=state
-        
-    def task_start(self):
-        # Simulate task start logic
-        return random.choice([True,True,True, False])  # Random success/failure for demonstration
-
-    def simulate_error(self):
-        # Simulate error detection
-        return random.choice(["overheat", "hardware_failure",None])  # Random error type
-
-    def wait_for_cool_down(self):
-        print("wait for cool down ...")
-        time.sleep(2)  # Simulate cooling down period
-
+        self.state=state
+        self.model.state=state
+        self.save_model()
+    
     def handle_errors(func:Callable):
         @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            valid_transitions = self._transitions[self._state]
+        def wrapper(self:'VideoConversionFSMsController',
+                    *args, **kwargs):
+            valid_transitions = VideoConversionFSMsController.VideoConversionState._transitions[self.state]
             target_transition = func.__name__.replace('to_','')
             if target_transition not in valid_transitions:            
-                raise ValueError(f"Invalid transition from [{self._state}] -> [{target_transition}]")
+                raise ValueError(f"Invalid transition from [{self.state}] -> [{target_transition}]")
             try:
                 return func(self, *args, **kwargs)
             except Exception as e:
                 print(f'[{self.__class__.__name__}]: {e}')
         return wrapper
+
+    @handle_errors
+    def to_idle(self):
+        self.set_state(self.FSMs_STATES.idle)
+
+    @handle_errors
+    def to_resize_stage(self):
+        self.set_state(self.FSMs_STATES.resize_stage)
+        try:
+            while self.model.converted_count < self.model.total_count:
+
+                # Transition to reading state
+                ret, frame = self.cap.read()
+                if not ret:
+                    raise RuntimeError(f"can not read frame.")
+                
+                # skip images for small fps
+                if self.model.converted_count%self.model.thumbnail_fps_ratio==0:
+                    # Transition to resizing state
+                    frame = cv2.resize(frame, (self.model.thumbnail_width, self.model.thumbnail_height))
+                    # Transition to writing state
+                    with open(self.model.thumbnail_bin_path,'ab') as f: f.write(frame.tobytes())
+                
+                self.model.converted_count += 1
+                self.save_model()
+                    
+        except Exception as e:
+            self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
+
+    @handle_errors
+    def to_error(self,e):
+        self.set_state(self.FSMs_STATES.error)
+        print(e)
+
+    @handle_errors
+    def to_complete_mp4(self):
+        try:
+            if self.model.converted_count >= self.model.total_count:
+                # convert bin file into mp4
+                out = cv2.VideoWriter(
+                    self.model.thumbnail_mp4_path,
+                    cv2.VideoWriter_fourcc(*'mp4v'),  # Codec for mp4 files
+                    self.cap.get(cv2.CAP_PROP_FPS)/self.model.thumbnail_fps_ratio,
+                    # self.model.thumbnail_fps_ratio,
+                    (self.model.thumbnail_width, self.model.thumbnail_height)
+                )
+                with open(self.model.thumbnail_bin_path, 'rb') as f: raw_data = f.read()
+                # Read the frames data
+                frames = np.frombuffer(raw_data, dtype=np.uint8).reshape(
+                    (-1, self.model.thumbnail_height, self.model.thumbnail_width, 3))
+                for frame in frames:
+                    out.write(frame)
+                out.release()
+
+                os.remove(self.model.thumbnail_bin_path)
+                self.set_state(self.FSMs_STATES.complete_mp4)
+            else:
+                self.to_resize_stage()
+        except Exception as e:
+            self.to_error(f"{self.model.state} error [{self.model.filename}]: {e}")
 
     def find_path(self, transitions:dict, start_state, end_state):
         queue = deque([[start_state]])    
@@ -5822,323 +5602,3176 @@ class TaskStateMachine:
                     queue.append(new_path)
         return []
     
-    def resume_state(self,target_state, max_attempts=10):
-        print(f'Set target state: {target_state} ( current is {self._state})')
-        def next_action(task,target_state):
-            path = self.find_path(self._transitions, task._state, target_state)
+    def resume_state(self,target_state, max_attempts=100,simulate_error=False):
+        print(f'Set target state: {target_state} ( current is {self.state})')
+        def next_action(task:VideoConversionFSMsController.VideoConversionState.States
+                        ,target_state):
+            path = self.find_path(VideoConversionFSMsController.VideoConversionState._transitions, task, target_state)
             if len(path)<=1: return None
             return path[1]
             
-        while self._state != target_state:
-            cls = next_action(self,target_state)
-            if cls is None:raise ValueError(
-                f"no next acion! unreachable from '{self._state}' to '{target_state}'")
+        while self.state != target_state:
+            cls = next_action(self.state,target_state)
+            if cls is None:raise ValueError('no next acion! unreachable!')
             if max_attempts<0:raise ValueError(f'over max_attempts!')
+            print(f'Current: {self.state}, try to_{cls}')
             
-            print(f'Current: {self._state}, try to_{cls}')
+            if simulate_error and random.random()>0.3:
+                print('simulate some error!')
+                continue
+            
             getattr(self,f'to_{cls}')()
             max_attempts -= 1
-        print(f'Success to target state: {self._state}')
+        print(f'Success to target state: {self.state}')
+       
+```
 
-    # Transition methods
-    @handle_errors
-    def to_assigned(self):
-        self.set_state(self.States.assigned)
 
-    @handle_errors
-    def to_in_progress(self):
-        if self.task_start():
-            self.set_state(self.States.in_progress)
-        else:
-            print('Can not start and remain state of assigned')
-            return
-                
-        error = self.simulate_error()
-        if error:
-            self.to_error(error)
-
-    @handle_errors
-    def to_error(self,error_type):
-        self.set_state(self.States.error)
-
-        print(f"Error detected: {error_type}")
-        if error_type == "hardware_failure":
-            print("hardware critical failure!")
-            self.to_failed()
-
-    @handle_errors
-    def to_paused(self):
-        self.set_state(self.States.paused)
-        self.wait_for_cool_down()
-
-    @handle_errors
-    def to_failed(self):
-        self.set_state(self.States.failed)
-
-    @handle_errors
-    def to_completed(self):
-        error_type = self.simulate_error()
-        if error_type:
-            self.to_error(error_type)
-        else:
-            self.set_state(self.States.completed)
-
-    @handle_errors
-    def to_canceled(self):
-        self.set_state(self.States.canceled)
-
-# Test cases for the TaskStateMachine
-def test_task_state_machine():
-    # Initialize the FSM in the 'created' state
-    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
-
-    print("\n########### Test Case 1: Transition from 'created' to 'completed'")
-    try:
-        fsm.resume_state(TaskStateMachine.States.completed)
-    except Exception as e:
-        print(f"Test failed: {e}")
-
-    print("\n########### Test Case 2: Transition from 'created' to 'failed' when task_start")
-    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
-    try:
-        # Force task_start to simulate failure
-        def always_fail():
-            return False
-        fsm.task_start = always_fail  # Override method
-        fsm.resume_state(TaskStateMachine.States.failed)
-    except Exception as e:
-        print(f"Test failed: {e}")
-
-    print("\n########### Test Case 3: Transition from 'created' to 'paused' (recoverable error)")
-    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
-    try:
-        # Force simulate_error to simulate overheating
-        def simulate_overheat():
-            return "overheat"
-        fsm.simulate_error = simulate_overheat  # Override method
-        fsm.resume_state(TaskStateMachine.States.paused)
-    except Exception as e:
-        print(f"Test failed: {e}")
-
-    print("\n########### Test Case 4: Transition from 'created' to 'canceled'")
-    fsm = TaskStateMachine(state=TaskStateMachine.States.created)
-    try:
-        fsm.resume_state(TaskStateMachine.States.canceled)
-    except Exception as e:
-        print(f"Test failed: {e}")
-
-# Run the tests
+```
 print('```')
-test_task_state_machine()
+conversion = VideoConversionFSMsController.new_video_conversion('test.mp4',width_limit=320,fps_ratio=1/4)
+print(f'start conversion of {conversion.model.uuid}')
+conversion.start_conversion(simulate_error=True)
 print('```')
 ```
 
     ```
-    
-    ########### Test Case 1: Transition from 'created' to 'completed'
-    Set target state: completed ( current is created)
-    Current: created, try to_assigned
-    Current: assigned, try to_in_progress
-    Error detected: hardware_failure
-    hardware critical failure!
-    Test failed: no next acion! unreachable from 'failed' to 'completed'
-    
-    ########### Test Case 2: Transition from 'created' to 'failed' when task_start
-    Set target state: failed ( current is created)
-    Current: created, try to_assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Test failed: over max_attempts!
-    
-    ########### Test Case 3: Transition from 'created' to 'paused' (recoverable error)
-    Set target state: paused ( current is created)
-    Current: created, try to_assigned
-    Current: assigned, try to_in_progress
-    Can not start and remain state of assigned
-    Current: assigned, try to_in_progress
-    Error detected: overheat
-    Current: error, try to_paused
-    wait for cool down ...
-    Success to target state: paused
-    
-    ########### Test Case 4: Transition from 'created' to 'canceled'
-    Set target state: canceled ( current is created)
-    Current: created, try to_assigned
-    Current: assigned, try to_canceled
-    Success to target state: canceled
+    start conversion of 1bf370b5-4cd4-408f-bee5-7d9734c51fab
+    Set target state: complete_mp4 ( current is idle)
+    Current: idle, try to_resize_stage
+    simulate some error!
+    Current: idle, try to_resize_stage
+    Current: resize_stage, try to_complete_mp4
+    simulate some error!
+    Current: resize_stage, try to_complete_mp4
+    simulate some error!
+    Current: resize_stage, try to_complete_mp4
+    Success to target state: complete_mp4
     ```
+
+
+### Section 3: AI Object Detection and Segmentation Service (SAM 3)
+
+Another practical application of resumable programming is an AI object detection and segmentation service.
+
+In recent years, foundation models for computer vision have made it possible to identify objects using natural-language prompts instead of relying only on a fixed collection of predefined object classes.
+
+In this example, we use **Segment Anything Model 3 (SAM 3)**.
+
+SAM 3 can detect and segment objects using prompts such as:
+
+```text
+person
+red car
+yellow school bus
+dog
+a person wearing a helmet
+```
+
+Instead of returning only a bounding box, SAM 3 can also return a segmentation mask describing the precise pixels belonging to each detected object.
+
+This makes it useful for applications such as:
+
+* video analysis,
+* automatic video editing,
+* surveillance analysis,
+* autonomous systems,
+* scientific image processing,
+* robotics,
+* media processing,
+* and dataset generation.
+
+However, processing a large video with an AI model can be expensive.
+
+For example, consider a video containing 500,000 frames.
+
+If our application successfully processes 350,000 frames and then the machine unexpectedly restarts, processing the entire video again would waste a significant amount of GPU computation.
+
+Therefore, object segmentation is another good example of a task that should be **resumable**.
+
+Instead of considering the entire video as one large operation, we divide it into many smaller operations:
+
+
+Before designing the SAM 3 inference states, we first need to define how input data is provided to the task.
+
+A SAM 3 task may receive different kinds of sources.
+
+For example:
+
+```text
+Source
+  |
+  +-- Video
+  |     |
+  |     +-- frame 0
+  |     +-- frame 1
+  |     +-- frame 2
+  |     +-- ...
+  |
+  +-- Image List
+        |
+        +-- image_001.jpg
+        +-- image_002.jpg
+        +-- image_003.jpg
+        +-- ...
+```
+
+From SAM 3's point of view, both sources eventually produce the same thing:
+
+```text
+an image/frame
+```
+
+Therefore, the SAM 3 processor should not need to know whether the image came from:
+
+```text
+a video
+```
+
+or:
+
+```text
+a directory/list of images
+```
+
+Instead, a separate **Source Reader** is responsible for converting different source types into a common stream of frames.
+
+The architecture becomes:
+
+```text
+                  Persistent Task
+                        |
+                        v
+                +---------------+
+                | Source Reader |
+                +-------+-------+
+                        |
+                    Frame Data
+                        |
+                        v
+                +---------------+
+                |     SAM 3     |
+                +-------+-------+
+                        |
+                        v
+                +---------------+
+                | Save Result   |
+                +---------------+
+```
+
+This separation is important because source errors and SAM errors are fundamentally different.
+
+For example:
+
+```text
+Cannot open video
+```
+
+is a source error.
+
+```text
+JPEG file is corrupted
+```
+
+is a source error.
+
+```text
+Cannot decode frame 1532
+```
+
+is a source error.
+
+But:
+
+```text
+CUDA out of memory
+```
+
+is a SAM execution error.
+
+And:
+
+```text
+SAM model inference failed
+```
+
+is also a SAM execution error.
+
+These failures should not be represented by the same state.
+
+
+```
+from __future__ import annotations
+"""
+smart_sam3_separated_demo.py
+
+Goal
+====
+Keep four responsibilities separate:
+
+1. SAM3Segmentation / SmartSAM3Segmentation
+   - Base class is ordinary usable SAM3 code.
+   - Smart subclass adds @action + recovery through inheritance/super().
+   - No state/current_cnt/retry/error history.
+
+2. SAM3ProgressStore        <-- TASK AUTHOR OWNS THIS
+   - Knows what "progress" means for SAM3.
+   - Here it stores next_frame/completed.
+   - SmartEngine never reads or writes it.
+
+3. SmartEngine              <-- GENERIC
+   - Wraps @action methods.
+   - Catches ordinary exceptions.
+   - Discovers recovery actions.
+   - Applies guards.
+   - Ranks by declared cost + learned action memory.
+   - Uses softmax/random exploration.
+   - Retries the original failed action.
+   - Replans after another failure.
+
+4. ActionRecorder / ActionMemory  <-- GENERIC PLUG-INS
+   - Recorder observes engine events only.
+   - Memory learns which recovery choices work.
+   - Neither one knows SAM3 progress semantics.
+
+Run:
+    pip install pydantic
+    python smart_sam3_separated_demo.py --reset
+
+Hard-crash simulation:
+    python smart_sam3_separated_demo.py --reset --hard-crash-rate 0.08
+"""
+import argparse
+import contextvars
+import hashlib
+import json
+import math
+import random
+import time
+import uuid
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Callable, Literal, Protocol
+from pydantic import BaseModel, PrivateAttr
+
+# --- Generic utilities -------------------------------------------------------
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+def json_hash(value: Any) -> str:
+    raw = json.dumps(value, sort_keys=True, ensure_ascii=False, default=repr, separators=(',', ':')).encode('utf-8')
+    return hashlib.sha256(raw).hexdigest()
+
+def short(value: Any, limit: int=180) -> str:
+    text = repr(value)
+    return text if len(text) <= limit else text[:limit - 3] + '...'
+
+class JSONFile:
+    """Tiny atomic JSON helper used by demo plug-ins."""
+
+    def __init__(self, path: str | Path):
+        self.path = Path(path)
+
+    def read(self, default: Any) -> Any:
+        if not self.path.exists():
+            return default
+        with self.path.open('r', encoding='utf-8') as f:
+            return json.load(f)
+
+    def write(self, data: Any) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temp = self.path.with_suffix(self.path.suffix + '.tmp')
+        with temp.open('w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False, sort_keys=True)
+            f.flush()
+        temp.replace(self.path)
+
+# --- Simulated failures ------------------------------------------------------
+class FakeGPUError(RuntimeError):
+    pass
+
+class SimulatedHardCrash(BaseException):
+    """
+    BaseException deliberately bypasses SmartEngine's Exception handler.
+    This imitates process death / kill / native crash.
+    """
+    pass
+
+# --- Generic action metadata -------------------------------------------------
+@dataclass(frozen=True)
+class ActionSpec:
+    name: str
+    raw: Callable[..., Any]
+    cost: float = 1.0
+    recovery: bool = False
+    guard: str | Callable[[Any, 'FailureContext'], bool] | None = None
+    prior_success: float = 0.5
+
+def action(
+    *, cost: float = 1.0, recovery: bool = False,
+    guard: str | Callable[[Any, "FailureContext"], bool] | None = None,
+    prior_success: float = 0.5,
+):
+    """
+    Decorate an ordinary method.
+
+    If no SmartEngine is active:
+        method behaves normally.
+
+    If SmartEngine is active:
+        engine.invoke(...) wraps the call.
+    """
+
+    def decorate(func: Callable[..., Any]):
+        spec = ActionSpec(
+            func.__name__, func, float(cost), recovery, guard, float(prior_success)
+        )
+
+        def wrapper(self, *args, **kwargs):
+            engine = SmartEngine.current()
+            if engine is None:
+                return func(self, *args, **kwargs)
+            return engine.invoke(obj=self, spec=spec, args=args, kwargs=kwargs, allow_recovery=not spec.recovery)
+        wrapper.__name__ = func.__name__
+        wrapper.__qualname__ = func.__qualname__
+        wrapper.__doc__ = func.__doc__
+        wrapper.__wrapped__ = func
+        wrapper.__action_spec__ = spec
+        return wrapper
+    return decorate
+
+# --- Engine events / recorder plug-ins --------------------------------------
+@dataclass(frozen=True)
+class ActionEvent:
+    event_id: str
+    task_key: str
+    task_type: str
+    action: str
+    recovery: bool
+    phase: Literal['started', 'succeeded', 'failed', 'recovery_chosen']
+    timestamp: str
+    parent_event_id: str | None = None
+    error_type: str | None = None
+    error_message: str | None = None
+    details: dict[str, Any] | None = None
+
+class ActionRecorder(Protocol):
+    """
+    Generic observer interface.
+
+    IMPORTANT:
+    This interface says nothing about:
+        frame numbers
+        upload chunks
+        DB primary keys
+        workflow completion
+        checkpoints
+
+    It only observes engine/action facts.
+    """
+
+    def record(self, event: ActionEvent) -> None:
+        ...
+
+class NullActionRecorder:
+
+    def record(self, event: ActionEvent) -> None:
+        pass
+
+class ConsoleActionRecorder:
+
+    def record(self, event: ActionEvent) -> None:
+        if event.phase == 'started':
+            return
+        print(f'[REC   ] {event.phase:15s} {event.action}')
+
+class JSONActionRecorder:
+    """
+    Generic append-only-ish event recorder.
+
+    It records engine events only. It does NOT store SAM3 progress.
+    """
+
+    def __init__(self, path: str | Path):
+        self.file = JSONFile(path)
+
+    def record(self, event: ActionEvent) -> None:
+        data = self.file.read({'events': []})
+        data['events'].append(asdict(event))
+        self.file.write(data)
+
+class MultiRecorder:
+
+    def __init__(self, *recorders: ActionRecorder):
+        self.recorders = recorders
+
+    def record(self, event: ActionEvent) -> None:
+        for recorder in self.recorders:
+            recorder.record(event)
+
+# --- Failure context ---------------------------------------------------------
+@dataclass(frozen=True)
+class FailureContext:
+    failed_action: str
+    error_type: str
+    error_message: str
+    features: dict[str, Any]
+    recovery_round: int = 0
+ContextProvider = Callable[[Any, ActionSpec, Exception, Any], dict[str, Any]]
+
+def default_context_provider(obj: Any, failed_spec: ActionSpec, error: Exception, runtime: Any) -> dict[str, Any]:
+    return {}
+
+# --- Learned recovery memory -------------------------------------------------
+@dataclass
+class MemoryStats:
+    attempts: int = 0
+    successes: int = 0
+    total_actual_cost: float = 0.0
+
+class ActionMemory(Protocol):
+
+    def success_probability(self, context: FailureContext, action_name: str, prior_success: float) -> float:
+        ...
+
+    def learned_cost(self, context: FailureContext, action_name: str) -> float | None:
+        ...
+
+    def update(self, context: FailureContext, action_name: str, *, success: bool, actual_cost: float) -> None:
+        ...
+
+class InMemoryActionMemory:
+
+    def __init__(self, prior_strength: float=2.0):
+        self.prior_strength = prior_strength
+        self.stats: dict[str, MemoryStats] = {}
+
+    @staticmethod
+    def _context_key(context: FailureContext) -> str:
+        return json_hash({
+            "failed_action": context.failed_action, "error_type": context.error_type,
+            "features": context.features,
+        })
+
+    def _key(self, context: FailureContext, action_name: str) -> str:
+        return f'{self._context_key(context)}::{action_name}'
+
+    def _stats(self, context: FailureContext, action_name: str, *, create: bool=False) -> MemoryStats:
+        key = self._key(context, action_name)
+        if create:
+            return self.stats.setdefault(key, MemoryStats())
+        return self.stats.get(key, MemoryStats())
+
+    def success_probability(self, context: FailureContext, action_name: str, prior_success: float) -> float:
+        stats = self._stats(context, action_name)
+        return (stats.successes + self.prior_strength * prior_success) / (stats.attempts + self.prior_strength)
+
+    def learned_cost(self, context: FailureContext, action_name: str) -> float | None:
+        stats = self._stats(context, action_name)
+        if not stats.attempts:
+            return None
+        return stats.total_actual_cost / stats.attempts
+
+    def update(self, context: FailureContext, action_name: str, *, success: bool, actual_cost: float) -> None:
+        stats = self._stats(context, action_name, create=True)
+        stats.attempts += 1
+        stats.successes += int(success)
+        stats.total_actual_cost += actual_cost
+
+class JSONActionMemory(InMemoryActionMemory):
+    """
+    Same generic learning logic, persisted to JSON.
+
+    Still knows nothing about SAM3 progress.
+    """
+
+    def __init__(self, path: str | Path, prior_strength: float=2.0):
+        self.file = JSONFile(path)
+        super().__init__(prior_strength=prior_strength)
+        self._load()
+
+    def _load(self) -> None:
+        data = self.file.read({'stats': {}})
+        self.stats = {key: MemoryStats(**raw) for key, raw in data['stats'].items()}
+
+    def _save(self) -> None:
+        self.file.write({'stats': {key: asdict(stats) for key, stats in self.stats.items()}})
+
+    def update(self, context: FailureContext, action_name: str, *, success: bool, actual_cost: float) -> None:
+        super().update(context, action_name, success=success, actual_cost=actual_cost)
+        self._save()
+
+    def pretty_print(self) -> None:
+        print('\n=== GENERIC RECOVERY MEMORY ===')
+        if not self.stats:
+            print('(empty)')
+            return
+        for key, stats in sorted(self.stats.items()):
+            rate = stats.successes / stats.attempts if stats.attempts else 0.0
+            print(f'{key[-46:]:46s} attempts={stats.attempts:3d} successes={stats.successes:3d} rate={rate:.3f}')
+
+# --- Generic smart recovery engine ------------------------------------------
+@dataclass
+class RecoveryCandidate:
+    spec: ActionSpec
+    p_success: float
+    expected_cost: float
+    selection_probability: float = 0.0
+_CURRENT_ENGINE: contextvars.ContextVar['SmartEngine | None'] = contextvars.ContextVar('smart_engine', default=None)
+
+class SmartEngine:
+    """
+    Generic adaptive recovery engine.
+
+    This class deliberately does NOT contain:
+        run store
+        checkpoint
+        frame index
+        iterator resume
+        task completion
+        upload chunk progress
+        DB cursor progress
+
+    Task-specific progress belongs outside.
+    """
+
+    def __init__(
+        self, *, task_key: str, runtime: Any = None,
+        recorder: ActionRecorder | None = None, memory: ActionMemory | None = None,
+        context_provider: ContextProvider | None = None, temperature: float = 1.5,
+        max_recovery_attempts: int = 10, random_seed: int | None = None,
+    ):
+        self.task_key = task_key
+        self.runtime = runtime
+        self.recorder = recorder if recorder is not None else NullActionRecorder()
+        self.memory = memory if memory is not None else InMemoryActionMemory()
+        self.context_provider = context_provider if context_provider is not None else default_context_provider
+        self.temperature = max(float(temperature), 1e-06)
+        self.max_recovery_attempts = int(max_recovery_attempts)
+        self.random = random.Random(random_seed)
+        self._token = None
+
+    @classmethod
+    def current(cls) -> 'SmartEngine | None':
+        return _CURRENT_ENGINE.get()
+
+    def __enter__(self) -> 'SmartEngine':
+        self._token = _CURRENT_ENGINE.set(self)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._token is not None:
+            _CURRENT_ENGINE.reset(self._token)
+        return False
+
+    def _record(
+        self, *, obj: Any, action_name: str, recovery: bool,
+        phase: Literal["started", "succeeded", "failed", "recovery_chosen"],
+        parent_event_id: str | None = None, error: Exception | None = None,
+        details: dict[str, Any] | None = None, event_id: str | None = None,
+    ) -> str:
+        eid = event_id or str(uuid.uuid4())
+        event = ActionEvent(
+            eid, self.task_key, type(obj).__name__, action_name, recovery, phase, utc_now(),
+            parent_event_id, type(error).__name__ if error is not None else None,
+            str(error) if error is not None else None, details,
+        )
+        self.recorder.record(event)
+        return eid
+
+    def invoke(
+        self, *, obj: Any, spec: ActionSpec, args: tuple[Any, ...],
+        kwargs: dict[str, Any], allow_recovery: bool,
+    ) -> Any:
+        event_id = self._record(
+            obj=obj, action_name=spec.name, recovery=spec.recovery, phase="started",
+            details={"args": short(args), "kwargs": short(kwargs)},
+        )
+        print(f'\n[ACTION] {spec.name} cost={spec.cost:g}')
+        try:
+            result = spec.raw(obj, *args, **kwargs)
+        except Exception as exc:
+            self._record(
+                obj=obj, action_name=spec.name, recovery=spec.recovery, phase="failed",
+                parent_event_id=event_id, error=exc,
+            )
+            print(f'[ERROR ] {spec.name}: {type(exc).__name__}: {exc}')
+            if not allow_recovery:
+                raise
+            return self._recover(
+                obj=obj, failed_spec=spec, original_args=args, original_kwargs=kwargs,
+                initial_error=exc, parent_event_id=event_id,
+            )
+        else:
+            self._record(
+                obj=obj, action_name=spec.name, recovery=spec.recovery, phase="succeeded",
+                parent_event_id=event_id,
+            )
+            return result
+
+    @staticmethod
+    def _action_specs(obj: Any) -> list[ActionSpec]:
+        found: dict[str, ActionSpec] = {}
+        for cls in type(obj).__mro__:
+            for value in cls.__dict__.values():
+                spec = getattr(value, '__action_spec__', None)
+                if spec is not None:
+                    found.setdefault(spec.name, spec)
+        return list(found.values())
+
+    @staticmethod
+    def _guard_passes(obj: Any, spec: ActionSpec, context: FailureContext) -> bool:
+        guard = spec.guard
+        if guard is None:
+            return True
+        if isinstance(guard, str):
+            return bool(getattr(obj, guard)(context))
+        return bool(guard(obj, context))
+
+    def _enabled_recovery_actions(self, obj: Any, context: FailureContext) -> list[ActionSpec]:
+        enabled: list[ActionSpec] = []
+        for spec in self._action_specs(obj):
+            if not spec.recovery:
+                continue
+            try:
+                if self._guard_passes(obj, spec, context):
+                    enabled.append(spec)
+            except Exception as exc:
+                print(f'[GUARD ] {spec.name} disabled: {type(exc).__name__}: {exc}')
+        return enabled
+
+    def _failure_context(
+        self, obj: Any, failed_spec: ActionSpec, error: Exception, recovery_round: int
+    ) -> FailureContext:
+        features = self.context_provider(obj, failed_spec, error, self.runtime)
+        return FailureContext(
+            failed_spec.name, type(error).__name__, str(error), features, recovery_round
+        )
+
+    def _rank(
+        self, enabled: list[ActionSpec], context: FailureContext,
+        episode_counts: dict[str, int],
+    ) -> list[RecoveryCandidate]:
+        candidates: list[RecoveryCandidate] = []
+        for spec in enabled:
+            p_success = self.memory.success_probability(context, spec.name, spec.prior_success)
+            learned_cost = self.memory.learned_cost(context, spec.name)
+            cost = learned_cost if learned_cost is not None else spec.cost
+            repeat_count = episode_counts.get(spec.name, 0)
+            repeat_penalty = 1.0 + 0.75 * repeat_count
+            expected_cost = cost * repeat_penalty / max(p_success, 0.02)
+            candidates.append(RecoveryCandidate(spec=spec, p_success=p_success, expected_cost=expected_cost))
+        best = min((c.expected_cost for c in candidates))
+        weights = [math.exp(-(candidate.expected_cost - best) / self.temperature) for candidate in candidates]
+        total = sum(weights)
+        for candidate, weight in zip(candidates, weights):
+            candidate.selection_probability = weight / total
+        candidates.sort(key=lambda c: c.expected_cost)
+        return candidates
+
+    def _choose(self, candidates: list[RecoveryCandidate]) -> RecoveryCandidate:
+        return self.random.choices(candidates, weights=[c.selection_probability for c in candidates], k=1)[0]
+
+    def _recover(
+        self, *, obj: Any, failed_spec: ActionSpec, original_args: tuple[Any, ...],
+        original_kwargs: dict[str, Any], initial_error: Exception, parent_event_id: str,
+    ) -> Any:
+        error = initial_error
+        episode_counts: dict[str, int] = {}
+        for recovery_round in range(1, self.max_recovery_attempts + 1):
+            context = self._failure_context(obj, failed_spec, error, recovery_round)
+            enabled = self._enabled_recovery_actions(obj, context)
+            if not enabled:
+                raise RuntimeError(f'No recovery action is enabled for failed action {failed_spec.name!r}') from error
+            ranked = self._rank(enabled, context, episode_counts)
+            print('\n[PLAN] recovery candidates:')
+            for candidate in ranked:
+                print(
+                    f"       {candidate.spec.name:18s} cost={candidate.spec.cost:6.2f} "
+                    f"P(success)={candidate.p_success:5.3f} "
+                    f"score={candidate.expected_cost:7.2f} "
+                    f"P(select)={candidate.selection_probability:5.3f}"
+                )
+            chosen = self._choose(ranked)
+            chosen_spec = chosen.spec
+            episode_counts[chosen_spec.name] = episode_counts.get(chosen_spec.name, 0) + 1
+            self._record(
+                obj=obj, action_name=chosen_spec.name, recovery=True,
+                phase="recovery_chosen", parent_event_id=parent_event_id,
+                details={
+                    "failed_action": failed_spec.name, "round": recovery_round,
+                    "expected_cost": chosen.expected_cost, "p_success": chosen.p_success,
+                    "p_select": chosen.selection_probability,
+                },
+            )
+            print(f'[CHOOSE] {chosen_spec.name} (round {recovery_round})')
+            recovery_event_id = self._record(
+                obj=obj, action_name=chosen_spec.name, recovery=True, phase="started",
+                parent_event_id=parent_event_id,
+            )
+            started = time.perf_counter()
+            try:
+                chosen_spec.raw(obj, context)
+            except Exception as recovery_error:
+                actual_cost = chosen_spec.cost + max(time.perf_counter() - started, 0.001)
+                self._record(
+                    obj=obj, action_name=chosen_spec.name, recovery=True, phase="failed",
+                    parent_event_id=recovery_event_id, error=recovery_error,
+                )
+                self.memory.update(context, chosen_spec.name, success=False, actual_cost=actual_cost)
+                print(f'[LEARN ] {chosen_spec.name} itself failed.')
+                error = recovery_error
+                continue
+            else:
+                self._record(
+                    obj=obj, action_name=chosen_spec.name, recovery=True, phase="succeeded",
+                    parent_event_id=recovery_event_id,
+                )
+            retry_event_id = self._record(
+                obj=obj, action_name=failed_spec.name, recovery=False, phase="started",
+                parent_event_id=recovery_event_id, details={"retry_after": chosen_spec.name},
+            )
+            try:
+                result = failed_spec.raw(obj, *original_args, **original_kwargs)
+            except Exception as retry_error:
+                actual_cost = chosen_spec.cost + max(time.perf_counter() - started, 0.001)
+                self._record(
+                    obj=obj, action_name=failed_spec.name, recovery=False, phase="failed",
+                    parent_event_id=retry_event_id, error=retry_error,
+                )
+                self.memory.update(context, chosen_spec.name, success=False, actual_cost=actual_cost)
+                print(f'[LEARN ] {chosen_spec.name} did NOT recover {failed_spec.name}: {type(retry_error).__name__}')
+                error = retry_error
+                continue
+            else:
+                actual_cost = chosen_spec.cost + max(time.perf_counter() - started, 0.001)
+                self._record(
+                    obj=obj, action_name=failed_spec.name, recovery=False, phase="succeeded",
+                    parent_event_id=retry_event_id,
+                )
+                self.memory.update(context, chosen_spec.name, success=True, actual_cost=actual_cost)
+                print(f'[LEARN ] {chosen_spec.name} recovered {failed_spec.name}.')
+                return result
+        raise RuntimeError(
+            f"Failed to recover {failed_spec.name!r} "
+            f"after {self.max_recovery_attempts} attempts."
+        ) from error
+
+# --- SAM3 runtime (task-specific) -------------------------------------------
+@dataclass
+class SAM3Runtime:
+    """
+    Disposable process-local resources.
+
+    SmartEngine stores this object opaquely but does not understand it.
+    """
+    model: Any = None
+    frame: Any = None
+    infer_result: Any = None
+    current_frame: int | None = None
+
+    def clear_frame(self) -> None:
+        self.frame = None
+        self.infer_result = None
+        self.current_frame = None
+
+    def clear_all(self) -> None:
+        self.model = None
+        self.clear_frame()
+
+# --- SAM3 progress (task-specific) ------------------------------------------
+class SAM3Progress(BaseModel):
+    """
+    This is deliberately NOT part of SAM3Segmentation and NOT part
+    of SmartEngine.
+
+    The SAM3 author decides what resumable progress means.
+    """
+    next_frame: int = 0
+    completed: bool = False
+
+class SAM3ProgressStore:
+    """
+    SAM3-specific persistence semantics.
+
+    Another task can implement a completely different progress store.
+    """
+
+    def __init__(self, path: str | Path):
+        self.file = JSONFile(path)
+
+    def load(self, task_key: str) -> SAM3Progress:
+        data = self.file.read({'tasks': {}})
+        raw = data['tasks'].get(task_key)
+        if raw is None:
+            return SAM3Progress()
+        return SAM3Progress.model_validate(raw)
+
+    def save(self, task_key: str, progress: SAM3Progress) -> None:
+        data = self.file.read({'tasks': {}})
+        data['tasks'][task_key] = progress.model_dump(mode='json')
+        self.file.write(data)
+
+    def commit_frame(self, task_key: str, progress: SAM3Progress, frame_index: int) -> None:
+        progress.next_frame = frame_index + 1
+        self.save(task_key, progress)
+        print(f'[PROGRESS] next_frame={progress.next_frame}')
+
+    def mark_complete(self, task_key: str, progress: SAM3Progress) -> None:
+        progress.completed = True
+        self.save(task_key, progress)
+
+# --- SAM3 task model ---------------------------------------------------------
+class SAM3Segmentation(BaseModel):
+    """Ordinary SAM3 implementation. No SmartEngine/@action/recovery dependency."""
+    source: list[str] | str
+    sam3_model_path: str
+    prompt: str
+
+    _runtime: SAM3Runtime = PrivateAttr(default_factory=SAM3Runtime)
+    _random: random.Random = PrivateAttr(default_factory=random.Random)
+    _hard_crash_rate: float = PrivateAttr(default=0.0)
+
+    @property
+    def runtime(self) -> SAM3Runtime:
+        return self._runtime
+
+    def configure_simulation(self, *, seed: int | None=None, hard_crash_rate: float=0.0) -> 'SAM3Segmentation':
+        if seed is not None:
+            self._random.seed(seed)
+        self._hard_crash_rate = hard_crash_rate
+        return self
+
+    def _maybe_fail(self, operation: str, rate: float) -> None:
+        if self._random.random() >= rate:
+            return
+        exc_type = self._random.choice([RuntimeError, OSError, TimeoutError, FakeGPUError])
+        raise exc_type(f'simulated unknown error during {operation}')
+
+    def _maybe_hard_crash(self, operation: str, rate: float) -> None:
+        if rate > 0 and self._random.random() < rate:
+            print(f'\n[CRASH!] simulated hard crash during {operation}')
+            raise SimulatedHardCrash(f'hard crash during {operation}')
+
+    def load_sam3(self) -> None:
+        print(f'         pseudo load model {self.sam3_model_path!r}')
+        self._maybe_fail('load_sam3', 0.12)
+        self.runtime.model = {'path': self.sam3_model_path}
+
+    def read_frame(self, index: int) -> None:
+        self.runtime.current_frame = index
+        source_name = self.source[index] if isinstance(self.source, list) else self.source
+        print(f'         pseudo read frame {index}: {source_name}')
+        self._maybe_fail('read_frame', 0.18)
+        self.runtime.frame = {'index': index, 'source': source_name, 'pixels': f'<fake pixels {index}>'}
+        self.runtime.infer_result = None
+
+    def infer(self) -> dict[str, Any]:
+        if self.runtime.model is None:
+            raise RuntimeError('SAM3 model is missing from runtime')
+        if self.runtime.frame is None:
+            raise RuntimeError('frame is missing from runtime')
+        print(f'         pseudo infer frame {self.runtime.current_frame} prompt={self.prompt!r}')
+        self._maybe_fail('infer', 0.28)
+        self._maybe_hard_crash('infer', self._hard_crash_rate)
+        result = {
+            'frame_index': self.runtime.current_frame, 'prompt': self.prompt,
+            'mask_score': round(0.7 + self._random.random() * 0.29, 4),
+        }
+        self.runtime.infer_result = result
+        return result
+
+    def save_result(self, index: int) -> str:
+        if self.runtime.infer_result is None:
+            raise RuntimeError('no inference result to save')
+        output_dir = Path('demo_outputs_separated')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        task_key = json_hash(self.model_dump(mode='json'))
+        output_path = output_dir / f'{task_key[:12]}_frame_{index:06d}.json'
+        if output_path.exists():
+            print(f'         reuse existing output: {output_path}')
+            return str(output_path)
+        print(f'         pseudo save frame {index}: {output_path}')
+        self._maybe_fail('save_result', 0.1)
+        with output_path.open('w', encoding='utf-8') as f:
+            json.dump(self.runtime.infer_result, f, indent=2)
+        self._maybe_hard_crash('save_result_after_write', self._hard_crash_rate * 0.35)
+        return str(output_path)
+
+    def unload_sam3(self) -> None:
+        print('         pseudo unload SAM3')
+        self.runtime.clear_all()
+
+
+class SmartSAM3Segmentation(SAM3Segmentation):
+    """Same public API + SmartEngine actions/recovery. super().xxx() bypasses the engine."""
+
+    @action(cost=10)
+    def load_sam3(self) -> None:
+        return super().load_sam3()
+
+    @action(cost=2)
+    def read_frame(self, index: int) -> None:
+        return super().read_frame(index)
+
+    @action(cost=5)
+    def infer(self) -> dict[str, Any]:
+        return super().infer()
+
+    @action(cost=1)
+    def save_result(self, index: int) -> str:
+        return super().save_result(index)
+
+    @action(cost=1)
+    def unload_sam3(self) -> None:
+        return super().unload_sam3()
+
+    def can_retry(self, context: FailureContext) -> bool:
+        return True
+
+    def can_reread_frame(self, context: FailureContext) -> bool:
+        return context.failed_action in {'read_frame', 'infer'} and context.features.get('frame_index') is not None
+
+    def can_reload_model(self, context: FailureContext) -> bool:
+        return context.failed_action in {'load_sam3', 'infer'} and bool(self.sam3_model_path)
+
+    def can_restart_runtime(self, context: FailureContext) -> bool:
+        return context.failed_action in {'load_sam3', 'read_frame', 'infer'}
+
+    @action(recovery=True, cost=1, guard='can_retry', prior_success=0.45)
+    def retry(self, context: FailureContext) -> None:
+        print('         recovery: retry original action')
+
+    @action(recovery=True, cost=3, guard='can_reread_frame', prior_success=0.7)
+    def reread_frame(self, context: FailureContext) -> None:
+        index = context.features['frame_index']
+        print(f'         recovery: reread frame {index}')
+        return super().read_frame(index)
+
+    @action(recovery=True, cost=12, guard='can_reload_model', prior_success=0.85)
+    def reload_model(self, context: FailureContext) -> None:
+        print('         recovery: reload model')
+        self.runtime.model = None
+        return super().load_sam3()
+
+    @action(recovery=True, cost=30, guard='can_restart_runtime', prior_success=0.95)
+    def restart_runtime(self, context: FailureContext) -> None:
+        print('         recovery: rebuild runtime')
+        index = context.features.get('frame_index')
+        self.runtime.clear_all()
+        super().load_sam3()
+        if index is not None:
+            super().read_frame(index)
+
+# --- SAM3 recovery context ---------------------------------------------------
+def sam3_context_provider(
+    task: SAM3Segmentation, failed_spec: ActionSpec, error: Exception, runtime: SAM3Runtime
+) -> dict[str, Any]:
+    """
+    SmartEngine does not know what these features mean.
+
+    The task author chooses useful context for recovery learning.
+    """
+    if isinstance(task.source, list):
+        source_kind = 'images'
+        total = len(task.source)
+    else:
+        source_kind = 'video'
+        total = None
+    index = runtime.current_frame
+    if index is None or total is None or total == 0:
+        progress_bucket = 'unknown'
+    else:
+        ratio = index / total
+        if ratio < 0.25:
+            progress_bucket = '0-25%'
+        elif ratio < 0.5:
+            progress_bucket = '25-50%'
+        elif ratio < 0.75:
+            progress_bucket = '50-75%'
+        else:
+            progress_bucket = '75-100%'
+    return {
+        "frame_index": index, "source_kind": source_kind,
+        "progress_bucket": progress_bucket, "model_loaded": runtime.model is not None,
+        "frame_loaded": runtime.frame is not None, "result_available": runtime.infer_result is not None,
+    }
+
+# --- Task identity -----------------------------------------------------------
+def sam3_task_key(task: SAM3Segmentation) -> str:
+    """
+    The application chooses task identity semantics.
+
+    This demo hashes the declarative task specification.
+    """
+    return json_hash(task.model_dump(mode='json'))
+
+# --- Application workflow ----------------------------------------------------
+def run_sam3_job(task: SAM3Segmentation, *, progress_store: SAM3ProgressStore, task_key: str) -> None:
+    """
+    Notice:
+      - SmartEngine is not passed in.
+      - Progress is explicitly task-specific.
+      - No generic engine.iterate()/commit().
+      - The author controls resume semantics.
+    """
+    progress = progress_store.load(task_key)
+    if progress.completed:
+        print('\n[PROGRESS] task already complete.')
+        return
+    print(f'\n[PROGRESS] resume from frame {progress.next_frame}')
+    task.load_sam3()
+    if isinstance(task.source, list):
+        total_frames = len(task.source)
+    else:
+        total_frames = 8
+    for index in range(progress.next_frame, total_frames):
+        task.read_frame(index)
+        task.infer()
+        task.save_result(index)
+        progress_store.commit_frame(task_key, progress, index)
+    task.unload_sam3()
+    progress_store.mark_complete(task_key, progress)
+    print('\n=== SAM3 JOB COMPLETE ===')
+
+# --- Demo / supervisor -------------------------------------------------------
+def build_demo_task() -> SmartSAM3Segmentation:
+    return SmartSAM3Segmentation(
+        source=[f"{i:03d}.jpg" for i in range(1, 9)],
+        sam3_model_path="sam3_fake.pt", prompt="car",
+    )
+
+def reset_demo_files() -> None:
+    paths = [Path('sam3_progress.json'), Path('generic_action_events.json'), Path('generic_action_memory.json')]
+    for path in paths:
+        if path.exists():
+            path.unlink()
+    out = Path('demo_outputs_separated')
+    if out.exists():
+        for child in out.glob('*.json'):
+            child.unlink()
+
+def run_demo(*, reset: bool, hard_crash_rate: float, seed: int, max_process_restarts: int=20) -> None:
+    if reset:
+        reset_demo_files()
+    memory = JSONActionMemory('generic_action_memory.json')
+    recorder = MultiRecorder(ConsoleActionRecorder(), JSONActionRecorder('generic_action_events.json'))
+    progress_store = SAM3ProgressStore('sam3_progress.json')
+    for generation in range(max_process_restarts + 1):
+        task = build_demo_task().configure_simulation(
+            seed=seed + generation * 101, hard_crash_rate=hard_crash_rate,
+        )
+        task_key = sam3_task_key(task)
+        engine = SmartEngine(
+            task_key=task_key, runtime=task.runtime, recorder=recorder, memory=memory,
+            context_provider=sam3_context_provider, temperature=2.0,
+            max_recovery_attempts=12, random_seed=seed + generation * 101,
+        )
+        try:
+            with engine:
+                run_sam3_job(task, progress_store=progress_store, task_key=task_key)
+        except SimulatedHardCrash as exc:
+            print('\n========================================')
+            print('[SUPERVISOR] simulated process died:')
+            print(f'             {exc}')
+            print('[SUPERVISOR] SmartEngine has no progress state to restore.')
+            print('[SUPERVISOR] The SAM3-specific progress store decides where the new run resumes.')
+            print('========================================\n')
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError('Exceeded simulated process restart limit')
+    memory.pretty_print()
+    final_progress = progress_store.load(sam3_task_key(build_demo_task()))
+    print('\n=== TASK-SPECIFIC FINAL PROGRESS ===')
+    print(final_progress.model_dump_json(indent=2))
+
+# def main() -> None:
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--reset', action='store_true')
+#     parser.add_argument(
+#         "--hard-crash-rate", type=float, default=0.0,
+#         help="Try 0.05-0.10 to demonstrate task-specific crash resume.",
+#     )
+#     parser.add_argument('--seed', type=int, default=7)
+#     args = parser.parse_args()
+#     run_demo(reset=args.reset, hard_crash_rate=args.hard_crash_rate, seed=args.seed)
+# if __name__ == '__main__':
+#     main()
+
+```
+
+
+```
+from typing import List, Union
+from functools import wraps
+
+class DBStorage(ShelveStorage):
+    pass
+
+
+class SAM3SegmentationModel:
+    def __init__(self,
+                 source:Union[List[str],str], # list of image path or one mp4 path str
+                 sam3_model_path:str,
+                 prompt:str,
+                 current_cnt=0, # for resume to certain idx
+                 ) -> None:
+        self.FSMs_state=SAM3SegmentationFSMsController.SAM3SegmentationState.States.idle
+        self.source = source
+        self.current_cnt = current_cnt
+
+    # do not random gen id, for to identify file
+    @staticmethod
+    def gen_id(file_name,file_size,file_hash):
+        return f'{file_name},{file_size},{file_hash}'
     
+    def get_id(self):
+        pass
+    
+    def to_dict(self):
+        return self.__dict__
+    
+    def from_dict(self,data):
+        for k in self.__dict__.keys():
+            setattr(self,k,data[k])
+        return self
+
+    def is_video_src(self):
+        return isinstance(self.source,str)
+    
+class SAM3SegmentationFSMsController:
+    
+    class SAM3SegmentationState:
+        class States:
+            idle = 'idle'
+            loaded_model = 'loaded_model'
+            read_frame_stage = 'read_frame_stage'
+            infer_frame_stage = 'infer_frame_stage'
+            frame_complete = 'frame_complete'
+
+            error_read_frame = 'error_read_frame'
+            error_sam3_load_model = 'error_sam3_load_model'
+            error_sam3_infer = 'error_sam3_infer'
+            # error_other = 'error_other' # add more detailed errors will be better
+
+            all_complete = 'all_complete'
+        
+        _transitions = {
+            States.idle:                    [States.loaded_model],
+
+            States.loaded_model:            [States.read_frame_stage, States.error_sam3_load_model],
+            States.error_sam3_load_model:   [States.idle],
+
+            States.read_frame_stage:        [States.infer_frame_stage, States.error_read_frame],
+            States.error_read_frame:        [States.loaded_model, States.idle],
+            
+            States.infer_frame_stage:       [States.frame_complete, States.error_sam3_infer],
+            States.error_sam3_infer:        [States.read_frame_stage, States.idle],
+            
+            States.frame_complete:          [States.read_frame_stage, States.all_complete],
+
+        }
+        _states = list(_transitions.keys())
+
+
+    def __init__(self, model:'SAM3SegmentationModel'):
+        self.model = model
+        self.FSMs_STATES = SAM3SegmentationFSMsController.SAM3SegmentationState.States
+        self.transitions = SAM3SegmentationFSMsController.SAM3SegmentationState._transitions
+
+        # private placeholders
+        self._frame_array = None
+        self._sam3_model = None
+
+    def save_model(self):
+        DBStorage().set(self.model.get_id(),self.model.to_dict())
+        return self
+        
+    def delete_model(self):
+        return DBStorage().delete(self.model.get_id())
+    
+    def current_state(self):
+        return self.model.FSMs_state
+
+    def set_state(self,state):
+        self.model.FSMs_state=state
+        self.save_model()
+
+
+    ################## private part
+    @staticmethod
+    def _read_img_frame():pass
+    @staticmethod
+    def _read_video_frame():pass
+    @staticmethod
+    def _load_sam3():pass
+
+
+    ################## public FSMs part
+    def valid_transition(func:Callable):
+        @wraps(func)
+        def wrapper(self:'SAM3SegmentationFSMsController',
+                    *args, **kwargs):
+            valid_transitions = self.transitions[self.current_state()]
+            target_transition = func.__name__.replace('to_','')
+            if target_transition not in valid_transitions:
+                raise ValueError(f"Invalid transition from [{self.current_state()}] -> [{target_transition}]")
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(f'[{self.__class__.__name__}]: {e}')
+        return wrapper
+
+    @valid_transition
+    def to_idle(self):
+        self.set_state(self.FSMs_STATES.idle)
+
+    @valid_transition
+    def to_loaded_model(self):
+        try:
+            # try to load SAM3 model
+            pass        
+        except Exception as e:
+            self.to_error_sam3_load_model(f"{e}")
+            return
+
+        self.set_state(self.FSMs_STATES.loaded_model)
+
+    @valid_transition
+    def to_error_sam3_load_model(self, error_msg):
+        self.set_state(self.FSMs_STATES.error_sam3_load_model)
+
+    @valid_transition
+    def to_read_frame_stage(self):
+        try:
+            # try to read frame
+            if self.model.is_video_src():
+                pass
+            else:
+                img_path = self.model.source[self.model.current_cnt]
+                self._frame_array = cv2.imread(img_path)                    
+        except Exception as e:
+            self.to_error_read_frame(f"{e}")
+            return
+
+        # complete read frame
+        self.set_state(self.FSMs_STATES.read_frame_stage)
+
+    @valid_transition
+    def to_error_read_frame(self, error_msg):
+        self.set_state(self.FSMs_STATES.error_read_frame)
+
+    @valid_transition
+    def to_infer_frame_stage(self, img):
+        try:
+            # try to do SAM3 infer
+            pass        
+        except Exception as e:
+            self.to_error_sam3_infer(f"{e}")
+            return
+            
+        self.set_state(self.FSMs_STATES.infer_frame_stage)
+        self.to_frame_complete()
+
+    @valid_transition
+    def to_error_sam3_infer(self, error_msg):
+        self.set_state(self.FSMs_STATES.error_sam3_infer)
+           
+    @valid_transition
+    def to_frame_complete(self):
+        self.model.current_cnt += 1
+        
+        if self.model.is_video_src():
+            pass
+        else:
+            if self.model.current_cnt==len(self.model.source):
+                return self.to_all_complete()
+            
+        self.set_state(self.FSMs_STATES.frame_complete)
+        self.to_read_frame_stage()
+
+    @valid_transition
+    def to_all_complete(self):
+        self.set_state(self.FSMs_STATES.all_complete)
+
+    ################## public FSMs solver part
+    def find_path(self, transitions:dict, start_state, end_state):
+        queue = deque([[start_state]])    
+        visited = set()    
+        while queue:
+            path = queue.popleft()
+            state = path[-1]        
+            if state == end_state:
+                return path
+            if state not in visited:
+                visited.add(state)            
+                next_states = transitions.get(state, [])
+                for next_state in next_states:
+                    new_path = list(path)
+                    new_path.append(next_state)
+                    queue.append(new_path)
+        return []
+    
+    def resume_state(self,target_state, max_attempts=100,simulate_error=False):
+        print(f'Set target state: {target_state} ( current is {self.current_state()})')
+        def next_first_action(task:VideoConversionFSMsController.VideoConversionState.States
+                        ,target_state):
+            path = self.find_path(VideoConversionFSMsController.VideoConversionState._transitions, task, target_state)
+            if len(path)<=1: return None
+            return path[1]
+            
+        while self.current_state() != target_state:
+            cls = next_first_action(self.current_state(),target_state)
+            if cls is None:raise ValueError('no next acion! unreachable!')
+            if max_attempts<=0:raise ValueError(f'over max_attempts!')
+            print(f'Current: {self.current_state()}, try to_{cls}')
+            
+            if simulate_error and random.random()>0.3:
+                print('simulate some error!')
+                continue
+            
+            getattr(self,f'to_{cls}')()
+            max_attempts -= 1
+        print(f'Success to target state: {self.current_state()}')
+```
 
 ### Conclusion
 
-In this chapter, we moved from *concepts* to *real systems*, showing how resumable programming looks in practice when combined with storage, state machines, and MVC-style structure.
+The examples in this chapter demonstrate that resumable programming is not limited to one particular technology, framework, or type of application. The same basic idea can be applied to file uploads, media processing, AI inference, distributed services, and many other long-running or failure-prone tasks.
 
-Across the two case studies:
+Although these applications are very different, they share a common structure:
 
-1. **Resumable Large File Uploading Service (AWS Lambda + S3 + FastAPI)**
+```text
+Task
+  |
+  v
+Perform some work
+  |
+  v
+Save meaningful progress
+  |
+  v
+Continue
+  |
+  +---- failure ----> recover / restart
+                         |
+                         v
+                  restore progress
+                         |
+                         v
+                      continue
+```
 
-   * We used a **finite state machine** (`S3LargeUploadingState`) to model the lifecycle of a multipart upload:
-     `idle → receiving → received → merged` (with `*_failure` states for error handling).
-   * The **model** (`S3LargeUploadingModel`) holds all resumable state: file name, hash, upload_id, chunk_size, total_chunks, and uploaded parts.
-   * A **controller with FSM logic** (`S3LargeUploadingFSMsController`) encapsulates:
+The central principle is simple:
 
-     * Hard operations: calling S3 APIs, appending chunks, merging parts.
-     * Soft operations: updating in-memory state and persisting it via `DBStorage`.
-   * Persistent storage (MongoDB or Shelve) allows:
+> **Do not require a task to start from the beginning when enough information exists to continue from where it stopped.**
 
-     * AWS Lambda (or any short-lived process) to stop at any time.
-     * Another process / next call to *resume* from the last consistent state.
-   * On the client side (`index.html`), the browser:
+In the large-file upload example, this information is the list of successfully uploaded parts.
 
-     * Splits the file into chunks.
-     * Computes a hash to uniquely identify the upload.
-     * Calls `/start_upload/` and `/upload_chunk/` in a loop, trusting the backend’s FSM to figure out the *next action*.
+In the video conversion example, it is the number of frames that have already been processed.
 
-2. **Resumable Video File Conversion Service (Thumbnail Generator)**
+In the AI segmentation example, it is the next frame that needs to be processed.
 
-   * We modelled another FSM (`VideoConversionState`) with states:
-     `idle → resize_stage → complete_mp4` (with `error` for failures).
-   * The **model** (`VideoConversionModel`) records:
+The meaning of *progress* is therefore application-specific.
 
-     * A UUID for the task, original filename, total frame count.
-     * Thumbnail size, fps sampling ratio.
-     * Progress (`converted_count`), intermediate files (`*.bin`), final output path.
-   * The **controller + state** (`VideoConversionFSMsController` / `VideoConversionState`) manage:
+This is an important lesson. A generic resumability framework can provide useful mechanisms for persistence, recovery, retries, event recording, and state transitions, but it cannot automatically decide what progress means for every possible application.
 
-     * Resizing frames and appending them to a temporary binary file.
-     * Converting the binary frame dump into an MP4 thumbnail.
-     * Persisting progress to storage so that a crash or error only loses at most a small step.
-   * The `resume_state(target_state, simulate_error=...)` method shows the *core idea* of resumability:
+The application developer must define the **semantic checkpoint**.
 
-     * Given a target state (e.g., `complete_mp4`), repeatedly determine the next legal action (`find_path`) and run it.
-     * If an error occurs, store the error state, then let a later run continue from there.
+For example:
 
-Across both examples, the same pattern appears:
+```text
+File Upload
+    progress = uploaded parts
 
-* **State is explicit and externalized**
-  Nothing important lives only in RAM. All progress (chunks uploaded, frames processed, current FSM state) is stored in a database or filesystem.
+Video Conversion
+    progress = converted frame index
 
-* **FSMs define legal progress**
-  Transitions are whitelisted via `_transitions` and validated via decorators like `validate_transition` / `handle_errors`. This prevents illegal jumps and makes error handling explicit.
+AI Processing
+    progress = next frame to process
 
-* **Controllers own “hard operations”**
-  Anything that can fail or cause durable side effects (S3 writes, file writes, DB updates) lives in the controller, not in the model.
-  The model stays as a *data record*, not a place full of side effects.
+Database Migration
+    progress = last successfully migrated record
 
-* **Resumability = “drive toward a target state”**
-  Both `next_action(...)` (upload service) and `resume_state(...)` (video converter) implement the same philosophy:
+Web Crawler
+    progress = visited URLs + pending URLs
+```
 
-  > From the current state, find a valid path toward the goal, take one step, persist, repeat.
+Once this progress is stored persistently, the running process itself becomes much less important.
 
-This chapter demonstrates that **resumable programming is not magic**—it’s a disciplined combination of:
+A machine may restart.
 
-* Clear state design (FSMs),
-* Clean separation of concerns (MVC-like structure),
-* And reliable persistence (SQL / NoSQL / key-value storage).
+A container may disappear.
 
-Once you adopt this mindset, many long-running or failure-prone tasks—uploads, conversions, workflows, robot tasks, etc.—can be redesigned to be safely pausable and resumable.
+A network request may fail.
 
-### Additional Notes
+A GPU may run out of memory.
 
-* **Storage Choice Matters, but the Pattern Is Reusable**
-  We used `MongoDBStorage` and `ShelveStorage`, but the pattern works the same with:
+A worker may be replaced.
 
-  * Firestore, DynamoDB, Redis, PostgreSQL, etc.
-    As long as you can:
+But if the important state survives, another process can continue the work.
 
-  1. Save a model dict,
-  2. Look it up by a stable key (UUID, file-hash, etc.),
-  3. Update it atomically enough for your use case.
+This changes the way we think about reliability.
 
-* **Idempotency & Safety**
-  When making transitions resumable:
+Traditional programs are often designed around the lifetime of a process:
 
-  * Design each step so it can be retried without breaking data:
+```text
+start program
+    |
+    v
+perform work
+    |
+    v
+finish
+```
 
-    * Uploading a chunk at a known index,
-    * Writing a frame only once per `converted_count`,
-    * Avoiding “double-merge” or “double-complete”.
-  * Prefer “append” or “set by index/state” semantics instead of “blind overwrite”.
+A resumable system is designed around the lifetime of a **task** instead:
 
-* **Cleaning Up**
-  Resumable systems tend to accumulate:
+```text
+                 Persistent Task
+                       |
+          +------------+------------+
+          |            |            |
+          v            v            v
+      Process A    Process B    Process C
+          |            |            |
+        crash        restart      continue
+          |            |            |
+          +------------+------------+
+                       |
+                       v
+                    complete
+```
 
-  * Old records (unfinished uploads, failed conversions),
-  * Temporary files (`*.bin`, partial multipart uploads),
-  * Zombie states stuck in failure.
-    Consider:
-  * TTL (time-to-live) cleanup jobs,
-  * Admin tools to inspect and purge stale tasks,
-  * Automatic retries with a maximum attempt count.
+The task can therefore live longer than any individual process executing it.
 
-* **Observability**
-  Resumable tasks are much easier to reason about when you have:
+This is particularly valuable in modern computing environments. Cloud functions have execution limits, containers are disposable, distributed workers can fail, network connections are temporary, and AI workloads can consume significant amounts of computation.
 
-  * Logs that include the current state and target state,
-  * Metrics (e.g., number of tasks in `error`, average steps to reach `merged`),
-  * Simple admin views to show per-task FSM state.
+In such environments, interruption should be considered a normal operating condition rather than an exceptional event.
 
-* **Concurrency Considerations**
-  If multiple workers or processes may touch the same task:
-
-  * Add some form of locking (optimistic versioning, “claimed_by” fields, or distributed locks).
-  * Avoid two workers driving the same FSM at the same time unless you design for it explicitly.
-
-* **Security & Multi-Tenancy**
-  For production systems:
-
-  * Tie each resumable task (upload, conversion, etc.) to a user or tenant ID.
-  * Ensure only the owner can resume, query, or delete that task.
-  * Encrypt sensitive data where appropriate (file names, hashes, user IDs).
-
-* **Suggested Exercises for Readers**
-  To deepen your understanding, try:
-
-  1. **Add a “cancel” state**
-     Extend the S3 upload FSM with a `canceled` state and implement:
-
-     * S3 multipart abort,
-     * DB cleanup,
-     * Frontend “Cancel” button.
-
-  2. **Introduce Backoff & Retry Policies**
-     In both services, add a retry counter and exponential backoff for some transitions (like `_append_chunk` or `to_resize_stage`).
-
-  3. **Port to Another Backend**
-     Replace `ShelveStorage`/`MongoDBStorage` with:
-
-     * A Redis hash,
-     * Or a simple PostgreSQL table.
-       Keep the model/controller code mostly unchanged to feel the benefit of abstraction.
-
-  4. **Add a Monitoring Endpoint**
-     For the upload or video conversion service, create an endpoint like:
-
-     * `GET /status/<task_id>` returning current FSM state and progress percentage.
-
-By experimenting with these extensions, you’ll not only understand the examples in this chapter more deeply, but also be ready to design your own resumable systems—built on the same core ideas of **explicit state, controlled transitions, and persistent progress**.
+Resumable programming gives us a systematic way to design for that reality.
 
 ---
 
-## Chapter 10: Architectural Considerations for Resumability — Proposal
+Another important lesson from this chapter is that **resuming progress and recovering from errors are related, but they are not the same problem**.
+
+Consider an AI inference task.
+
+A progress store may tell us:
+
+```text
+next_frame = 350001
+```
+
+This tells the application **where to continue**.
+
+But suppose processing frame 350001 produces:
+
+```text
+CUDA out of memory
+```
+
+The progress store cannot decide whether the best response is to:
+
+```text
+clear temporary tensors
+```
+
+or:
+
+```text
+reload the model
+```
+
+or:
+
+```text
+restart the GPU runtime
+```
+
+These are recovery decisions.
+
+We can therefore think about a robust resumable architecture as having several separate responsibilities:
+
+```text
++--------------------------------------------------+
+|                  Application                     |
+|                                                  |
+|  Defines what the task means                     |
+|  Defines what successful progress means          |
++--------------------------+-----------------------+
+                           |
+                           v
++--------------------------------------------------+
+|               Progress / State Store             |
+|                                                  |
+|  Persists checkpoints                            |
+|  Restores task progress                          |
++--------------------------+-----------------------+
+                           |
+                           v
++--------------------------------------------------+
+|                  Recovery Logic                  |
+|                                                  |
+|  Detects failures                                |
+|  Selects recovery actions                        |
+|  Retries failed operations                       |
++--------------------------+-----------------------+
+                           |
+                           v
++--------------------------------------------------+
+|                    Runtime                       |
+|                                                  |
+|  Files / Network / CPU / GPU / Database / Cloud  |
++--------------------------------------------------+
+```
+
+Keeping these responsibilities separate makes the system easier to understand, test, extend, and reuse.
+
+The final AI example extends this idea further. Recovery does not necessarily have to follow a single hard-coded path. Different recovery actions can have different costs and different probabilities of success. By observing previous recovery attempts, a system can gradually learn which actions tend to work best under particular conditions.
+
+This suggests an evolution from simple resumable programs toward **adaptive resumable systems**:
+
+```text
+Checkpoint
+    +
+State Machine
+    +
+Error Handling
+    +
+Recovery Actions
+    +
+Recovery History
+    +
+Adaptive Decision Making
+```
+
+The important point, however, is that increasingly intelligent recovery does not remove the need for correct persistence.
+
+No matter how intelligent a recovery engine becomes, it still needs a reliable answer to one fundamental question:
+
+> **What work has already been completed successfully?**
+
+That question remains the foundation of resumable programming.
+
+The goal is therefore not to create software that never fails.
+
+Such software does not exist.
+
+The more practical goal is to create software in which failure does not automatically mean losing all previous work.
+
+A well-designed resumable system can fail, restart, restore its progress, recover its resources, and continue moving toward its target state.
+
+That is the essential idea explored throughout this chapter:
+
+> **Reliable software is not software that never stops. It is software that knows how to continue.**
+
+### Additional Notes
+
+- **FastAPI Documentation** ([fastapi.tiangolo.com](https://fastapi.tiangolo.com/)): FastAPI is used in the resumable large-file uploading example. Its official documentation provides detailed guidance on building APIs, handling uploaded files, validating requests, managing errors, and deploying Python web services.
+
+- **Amazon S3 Documentation** ([docs.aws.amazon.com/s3](https://docs.aws.amazon.com/s3/)): Amazon S3 provides multipart upload functionality that is particularly useful for large and resumable file transfers. The documentation explains multipart uploads, upload IDs, individual parts, completion operations, and failure handling.
+
+- **MongoDB Documentation** ([mongodb.com/docs](https://www.mongodb.com/docs/)): MongoDB is used in this chapter as one possible persistent backend for storing task state and progress. Its documentation covers document storage, update operations, indexing, transactions, replication, and other features useful when building larger resumable systems.
+
+- **OpenCV Documentation** ([docs.opencv.org](https://docs.opencv.org/)): OpenCV is used in the video-processing examples. Its documentation provides further information about reading videos, accessing individual frames, image resizing, video encoding, and other computer-vision operations that can be combined with resumable workflows.
+
+- **Pydantic Documentation** ([docs.pydantic.dev](https://docs.pydantic.dev/)): Pydantic is useful for defining structured task models, progress records, configuration objects, and persistent application data. It is especially helpful when resumable systems become large enough that explicit data validation and schema management are needed.
+
+- **AWS Step Functions** ([aws.amazon.com/step-functions](https://aws.amazon.com/step-functions/)): AWS Step Functions is a useful real-world reference for understanding state-based and long-running workflows. It demonstrates how tasks, retries, errors, branches, and workflow state can be coordinated across distributed cloud services.
+
+- **Temporal Documentation** ([docs.temporal.io](https://docs.temporal.io/)): Temporal is a workflow platform built around durable execution. It is an excellent resource for readers who want to explore how resumability, retries, persistent workflow state, timers, and failure recovery are handled in production-scale distributed systems.
+
+- **Celery Documentation** ([docs.celeryq.dev](https://docs.celeryq.dev/)): Celery is a widely used distributed task queue for Python. Its documentation provides practical examples of background jobs, retries, task states, workers, scheduling, and failure handling, making it a useful reference when extending the examples in this chapter into distributed applications.
+
+- **Finite-State Machine Concepts** ([Wikipedia — Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine)): Readers who want to deepen their understanding of the state-machine approach used throughout this chapter can review the fundamental concepts of states, transitions, events, and terminal states before designing more complicated resumable workflows.
+
+- **Segment Anything Research** ([Meta AI Research](https://ai.meta.com/research/)): The AI segmentation example demonstrates how expensive AI workloads can benefit from persistent progress and recovery. Meta AI's research resources provide further background on segmentation models and related computer-vision systems.
+
+---
+
+
+## Chapter 8: Testing Resumable Systems
+
+### Introduction
+
+Testing is one of the areas where resumable programming provides a surprisingly large advantage.
+
+At first, a resumable system may appear more complicated than an ordinary program because it contains:
+
+- persistent state,
+- checkpoints,
+- state transitions,
+- retry logic,
+- error states,
+- and recovery paths.
+
+However, these additional structures also make the behavior of the system much more explicit.
+
+Consider an ordinary long-running function:
+
+```python
+def process_everything():
+    load_data()
+    process_data()
+    save_result()
+    send_notification()
+```
+
+If an error occurs somewhere in the middle, testing all possible situations can become difficult.
+
+For example:
+
+```text
+What happens if load_data() succeeds,
+but process_data() fails?
+
+What happens if save_result() succeeds,
+but the process crashes immediately afterward?
+
+What happens if the program restarts?
+
+Which operations should run again?
+
+Which operations should not run again?
+```
+
+Much of the program's progress exists only implicitly inside the call stack and local variables.
+
+A resumable program changes this.
+
+Instead of representing a workflow as one large execution:
+
+```text
+A -> B -> C -> D
+```
+
+we explicitly represent its states and transitions:
+
+```text
+idle
+  |
+  v
+loaded
+  |
+  v
+processing
+  |
+  v
+saved
+  |
+  v
+complete
+```
+
+The transitions are usually implemented as ordinary functions:
+
+```python
+to_loaded()
+to_processing()
+to_saved()
+to_complete()
+```
+
+This produces an important consequence:
+
+> **Each transition can be tested independently as a normal function.**
+
+Even better, because the possible transitions are explicitly defined, we can automatically test the transition graph itself.
+
+We can also deliberately inject failures at different points and verify that the task can still restore its state and eventually reach the target state.
+
+Therefore, resumability does not only improve runtime reliability.
+
+It also improves **testability**.
+
+- Objectives
+    - test individual state transitions;
+    - automatically test valid and invalid transitions;
+    - test complete workflow paths;
+    - test persistent checkpoints and restoration;
+    - inject simulated failures;
+    - use randomized failures to explore many recovery cases;
+    - simulate hard crashes and process restarts;
+    - and verify that important system invariants remain correct throughout recovery.
+
+The key idea of this chapter is:
+
+> **If a workflow is explicitly represented as states and transitions, much of its behavior becomes finite, visible, and automatically testable.**
+
+
+### Section 1: State Transitions Make Natural Unit Tests
+
+Consider a simple task with the following states:
+
+```text
+idle
+  |
+  v
+prepared
+  |
+  v
+processing
+  |
+  v
+saved
+  |
+  v
+complete
+```
+
+We can represent this workflow as:
+
+```python
+class TaskState:
+
+    class States:
+        idle = "idle"
+        prepared = "prepared"
+        processing = "processing"
+        saved = "saved"
+        complete = "complete"
+
+    transitions = {
+        States.idle: [
+            States.prepared,
+        ],
+
+        States.prepared: [
+            States.processing,
+        ],
+
+        States.processing: [
+            States.saved,
+        ],
+
+        States.saved: [
+            States.complete,
+        ],
+
+        States.complete: [],
+    }
+```
+
+The legal workflow is now visible in one data structure.
+
+We know exactly which transitions should succeed:
+
+```text
+idle       -> prepared
+prepared   -> processing
+processing -> saved
+saved      -> complete
+```
+
+We also know which transitions should fail:
+
+```text
+idle       -> complete
+idle       -> saved
+prepared   -> complete
+saved      -> processing
+complete   -> anything
+```
+
+The state graph therefore acts almost like a testing specification.
+
+Now implement a simple controller:
+
+```python
+class TaskModel:
+
+    def __init__(self):
+        self.state = TaskState.States.idle
+        self.result = None
+
+
+class TaskController:
+
+    def __init__(self, model=None):
+        self.model = model or TaskModel()
+
+    def current_state(self):
+        return self.model.state
+
+    def set_state(self, state):
+        self.model.state = state
+
+    def transition_to(self, target):
+        current = self.current_state()
+
+        valid = TaskState.transitions[current]
+
+        if target not in valid:
+            raise ValueError(
+                f"Invalid transition: {current} -> {target}"
+            )
+
+        self.set_state(target)
+
+    def to_prepared(self):
+        self.transition_to(TaskState.States.prepared)
+
+    def to_processing(self):
+        self.transition_to(TaskState.States.processing)
+
+    def to_saved(self):
+        self.transition_to(TaskState.States.saved)
+
+    def to_complete(self):
+        self.transition_to(TaskState.States.complete)
+```
+
+Each transition is now a small function.
+
+Testing one transition is simple:
+
+```python
+def test_idle_to_prepared():
+
+    controller = TaskController()
+
+    assert controller.current_state() == "idle"
+
+    controller.to_prepared()
+
+    assert controller.current_state() == "prepared"
+```
+
+Another transition can be tested independently:
+
+```python
+def test_processing_to_saved():
+
+    controller = TaskController()
+
+    controller.set_state(
+        TaskState.States.processing
+    )
+
+    controller.to_saved()
+
+    assert controller.current_state() == "saved"
+```
+
+This is one of the important advantages of resumable programming.
+
+Instead of testing:
+
+```text
+one enormous workflow
+```
+
+we test:
+
+```text
+many small transitions
+```
+
+Each transition normally has:
+
+```text
+known starting state
+        +
+known action
+        +
+known expected state
+```
+
+This creates very clear unit tests.
+
+
+### Section 2: Automatically Testing the Whole State Graph
+
+Because the state machine already defines all allowed transitions, we do not need to write every test case manually.
+
+We can generate them automatically.
+
+First, generate every valid transition:
+
+```python
+VALID_TRANSITIONS = [
+    (start, target)
+    for start, targets in TaskState.transitions.items()
+    for target in targets
+]
+```
+
+Then use `pytest`:
+
+```python
+import pytest
+
+
+@pytest.mark.parametrize(
+    "start_state,target_state",
+    VALID_TRANSITIONS,
+)
+def test_all_valid_transitions(
+    start_state,
+    target_state,
+):
+
+    controller = TaskController()
+
+    controller.set_state(start_state)
+
+    controller.transition_to(target_state)
+
+    assert controller.current_state() == target_state
+```
+
+Now every declared transition is automatically tested.
+
+Suppose we later add:
+
+```text
+processing -> paused
+paused -> processing
+```
+
+and update the transition table:
+
+```python
+States.processing: [
+    States.saved,
+    States.paused,
+],
+
+States.paused: [
+    States.processing,
+],
+```
+
+those transitions automatically become part of the test suite.
+
+The workflow definition itself becomes test input.
+
+We can do the same thing for invalid transitions.
+
+```python
+ALL_STATES = list(
+    TaskState.transitions.keys()
+)
+
+INVALID_TRANSITIONS = []
+
+for start in ALL_STATES:
+
+    valid_targets = TaskState.transitions[start]
+
+    for target in ALL_STATES:
+
+        if target not in valid_targets:
+
+            INVALID_TRANSITIONS.append(
+                (start, target)
+            )
+```
+
+Then:
+
+```python
+@pytest.mark.parametrize(
+    "start_state,target_state",
+    INVALID_TRANSITIONS,
+)
+def test_all_invalid_transitions(
+    start_state,
+    target_state,
+):
+
+    controller = TaskController()
+
+    controller.set_state(start_state)
+
+    with pytest.raises(ValueError):
+        controller.transition_to(target_state)
+
+    assert controller.current_state() == start_state
+```
+
+Now we test both:
+
+```text
+all legal transitions
+```
+
+and:
+
+```text
+all illegal transitions
+```
+
+For the declared state graph, this can be exhaustive.
+
+This is an important distinction.
+
+Randomized testing can explore many runtime failures, but the finite transition graph itself can often be tested completely.
+
+We should also test complete workflow paths.
+
+```python
+def test_complete_workflow():
+
+    controller = TaskController()
+
+    controller.to_prepared()
+    controller.to_processing()
+    controller.to_saved()
+    controller.to_complete()
+
+    assert controller.current_state() == "complete"
+```
+
+Unit tests verify individual edges:
+
+```text
+A -> B
+```
+
+while integration tests verify paths:
+
+```text
+A -> B -> C -> D -> E
+```
+
+Both are important.
+
+
+
+
+### Section 3: Testing Persistent State and Resuming After Restart
+
+Testing transitions alone is not enough.
+
+A resumable system must also survive the loss of its runtime process.
+
+Consider a task that processes several items.
+
+```python
+class TaskModel:
+
+    def __init__(
+        self,
+        state="idle",
+        current_item=0,
+        total_items=10,
+        results=None,
+    ):
+        self.state = state
+        self.current_item = current_item
+        self.total_items = total_items
+        self.results = (
+            results if results is not None else {}
+        )
+
+    def to_dict(self):
+        return {
+            "state": self.state,
+            "current_item": self.current_item,
+            "total_items": self.total_items,
+            "results": self.results.copy(),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
+```
+
+For testing, we can use a lightweight storage implementation:
+
+```python
+class MemoryStorage:
+
+    def __init__(self):
+        self.data = {}
+
+    def save(self, key, value):
+        self.data[key] = value.copy()
+
+    def load(self, key):
+        value = self.data.get(key)
+
+        if value is None:
+            return None
+
+        return value.copy()
+```
+
+A real application may instead use:
+
+```text
+Shelve
+MongoDB
+PostgreSQL
+Redis
+DynamoDB
+Firestore
+S3
+```
+
+But the testing principle is the same.
+
+Now we can simulate a process restart:
+
+```python
+def test_resume_after_restart():
+
+    storage = MemoryStorage()
+
+    # First runtime
+    model = TaskModel(
+        state="processing",
+        current_item=4,
+    )
+
+    storage.save(
+        "task-001",
+        model.to_dict(),
+    )
+
+    # Old runtime disappears.
+    del model
+
+    # New runtime restores the task.
+    restored = TaskModel.from_dict(
+        storage.load("task-001")
+    )
+
+    assert restored.state == "processing"
+    assert restored.current_item == 4
+```
+
+This test asks an important question:
+
+> **Can a completely new runtime reconstruct enough information to continue the task?**
+
+Testing whether the same Python object can continue is not sufficient.
+
+True resumability means:
+
+```text
+old runtime disappears
+        |
+        v
+persistent state remains
+        |
+        v
+new runtime starts
+        |
+        v
+task continues
+```
+
+This is one of the most important tests in a resumable system.
+
+
+### Section 4: Failure Injection and Checkpoint Testing
+
+A resumable system should not wait for real production failures before its recovery logic is tested.
+
+Instead, we should create failures deliberately.
+
+Define a simulated error:
+
+```python
+class SimulatedError(RuntimeError):
+    pass
+```
+
+A simple function can then expose an artificial failure:
+
+```python
+def process_item(simulate_error=False):
+
+    if simulate_error:
+        raise SimulatedError(
+            "Simulated processing failure"
+        )
+
+    return "success"
+```
+
+And test it:
+
+```python
+def test_simulated_failure():
+
+    with pytest.raises(SimulatedError):
+        process_item(
+            simulate_error=True
+        )
+```
+
+For larger systems, adding `simulate_error=True` to every function becomes inconvenient.
+
+A reusable failure injector is better:
+
+```python
+import random
+
+
+class FailureInjector:
+
+    def __init__(
+        self,
+        probability=0.0,
+        seed=None,
+    ):
+        self.probability = probability
+        self.random = random.Random(seed)
+
+    def check(self, location):
+
+        if self.random.random() < self.probability:
+
+            raise SimulatedError(
+                f"Simulated failure at: {location}"
+            )
+```
+
+Now we can add explicit failure points:
+
+```python
+def process_one(
+    model,
+    storage,
+    failure_injector,
+):
+
+    index = model.current_item
+
+    failure_injector.check(
+        "before_processing"
+    )
+
+    result = index * 10
+
+    failure_injector.check(
+        "before_saving_result"
+    )
+
+    model.results[index] = result
+    model.current_item += 1
+
+    storage.save(
+        "task-001",
+        model.to_dict(),
+    )
+
+    failure_injector.check(
+        "after_checkpoint"
+    )
+```
+
+The location of a failure matters.
+
+Consider:
+
+```text
+perform work
+    |
+    v
+save result
+    |
+    v
+update checkpoint
+```
+
+If the program crashes before doing the work:
+
+```text
+CRASH
+  |
+  v
+perform work
+```
+
+nothing has been completed, so retrying is simple.
+
+If the work succeeds but the checkpoint is not saved:
+
+```text
+perform work
+    |
+    v
+CRASH
+    |
+    X
+checkpoint
+```
+
+the operation may run again after restart.
+
+This is why idempotent operations are extremely useful.
+
+If the checkpoint is saved and the program crashes afterward:
+
+```text
+perform work
+    |
+    v
+checkpoint
+    |
+    v
+CRASH
+```
+
+the new runtime should load the checkpoint and continue with the next operation.
+
+Failure injection makes these normally difficult situations easy to reproduce.
+
+
+### Section 5: Randomized Failure Testing
+
+We can now extend failure injection into randomized testing.
+
+For example:
+
+```python
+failure = FailureInjector(
+    probability=0.20,
+    seed=123,
+)
+```
+
+Every call to:
+
+```python
+failure.check(...)
+```
+
+now has a 20% probability of raising a simulated error.
+
+During one execution, failures might occur like this:
+
+```text
+item 3   -> failure before processing
+item 7   -> failure before checkpoint
+item 15  -> failure after checkpoint
+item 18  -> failure before processing
+item 31  -> failure after checkpoint
+```
+
+Another random seed produces a different sequence.
+
+We can automatically restart the task whenever a simulated failure occurs.
+
+```python
+def run_with_restarts(
+    storage,
+    failure,
+    max_restarts=1000,
+):
+
+    task_key = "task-001"
+
+    if storage.load(task_key) is None:
+
+        model = TaskModel(
+            state="processing",
+            current_item=0,
+            total_items=20,
+        )
+
+        storage.save(
+            task_key,
+            model.to_dict(),
+        )
+
+    for restart_count in range(max_restarts):
+
+        model = TaskModel.from_dict(
+            storage.load(task_key)
+        )
+
+        try:
+
+            while (
+                model.current_item
+                < model.total_items
+            ):
+
+                process_one(
+                    model,
+                    storage,
+                    failure,
+                )
+
+            model.state = "complete"
+
+            storage.save(
+                task_key,
+                model.to_dict(),
+            )
+
+            return model
+
+        except SimulatedError as e:
+
+            print(
+                f"restart={restart_count}, "
+                f"error={e}"
+            )
+
+            # The runtime is considered lost.
+            # A new one will restore from storage.
+            continue
+
+    raise RuntimeError(
+        "Task did not finish "
+        "within restart limit."
+    )
+```
+
+The test becomes:
+
+```python
+def test_random_failures():
+
+    storage = MemoryStorage()
+
+    failure = FailureInjector(
+        probability=0.20,
+        seed=123,
+    )
+
+    result = run_with_restarts(
+        storage,
+        failure,
+    )
+
+    assert result.state == "complete"
+    assert result.current_item == 20
+    assert len(result.results) == 20
+```
+
+The important result is not that no error occurred.
+
+Many errors may occur.
+
+What matters is:
+
+```text
+errors occurred
+      +
+runtime restarted
+      +
+state restored
+      +
+work continued
+      =
+task completed correctly
+```
+
+This is exactly what a resumable system is designed to achieve.
+
+We can run many different failure patterns:
+
+```python
+@pytest.mark.parametrize(
+    "seed",
+    range(100),
+)
+def test_many_random_failure_patterns(seed):
+
+    storage = MemoryStorage()
+
+    failure = FailureInjector(
+        probability=0.20,
+        seed=seed,
+    )
+
+    result = run_with_restarts(
+        storage,
+        failure,
+    )
+
+    assert result.state == "complete"
+    assert result.current_item == 20
+
+    assert result.results == {
+        i: i * 10
+        for i in range(20)
+    }
+```
+
+Now the system executes under:
+
+```text
+seed 0
+seed 1
+seed 2
+...
+seed 99
+```
+
+Each seed gives us a different deterministic failure sequence.
+
+This can expose problems such as:
+
+```text
+failure immediately after checkpoint
+
+multiple consecutive failures
+
+failure during the first operation
+
+failure near completion
+
+failure after repeated resumptions
+```
+
+Randomized testing cannot mathematically prove that every possible runtime failure has been tested.
+
+However, it can explore a very large number of combinations automatically.
+
+
+### Section 6: Reproducible Random Tests and Invariants
+
+Random testing should never mean unreproducible testing.
+
+This is why the previous examples use:
+
+```python
+seed=123
+```
+
+Suppose continuous integration reports:
+
+```text
+test_many_random_failure_patterns[73] FAILED
+```
+
+We know exactly which sequence caused the failure.
+
+We can reproduce it:
+
+```python
+failure = FailureInjector(
+    probability=0.20,
+    seed=73,
+)
+```
+
+A useful randomized test should record:
+
+```text
+random seed
+failure location
+current state
+current progress
+exception type
+```
+
+For example:
+
+```text
+seed=73
+state=processing
+current_item=14
+failure_location=after_checkpoint
+exception=SimulatedError
+```
+
+This turns a random failure into a deterministic debugging case.
+
+We should also verify more than the final result.
+
+A resumable system has important **invariants** that should remain true even after failure.
+
+For example:
+
+```text
+current_item >= 0
+
+current_item <= total_items
+
+every item before current_item has a result
+
+completed task ->
+current_item == total_items
+```
+
+We can express them directly:
+
+```python
+def assert_task_invariants(model):
+
+    assert model.current_item >= 0
+
+    assert (
+        model.current_item
+        <= model.total_items
+    )
+
+    for i in range(
+        model.current_item
+    ):
+        assert i in model.results
+
+    if model.state == "complete":
+
+        assert (
+            model.current_item
+            == model.total_items
+        )
+```
+
+Now test the state after every failure:
+
+```python
+for restart in range(1000):
+
+    model = TaskModel.from_dict(
+        storage.load("task-001")
+    )
+
+    assert_task_invariants(model)
+
+    try:
+
+        continue_task(model)
+
+    except SimulatedError:
+
+        restored = TaskModel.from_dict(
+            storage.load("task-001")
+        )
+
+        assert_task_invariants(
+            restored
+        )
+
+        continue
+
+    break
+```
+
+This is stronger than asking only:
+
+```text
+Did the task eventually complete?
+```
+
+We also ask:
+
+```text
+Was the persisted state correct after every failure?
+```
+
+That is a much stronger reliability test.
+
+
+
+### Section 7: Testing Hard Crashes and Recovery Functions
+
+Ordinary exceptions are not the only possible failures.
+
+Sometimes the process disappears without application code having an opportunity to catch the error.
+
+We can simulate this with:
+
+```python
+class SimulatedHardCrash(BaseException):
+    pass
+```
+
+Why use `BaseException` instead of `Exception`?
+
+Because application code often contains:
+
+```python
+try:
+    ...
+except Exception:
+    ...
+```
+
+A custom `BaseException` can bypass those normal handlers.
+
+Therefore:
+
+```python
+raise SimulatedHardCrash()
+```
+
+can imitate situations such as:
+
+```text
+process termination
+container restart
+native-library crash
+machine restart
+```
+
+For example:
+
+```python
+def maybe_hard_crash(
+    random_generator,
+    probability,
+):
+
+    if (
+        random_generator.random()
+        < probability
+    ):
+        raise SimulatedHardCrash(
+            "Simulated process death"
+        )
+```
+
+A supervisor can then recreate the task:
+
+```python
+try:
+
+    run_task()
+
+except SimulatedHardCrash:
+
+    # Old runtime is gone.
+    # Create a new runtime and restore progress.
+    restart_task()
+```
+
+This verifies the most important architectural property:
+
+```text
+runtime may disappear
+```
+
+while:
+
+```text
+persistent progress survives
+```
+
+Recovery actions themselves can also be tested independently.
+
+For example:
+
+```python
+def clear_cache():
+    ...
+
+def reconnect_database():
+    ...
+
+def reload_model():
+    ...
+
+def restart_runtime():
+    ...
+```
+
+Suppose an AI service has:
+
+```python
+def reload_model(self):
+    self.runtime.model = None
+    self.load_model()
+```
+
+The test is straightforward:
+
+```python
+def test_reload_model():
+
+    service = FakeAIService()
+
+    old_model = service.runtime.model
+
+    service.reload_model()
+
+    assert service.runtime.model is not None
+    assert service.runtime.model is not old_model
+```
+
+This is another benefit of separating:
+
+```text
+persistent progress
+recovery behavior
+runtime resources
+```
+
+Each responsibility can be tested independently.
+
+
+### Section 8: Applying the Method to Real Resumable Systems
+
+The same testing strategy can be applied to the practical examples from the previous chapter.
+
+#### Large File Upload
+
+A large-file upload task may store:
+
+```text
+upload_id
+parts
+total_chunks
+state
+```
+
+Useful invariants include:
+
+```python
+assert len(parts) <= total_chunks
+```
+
+and:
+
+```python
+for index, part in enumerate(
+    parts,
+    start=1,
+):
+    assert (
+        part["PartNumber"]
+        == index
+    )
+```
+
+Possible failure points include:
+
+```text
+before upload_part()
+
+after upload_part()
+
+before recording ETag
+
+after recording ETag
+
+before complete_multipart_upload()
+
+after complete_multipart_upload()
+```
+
+The test repeatedly restarts the controller until the expected final state is reached:
+
+```text
+all chunks uploaded
+
+parts are correct
+
+no required chunk is missing
+
+final object is complete
+
+state == merged
+```
+
+#### Video Conversion
+
+For video conversion, progress may contain:
+
+```text
+converted_count
+total_count
+state
+```
+
+Useful invariants include:
+
+```python
+assert converted_count >= 0
+assert converted_count <= total_count
+```
+
+When complete:
+
+```python
+assert converted_count == total_count
+```
+
+Possible simulated failures include:
+
+```text
+before reading frame
+
+after reading frame
+
+before resizing
+
+after resizing
+
+before writing output
+
+after writing output
+
+before checkpoint
+
+after checkpoint
+```
+
+The test repeatedly:
+
+```text
+runs
+fails
+restores
+continues
+```
+
+until:
+
+```text
+state == complete_mp4
+```
+
+#### AI Processing
+
+AI workloads are particularly suitable for this approach because they may encounter:
+
+```text
+CUDA out of memory
+
+model loading failure
+
+corrupted image
+
+video decoding error
+
+GPU runtime failure
+
+result-writing failure
+```
+
+Persistent progress may be as simple as:
+
+```text
+next_frame = 350001
+```
+
+while runtime resources may include:
+
+```text
+model
+frame
+inference result
+GPU memory
+```
+
+Recovery actions might include:
+
+```text
+clear_frame
+
+clear_cache
+
+reload_model
+
+restart_runtime
+```
+
+Random failures can be injected into:
+
+```text
+load model
+
+read frame
+
+run inference
+
+save result
+
+checkpoint progress
+```
+
+The test can then verify:
+
+```text
+committed work is not lost
+
+progress remains valid
+
+results correspond to committed progress
+
+recovery does not corrupt state
+
+task eventually completes
+```
+
+The same idea can also scale from unit testing to larger fault-injection systems.
+
+At the smallest level:
+
+```text
+raise SimulatedError()
+```
+
+At a larger level:
+
+```text
+terminate worker process
+```
+
+At an even larger level:
+
+```text
+disconnect network
+
+restart database
+
+kill container
+
+remove worker
+
+delay messages
+
+make storage temporarily unavailable
+```
+
+This connects resumable-system testing with ideas such as:
+
+```text
+fault injection
+chaos testing
+chaos engineering
+```
+
+The scale changes, but the principle remains the same:
+
+> **Create failures deliberately and verify that the system preserves valid progress and continues correctly.**
+
+
+### Conclusion
+
+At first glance, adding explicit state, checkpoints, error states, and recovery logic may seem to make a program more complicated.
+
+From the perspective of testing, however, these structures can make the system easier to reason about.
+
+Instead of one large operation:
+
+```text
+do everything
+```
+
+we have:
+
+```text
+state
+  +
+transition
+  +
+checkpoint
+  +
+recovery
+```
+
+A transition is usually an ordinary function.
+
+Therefore, it can be unit tested.
+
+The transition graph is explicit.
+
+Therefore, all declared valid and invalid transitions can be tested automatically.
+
+Progress is persistent.
+
+Therefore, we can destroy the runtime and verify that a new runtime restores the task correctly.
+
+Failures are expected.
+
+Therefore, we can deliberately inject them.
+
+And because simulated failures are inexpensive, we can run the same workflow hundreds or thousands of times using different failure sequences.
+
+The core idea can be summarized as:
+
+```text
+Explicit States
+      +
+Small Transition Functions
+      +
+Persistent Checkpoints
+      +
+Failure Injection
+      +
+Automatic Restart
+      =
+Highly Testable Resumable System
+```
+
+There are two especially powerful forms of testing here.
+
+The first is **exhaustive transition testing**:
+
+```text
+all valid transitions
++
+all invalid transitions
+```
+
+The second is **randomized failure testing**:
+
+```text
+many failure positions
++
+many retry sequences
++
+many restart sequences
+```
+
+The transition graph is finite, so it can often be tested completely.
+
+Runtime failure combinations may be much larger, so random failure injection helps explore them automatically.
+
+Together, these approaches provide strong confidence in the behavior of a resumable system.
+
+More importantly, they change our attitude toward failure.
+
+Instead of asking:
+
+> **Will this system work if nothing goes wrong?**
+
+we can ask:
+
+> **How many things can we deliberately make go wrong while the system still completes correctly?**
+
+That is a much stronger test of reliability.
+
+A well-designed resumable system should repeatedly demonstrate that it can:
+
+```text
+run
+fail
+restore
+recover
+continue
+complete
+```
+
+And because those behaviors are explicit parts of the architecture, they can themselves become ordinary automated tests.
+
+### Additional Notes
+
+- **Pytest Documentation** ([docs.pytest.org](https://docs.pytest.org/)): Pytest is a popular Python testing framework and works particularly well for testing state transitions, parameterized transition tables, exceptions, fixtures, and repeated test cases.
+
+- **Python `unittest` Documentation** ([docs.python.org/3/library/unittest.html](https://docs.python.org/3/library/unittest.html)): Python's built-in `unittest` framework provides test cases, assertions, setup and teardown mechanisms, and mocking support without requiring an additional testing package.
+
+- **Hypothesis** ([hypothesis.readthedocs.io](https://hypothesis.readthedocs.io/)): Hypothesis is a property-based testing framework for Python. Instead of manually specifying every input, developers describe properties that should remain true and Hypothesis automatically generates many test cases. This approach fits especially well with state-machine invariants and resumable-system testing.
+
+- **Hypothesis Stateful Testing** ([hypothesis.readthedocs.io/en/latest/stateful.html](https://hypothesis.readthedocs.io/en/latest/stateful.html)): Hypothesis provides dedicated support for rule-based state-machine testing. This is particularly relevant to resumable programming because state transitions and invariants can be expressed directly and automatically explored through many action sequences.
+
+- **Coverage.py** ([coverage.readthedocs.io](https://coverage.readthedocs.io/)): Coverage.py measures which parts of Python code are executed by tests. It is useful for checking whether transition functions, failure states, and recovery paths are actually exercised.
+
+- **Python `random` Documentation** ([docs.python.org/3/library/random.html](https://docs.python.org/3/library/random.html)): Python's random-number utilities can create reproducible simulated failures. Recording and reusing the random seed is especially important when randomized testing discovers a failure.
+
+- **Python `unittest.mock` Documentation** ([docs.python.org/3/library/unittest.mock.html](https://docs.python.org/3/library/unittest.mock.html)): Mock objects are useful for simulating databases, network APIs, cloud services, GPUs, file systems, and other dependencies without requiring real external failures.
+
+- **Principles of Chaos Engineering** ([principlesofchaos.org](https://principlesofchaos.org/)): Chaos engineering extends failure injection from unit tests to complete running systems. It deliberately introduces failures to verify that distributed applications remain reliable and recover correctly.
+
+---
+
+## Chapter 9: Architectural Considerations for Resumability
 
 ### Introduction
 
@@ -7424,15 +10057,6 @@ This checklist should give you a concrete “How”:
 
 
 
-## Chapter 11: State Management Techniques
-- (Newly added chapter)
-
-## Chapter 13: The Role of AI in Enhancing Resumability
-- (Newly added chapter)
-
-## Chapter 12: Global Trends and Future Directions
-- (Newly added chapter)
-
 ---
 ## Conclusion (of this Book)
 
@@ -7449,27 +10073,6 @@ This checklist should give you a concrete “How”:
 - Reflect on the journey of reading the book and the transformative potential of adopting resumable programming practices.
 
 ## Closing
-- Thank readers and invite them to engage further through online communities and forums.
-
----
-## Fast References
-
-### Quick Tips
-- Provide bullet points of handy tips and best practices for quick reference.
-
-### Glossary
-- Define technical terms and jargon used throughout the book.
-
-### Further Reading
-- Recommend books, articles, and papers that expand on topics covered.
-
-### Online Resources
-- List websites, forums, and online courses for continued learning.
-
-### Tools and Utilities
-- Detail software tools and utilities that support the development of resumable programs.
-
-### FAQs
-- Address common questions and misconceptions about resumable programming.
+- Thank readers.
 
 
